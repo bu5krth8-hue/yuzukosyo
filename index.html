@@ -71,18 +71,27 @@
     <section class="cards two-col">
       <article class="card x-timeline-card">
         <h2>𝕏 柚胡椒の最新ポスト</h2>
-        <p class="x-timeline-note">Xの投稿をここに表示します。</p>
-        <div class="x-timeline-box">
+        <p class="x-timeline-note">Xの最新投稿をここに表示します。</p>
+
+        <div class="x-timeline-box" id="xTimelineBox">
           <a
             class="twitter-timeline"
             data-theme="dark"
+            data-height="380"
+            data-width="100%"
+            data-dnt="true"
             data-chrome="noheader nofooter noborders transparent"
-            data-height="360"
-            href="https://x.com/yuzukosyo1106"
+            href="https://twitter.com/yuzukosyo1106?ref_src=twsrc%5Etfw"
           >
-            柚胡椒のXを見る
+            Tweets by yuzukosyo1106
           </a>
+
+          <div class="x-fallback" id="xFallback">
+            <p>投稿が表示されない場合は、X側で開いて確認できます。</p>
+            <a href="https://x.com/yuzukosyo1106" target="_blank" rel="noopener">Xで柚胡椒を見る →</a>
+          </div>
         </div>
+
         <a class="mini-btn" href="https://x.com/yuzukosyo1106" target="_blank" rel="noopener">Xで開く →</a>
       </article>
 
@@ -127,8 +136,28 @@
     </div>
     <p>© 2026 柚胡椒の秘密基地 All Rights Reserved.</p>
   </footer>
-
-  <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
   <script src="script.js"></script>
+  <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+  <script>
+    window.addEventListener("load", function () {
+      const fallback = document.getElementById("xFallback");
+
+      function showFallbackIfNeeded() {
+        const box = document.getElementById("xTimelineBox");
+        if (!box || !fallback) return;
+
+        const iframe = box.querySelector("iframe");
+        if (!iframe) {
+          fallback.classList.add("is-visible");
+        }
+      }
+
+      if (window.twttr && window.twttr.widgets) {
+        window.twttr.widgets.load();
+      }
+
+      setTimeout(showFallbackIfNeeded, 3500);
+    });
+  </script>
 </body>
 </html>
