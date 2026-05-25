@@ -599,3 +599,36 @@ footer{position:relative;z-index:2;text-align:center;padding:28px 0 50px;color:v
     grid-template-columns:1fr;
   }
 }
+
+
+/* ===== center align schedule + quote ===== */
+.schedule-wide-card h2,
+.schedule-wide-card .schedule-status,
+.schedule-wide-card .schedule-note,
+.schedule-wide-card .mini-btn{
+  text-align:center;
+}
+
+.schedule-wide-card .mini-btn{
+  display:flex;
+  margin:18px auto 0;
+}
+
+.schedule-wide-card .schedule-list li{
+  text-align:center;
+}
+
+.schedule-wide-card .schedule-date,
+.schedule-wide-card .schedule-title,
+.schedule-wide-card .schedule-category{
+  text-align:center;
+}
+
+.daily-word-card h2,
+.daily-word-card .daily-word-note{
+  text-align:center;
+}
+
+.daily-word-box{
+  text-align:center;
+}
