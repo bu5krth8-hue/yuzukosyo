@@ -1,18 +1,9 @@
 export async function onRequest(context) {
-  const CLIENT_ID =
-    context.env?.TWITCH_CLIENT_ID ||
-    globalThis.TWITCH_CLIENT_ID ||
-    "";
+  const env = context.env || {};
 
-  const CLIENT_SECRET =
-    context.env?.TWITCH_CLIENT_SECRET ||
-    globalThis.TWITCH_CLIENT_SECRET ||
-    "";
-
-  const CHANNEL_LOGIN =
-    context.env?.TWITCH_CHANNEL_LOGIN ||
-    globalThis.TWITCH_CHANNEL_LOGIN ||
-    "yuzukosyo07";
+  const CLIENT_ID = String(env.TWITCH_CLIENT_ID || "").trim();
+  const CLIENT_SECRET = String(env.TWITCH_CLIENT_SECRET || "").trim();
+  const CHANNEL_LOGIN = String(env.TWITCH_CHANNEL_LOGIN || "yuzukosyo07").trim();
 
   if (!CLIENT_ID || !CLIENT_SECRET) {
     return json({
@@ -25,7 +16,8 @@ export async function onRequest(context) {
       debug: {
         hasClientId: Boolean(CLIENT_ID),
         hasClientSecret: Boolean(CLIENT_SECRET),
-        channelLogin: CHANNEL_LOGIN
+        channelLogin: CHANNEL_LOGIN,
+        envKeys: Object.keys(env)
       }
     });
   }
@@ -73,7 +65,7 @@ export async function onRequest(context) {
 
     const commonHeaders = {
       "Client-ID": CLIENT_ID,
-      "Authorization": `Bearer ${accessToken}`
+      Authorization: `Bearer ${accessToken}`
     };
 
     const userResponse = await fetch(
@@ -145,6 +137,7 @@ export async function onRequest(context) {
 
       if (scheduleResponse.ok) {
         const scheduleData = await scheduleResponse.json();
+
         const segments =
           scheduleData.data && Array.isArray(scheduleData.data.segments)
             ? scheduleData.data.segments
@@ -161,6 +154,7 @@ export async function onRequest(context) {
         }));
       } else {
         const text = await scheduleResponse.text();
+
         scheduleConfigured = false;
         scheduleMessage = `Twitch配信予定を取得できませんでした: ${scheduleResponse.status} ${text}`;
       }
