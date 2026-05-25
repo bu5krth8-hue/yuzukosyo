@@ -1,241 +1,601 @@
-export async function onRequest(context) {
-  const env = context.env || {};
+:root{
+  --bg:#05020a;--panel:rgba(21,8,38,.78);--panel2:rgba(9,4,18,.72);--purple:#a855f7;--purple2:#d8b4fe;--blue:#70d6ff;--red:#ff425f;--text:#f7ecff;--muted:#c7b7dd;--line:rgba(190,120,255,.45)
+}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;min-height:100vh;color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP","Segoe UI",sans-serif;background:radial-gradient(circle at top,rgba(126,34,206,.22),transparent 34rem),radial-gradient(circle at 15% 45%,rgba(80,170,255,.14),transparent 28rem),linear-gradient(180deg,#07020d 0%,#090315 48%,#030006 100%);overflow-x:hidden}body:before{content:"";position:fixed;inset:0;pointer-events:none;background:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:48px 48px;mask-image:linear-gradient(to bottom,black,transparent 92%)}
+.cursor-light{position:fixed;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(168,85,247,.22),transparent 65%);pointer-events:none;z-index:1;transform:translate(-50%,-50%);opacity:.65}.stars:before,.stars:after{content:"✦  ✧     ✦    ✧  ✦       ✧     ✦";position:fixed;left:0;right:0;top:20px;color:rgba(216,180,254,.8);letter-spacing:42px;font-size:15px;animation:twinkle 4s ease-in-out infinite alternate;pointer-events:none}.stars:after{top:52%;opacity:.55;animation-duration:6s;transform:scale(.85)}@keyframes twinkle{from{opacity:.25}to{opacity:.85}}.bg-glow{position:fixed;width:360px;height:360px;border-radius:50%;filter:blur(80px);opacity:.28;pointer-events:none}.glow-a{background:#7c3aed;left:-120px;top:130px}.glow-b{background:#ef4444;right:-120px;top:190px}
+.topbar{position:fixed;top:18px;left:18px;right:18px;z-index:10;display:flex;justify-content:space-between;align-items:center;pointer-events:none}.topbar>*{pointer-events:auto}.menu,.schedule-btn,.top-status{border:1px solid var(--line);background:rgba(20,8,32,.75);color:var(--purple2);border-radius:18px;box-shadow:0 0 18px rgba(168,85,247,.25);backdrop-filter:blur(12px)}.menu{width:52px;height:52px;font-size:28px}.top-status{padding:13px 18px;font-weight:900;letter-spacing:.05em}.schedule-btn{text-decoration:none;padding:15px 20px;font-weight:900;transition:.18s ease}.schedule-btn:hover{transform:translateY(-2px) scale(1.04);box-shadow:0 0 28px rgba(168,85,247,.55)}.schedule-btn.is-live{border-color:rgba(255,66,95,.95);color:#ffd1d9;box-shadow:0 0 30px rgba(255,66,95,.65);animation:bellShake 1.8s infinite}@keyframes bellShake{0%,80%,100%{transform:rotate(0)}84%{transform:rotate(-4deg)}88%{transform:rotate(4deg)}92%{transform:rotate(-3deg)}}
+.page{width:min(1080px,92vw);margin:0 auto;padding:70px 0 28px;position:relative;z-index:2}.hero{text-align:center;padding:22px 0 14px}.eyebrow{letter-spacing:9px;color:var(--muted);font-weight:900;margin:38px 0 6px}.logo-image-wrap{display:block;margin:8px auto 18px;width:min(720px,92vw);line-height:0;filter:drop-shadow(0 0 18px rgba(216,180,254,.56)) drop-shadow(0 0 42px rgba(168,85,247,.42))}.site-logo-image{width:100%;height:auto;display:block;border-radius:18px;mix-blend-mode:screen}.catchcopy{font-size:clamp(18px,2.4vw,28px);font-weight:1000;margin:8px 0 20px;text-shadow:0 0 18px rgba(168,85,247,.65)}
+.live-badge{display:inline-flex;align-items:center;gap:16px;border:2px solid rgba(112,214,255,.7);border-radius:20px;padding:20px 48px;font-size:clamp(30px,5vw,54px);font-weight:1000;letter-spacing:.08em;color:#d8f3ff;text-decoration:none;text-shadow:0 0 14px rgba(112,214,255,.8);box-shadow:0 0 24px rgba(112,214,255,.35),inset 0 0 22px rgba(112,214,255,.08);transition:.18s ease}.live-badge:hover{transform:translateY(-3px) scale(1.025)}.live-badge b{font:inherit}.live-dot{width:25px;height:25px;border-radius:50%;background:var(--blue);box-shadow:0 0 16px var(--blue);animation:pulse 1.2s infinite}@keyframes pulse{50%{transform:scale(.75);opacity:.58}}.live-badge.is-offline{border-color:rgba(168,85,247,.55);color:#d8b4fe;text-shadow:0 0 12px rgba(168,85,247,.8);box-shadow:0 0 18px rgba(168,85,247,.28),inset 0 0 18px rgba(168,85,247,.08)}.live-badge.is-offline .live-dot{background:#7c3aed;box-shadow:0 0 14px #7c3aed;animation:none}.live-badge.is-live{border-color:rgba(255,66,95,.95);color:#ffd1d9;text-shadow:0 0 16px var(--red);animation:liveGlow 1.5s ease-in-out infinite alternate}.live-badge.is-live .live-dot{background:var(--red);box-shadow:0 0 18px var(--red)}@keyframes liveGlow{from{box-shadow:0 0 24px rgba(255,66,95,.6),inset 0 0 22px rgba(255,66,95,.12)}to{box-shadow:0 0 48px rgba(255,66,95,.95),inset 0 0 30px rgba(255,66,95,.22)}}
+.live-panel{max-width:760px;margin:14px auto 0;display:flex;align-items:center;justify-content:center;gap:16px}.live-info{text-align:center}.live-detail,.today-game{margin:6px 0;color:#f5eaff;font-weight:900;text-shadow:0 0 12px rgba(168,85,247,.55)}.today-game{color:#d8f3ff}.live-thumb{width:180px;border-radius:16px;border:1px solid rgba(112,214,255,.5);box-shadow:0 0 22px rgba(112,214,255,.25)}.lead{font-size:18px;line-height:1.9;font-weight:800;color:#f5eaff;margin:16px 0 24px}.social-switches{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;max-width:660px;margin:0 auto 28px}.switch{min-height:118px;padding:18px 12px;text-decoration:none;color:var(--text);border-radius:18px;background:linear-gradient(180deg,rgba(16,7,30,.88),rgba(9,2,16,.9));border:1px solid var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;box-shadow:0 0 22px rgba(168,85,247,.25),inset 0 0 22px rgba(168,85,247,.05);transition:.18s ease}.switch:hover{transform:translateY(-5px);box-shadow:0 0 35px rgba(168,85,247,.5),inset 0 0 22px rgba(168,85,247,.12)}.switch .icon{font-size:42px}.switch strong{font-size:20px}.switch small{color:var(--muted);font-weight:800}.x{border-color:rgba(112,214,255,.65);box-shadow:0 0 22px rgba(112,214,255,.22)}.youtube{border-color:rgba(255,66,95,.75);box-shadow:0 0 22px rgba(255,66,95,.24)}.switch.twitch.is-live{border-color:rgba(255,66,95,.9);box-shadow:0 0 32px rgba(255,66,95,.42),inset 0 0 22px rgba(255,66,95,.12)}
+.mascot-area{position:relative;min-height:330px;margin-top:-4px}.guide{position:absolute;width:560px;height:285px;pointer-events:none}.guide img{position:absolute;display:block;object-fit:contain;filter:drop-shadow(0 0 20px rgba(216,180,254,.45));user-select:none;transition:opacity .22s ease,filter .22s ease}.ghost-guide{left:-42px;top:10px;animation:floatGhost 4.8s ease-in-out infinite}.ghost-guide img{left:0;bottom:0;width:250px}.tanu-guide{right:-18px;top:25px;animation:floatTanu 4.2s ease-in-out infinite}.tanu-guide img{right:0;bottom:0;width:230px}.bubble{position:absolute;width:245px;min-height:82px;display:flex;align-items:center;justify-content:center;padding:16px 18px;text-align:left;border:1px solid var(--line);border-radius:24px;background:rgba(20,8,32,.78);box-shadow:0 0 24px rgba(168,85,247,.32),inset 0 0 18px rgba(255,255,255,.04);font-weight:900;line-height:1.7;transition:opacity .18s ease,box-shadow .18s ease}.primary-bubble{left:285px;top:22px;border-color:rgba(112,214,255,.5)}.tanu-bubble{right:285px;top:40px}.guide.is-changing img,.guide.is-changing .bubble{opacity:.88;filter:drop-shadow(0 0 26px rgba(216,180,254,.65))}@keyframes floatGhost{0%,100%{transform:translateY(0)}50%{transform:translateY(-16px)}}@keyframes floatTanu{0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-12px) rotate(1deg)}}.pose-wave img{animation:wiggle .5s ease}.pose-happy img{animation:pop .5s ease}.pose-wink img{animation:blink .42s ease}@keyframes wiggle{0%,100%{transform:rotate(0)}35%{transform:rotate(-4deg)}70%{transform:rotate(4deg)}}@keyframes pop{50%{transform:scale(1.05)}}@keyframes blink{50%{filter:drop-shadow(0 0 30px rgba(255,255,255,.55)) brightness(1.15)}}
+.cards{display:grid;gap:22px}.two-col{grid-template-columns:1fr 1fr}.card,.gear-card{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--line);border-radius:20px;padding:28px;box-shadow:0 0 28px rgba(168,85,247,.16),inset 0 0 24px rgba(255,255,255,.03)}.card h2,.gear-card h2{margin:0 0 18px;font-size:25px;text-shadow:0 0 12px rgba(168,85,247,.55)}.card ul{margin:0 0 20px;padding-left:20px;line-height:2;font-weight:800}.mini-btn,.ad-btn{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;color:#fff;background:linear-gradient(180deg,rgba(126,34,206,.78),rgba(88,28,135,.86));border:1px solid rgba(216,180,254,.45);border-radius:999px;padding:12px 20px;font-weight:900;box-shadow:0 0 16px rgba(168,85,247,.3);transition:.18s ease}.mini-btn:hover,.ad-btn:hover{transform:translateY(-2px);box-shadow:0 0 26px rgba(168,85,247,.5)}.wide{margin-top:22px;min-height:250px;position:relative;overflow:hidden}.wide p{line-height:1.9;font-weight:800;color:#f5eaff}.neon-icons{position:absolute;right:28px;bottom:26px;display:flex;gap:24px;font-size:34px;text-shadow:0 0 18px var(--purple)}
+.gear-card{margin-top:22px}.gear-head{display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap}.ad-label{color:var(--muted);font-size:13px;font-weight:900;margin:0}.gear-head h2{margin:6px 0}.gear-head p:last-child{color:var(--muted);font-weight:800;margin:0}.gear-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:22px}.gear-item{text-decoration:none;color:var(--text);min-height:126px;border:1px solid rgba(216,180,254,.35);border-radius:18px;background:rgba(10,4,20,.7);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;transition:.18s ease;box-shadow:inset 0 0 18px rgba(255,255,255,.03)}.gear-item:hover{transform:translateY(-4px);border-color:rgba(112,214,255,.65);box-shadow:0 0 24px rgba(112,214,255,.22),inset 0 0 20px rgba(112,214,255,.05)}.gear-item span{font-size:34px}.gear-item strong{font-size:18px}.gear-item small{color:var(--muted);font-weight:800}
+footer{position:relative;z-index:2;text-align:center;padding:28px 0 50px;color:var(--muted);font-weight:800}.footer-links{display:flex;justify-content:center;gap:22px;margin-bottom:18px}.footer-links a{color:var(--purple2);text-decoration:none;font-weight:1000}.footer-links a:hover{color:#fff;text-shadow:0 0 12px var(--purple)}
+@media (max-width:820px){.top-status{display:none}.page{padding-top:72px}.social-switches,.two-col,.gear-grid{grid-template-columns:1fr 1fr}.mascot-area{min-height:540px}.guide{width:100%;height:250px}.ghost-guide{left:0;top:0}.ghost-guide img{left:0;bottom:0;width:210px}.primary-bubble{left:230px;top:24px;width:min(230px,40vw);min-height:72px}.tanu-guide{right:0;top:255px}.tanu-guide img{right:0;bottom:0;width:190px}.tanu-bubble{right:215px;top:36px;width:min(230px,40vw);min-height:72px}.live-panel{flex-direction:column}.live-thumb{width:min(300px,90vw)}}
+@media (max-width:520px){.topbar{top:12px;left:12px;right:12px}.menu{width:48px;height:48px}.schedule-btn{padding:13px 15px}.eyebrow{letter-spacing:6px}.logo-image-wrap{width:96vw;margin-bottom:14px}.live-badge{padding:16px 26px}.social-switches,.two-col,.gear-grid{grid-template-columns:1fr}.primary-bubble{left:0;top:0;width:calc(100vw - 32px);font-size:13px}.ghost-guide img{width:165px;top:98px}.tanu-bubble{right:0;top:0;width:calc(100vw - 32px);font-size:13px}.tanu-guide img{width:150px;top:98px}.neon-icons{position:static;margin-top:20px;justify-content:flex-end}.card,.gear-card{padding:22px}}
 
-  const CLIENT_ID = String(env.TWITCH_CLIENT_ID || "").trim();
-  const CLIENT_SECRET = String(env.TWITCH_CLIENT_SECRET || "").trim();
-  const CHANNEL_LOGIN = String(env.TWITCH_CHANNEL_LOGIN || "yuzukosyo07").trim();
 
-  if (!CLIENT_ID || !CLIENT_SECRET) {
-    return json({
-      configured: false,
-      isLive: false,
-      stream: null,
-      scheduleConfigured: false,
-      schedule: [],
-      scheduleMessage: "Twitch APIキー未設定",
-      debug: {
-        hasClientId: Boolean(CLIENT_ID),
-        hasClientSecret: Boolean(CLIENT_SECRET),
-        channelLogin: CHANNEL_LOGIN
-      }
-    });
+/* Twitch schedule / brand icons */
+.brand-icon img{width:42px;height:42px;display:block;object-fit:contain;color:var(--text);filter:drop-shadow(0 0 10px rgba(216,180,254,.45))}.switch.discord:hover .brand-icon img,.switch.twitch:hover .brand-icon img{filter:drop-shadow(0 0 16px rgba(168,85,247,.8))}.schedule-status{margin:0 0 12px;color:#d8f3ff;font-weight:900;text-shadow:0 0 12px rgba(112,214,255,.35)}.schedule-list{list-style:none!important;margin:0 0 18px!important;padding:0!important;display:grid;gap:10px}.schedule-list li{border:1px solid rgba(216,180,254,.25);border-radius:14px;background:rgba(10,4,20,.48);padding:12px 14px;line-height:1.55!important}.schedule-date{display:block;color:#d8b4fe;font-weight:1000}.schedule-title{display:block;color:#fff;font-weight:1000}.schedule-category{display:block;color:var(--muted);font-size:13px;font-weight:800;margin-top:2px}.schedule-note{color:var(--muted);font-size:13px;font-weight:800;line-height:1.7;margin:0 0 16px}
+
+
+/* ===== v2: brand icon visibility fix ===== */
+.switch .brand-icon{
+  width:52px;
+  height:52px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.switch .brand-icon img{
+  width:52px;
+  height:52px;
+  display:block;
+  object-fit:contain;
+  opacity:1 !important;
+  filter:none !important;
+}
+
+.switch.discord{
+  border-color:rgba(88,101,242,.98) !important;
+  box-shadow:
+    0 0 22px rgba(88,101,242,.55),
+    0 0 44px rgba(88,101,242,.28),
+    inset 0 0 22px rgba(88,101,242,.14) !important;
+}
+
+.switch.discord:hover{
+  box-shadow:
+    0 0 34px rgba(88,101,242,.75),
+    0 0 64px rgba(88,101,242,.38),
+    inset 0 0 28px rgba(88,101,242,.20) !important;
+}
+
+.switch.discord strong{
+  color:#ffffff !important;
+  text-shadow:0 0 12px rgba(88,101,242,.9);
+}
+
+.switch.discord small{
+  color:#dfe3ff !important;
+}
+
+.switch.twitch{
+  border-color:rgba(145,70,255,.98) !important;
+  box-shadow:
+    0 0 22px rgba(145,70,255,.62),
+    0 0 44px rgba(145,70,255,.30),
+    inset 0 0 22px rgba(145,70,255,.16) !important;
+}
+
+.switch.twitch:hover{
+  box-shadow:
+    0 0 34px rgba(145,70,255,.82),
+    0 0 64px rgba(145,70,255,.42),
+    inset 0 0 28px rgba(145,70,255,.22) !important;
+}
+
+.switch.twitch strong{
+  color:#ffffff !important;
+  text-shadow:0 0 12px rgba(145,70,255,.95);
+}
+
+.switch.twitch small{
+  color:#efe3ff !important;
+}
+
+/* 幽霊の画像崩れ対策：PNGは元データに戻し、ブラウザ補間だけ安定化 */
+.guide img{
+  image-rendering:auto;
+  backface-visibility:hidden;
+  transform:translateZ(0);
+}
+
+
+/* ===== v6: X timeline panel ===== */
+.x-timeline-card{
+  min-height:520px;
+}
+
+.x-timeline-note{
+  color:var(--muted);
+  font-weight:900;
+  margin:0 0 14px;
+}
+
+.x-timeline-box{
+  min-height:360px;
+  max-height:380px;
+  overflow:hidden;
+  border:1px solid rgba(112,214,255,.35);
+  border-radius:18px;
+  background:
+    radial-gradient(circle at top left, rgba(112,214,255,.14), transparent 45%),
+    rgba(5,2,10,.42);
+  box-shadow:
+    inset 0 0 24px rgba(112,214,255,.08),
+    0 0 20px rgba(112,214,255,.14);
+  padding:6px;
+  margin-bottom:18px;
+}
+
+.x-timeline-box iframe{
+  border-radius:14px !important;
+}
+
+
+/* ===== v7: stable X timeline embed ===== */
+.x-timeline-card{
+  min-height:560px;
+}
+
+.x-timeline-note{
+  color:var(--muted);
+  font-weight:900;
+  margin:0 0 14px;
+}
+
+.x-timeline-box{
+  position:relative;
+  min-height:400px;
+  height:400px;
+  overflow:hidden;
+  border:1px solid rgba(112,214,255,.50);
+  border-radius:18px;
+  background:
+    radial-gradient(circle at top left, rgba(112,214,255,.16), transparent 42%),
+    radial-gradient(circle at bottom right, rgba(168,85,247,.12), transparent 45%),
+    rgba(5,2,10,.50);
+  box-shadow:
+    inset 0 0 24px rgba(112,214,255,.10),
+    0 0 24px rgba(112,214,255,.18);
+  padding:8px;
+  margin-bottom:18px;
+}
+
+.x-timeline-box iframe{
+  width:100% !important;
+  max-width:100% !important;
+  height:380px !important;
+  border-radius:14px !important;
+  background:rgba(5,2,10,.35) !important;
+}
+
+.x-fallback{
+  display:none;
+  position:absolute;
+  inset:8px;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  gap:14px;
+  text-align:center;
+  border-radius:14px;
+  background:
+    linear-gradient(180deg, rgba(10,4,20,.82), rgba(5,2,10,.88));
+  color:var(--text);
+  padding:22px;
+  z-index:2;
+}
+
+.x-fallback.is-visible{
+  display:flex;
+}
+
+.x-fallback p{
+  margin:0;
+  color:var(--muted);
+  font-weight:900;
+  line-height:1.7;
+}
+
+.x-fallback a{
+  color:#fff;
+  text-decoration:none;
+  font-weight:1000;
+  border:1px solid rgba(112,214,255,.55);
+  border-radius:999px;
+  padding:12px 18px;
+  background:rgba(112,214,255,.10);
+  box-shadow:0 0 18px rgba(112,214,255,.22);
+}
+
+.x-fallback a:hover{
+  box-shadow:0 0 28px rgba(112,214,255,.38);
+}
+
+
+/* ===== v8: reliable X profile panel ===== */
+.x-profile-card{
+  min-height:360px;
+}
+
+.x-profile-lead{
+  color:var(--muted);
+  font-weight:900;
+  line-height:1.8;
+  margin:0 0 18px;
+}
+
+.x-profile-box{
+  display:flex;
+  align-items:center;
+  gap:18px;
+  border:1px solid rgba(112,214,255,.50);
+  border-radius:20px;
+  background:
+    radial-gradient(circle at top left, rgba(112,214,255,.16), transparent 42%),
+    radial-gradient(circle at bottom right, rgba(168,85,247,.14), transparent 45%),
+    rgba(5,2,10,.58);
+  box-shadow:
+    inset 0 0 24px rgba(112,214,255,.10),
+    0 0 24px rgba(112,214,255,.18);
+  padding:22px;
+  margin-bottom:20px;
+}
+
+.x-profile-icon{
+  width:72px;
+  height:72px;
+  flex:0 0 72px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:22px;
+  border:1px solid rgba(112,214,255,.75);
+  color:#fff;
+  font-size:40px;
+  font-weight:1000;
+  background:linear-gradient(180deg, rgba(112,214,255,.18), rgba(168,85,247,.12));
+  box-shadow:
+    0 0 22px rgba(112,214,255,.35),
+    inset 0 0 18px rgba(255,255,255,.05);
+}
+
+.x-profile-main strong{
+  display:block;
+  color:#fff;
+  font-size:24px;
+  text-shadow:0 0 14px rgba(168,85,247,.62);
+}
+
+.x-profile-main span{
+  display:block;
+  color:#d8f3ff;
+  font-weight:900;
+  margin-top:2px;
+}
+
+.x-profile-main p{
+  color:var(--muted);
+  font-weight:800;
+  line-height:1.75;
+  margin:10px 0 0;
+}
+
+.x-action-grid{
+  display:flex;
+  gap:14px;
+  flex-wrap:wrap;
+  margin-bottom:14px;
+}
+
+.x-follow-btn{
+  background:linear-gradient(180deg, rgba(112,214,255,.42), rgba(88,28,135,.86));
+  border-color:rgba(112,214,255,.55);
+}
+
+.x-profile-note{
+  color:rgba(199,183,221,.78);
+  font-size:12px;
+  font-weight:800;
+  line-height:1.7;
+  margin:0;
+}
+
+@media (max-width:520px){
+  .x-profile-box{
+    align-items:flex-start;
+    padding:18px;
   }
 
-  try {
-    const tokenResponse = await fetch("https://id.twitch.tv/oauth2/token", {
-      method: "POST",
-      cache: "no-store",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded"
-      },
-      body: new URLSearchParams({
-        client_id: CLIENT_ID,
-        client_secret: CLIENT_SECRET,
-        grant_type: "client_credentials"
-      })
-    });
+  .x-profile-icon{
+    width:56px;
+    height:56px;
+    flex-basis:56px;
+    font-size:30px;
+    border-radius:18px;
+  }
 
-    if (!tokenResponse.ok) {
-      const text = await tokenResponse.text();
-
-      return json({
-        configured: true,
-        isLive: false,
-        stream: null,
-        scheduleConfigured: false,
-        schedule: [],
-        scheduleMessage: "Twitchトークン取得エラー",
-        error: `Twitch token error: ${tokenResponse.status} ${text}`,
-        debug: {
-          hasClientId: Boolean(CLIENT_ID),
-          hasClientSecret: Boolean(CLIENT_SECRET),
-          clientIdStart: CLIENT_ID.slice(0, 6),
-          clientIdLength: CLIENT_ID.length,
-          secretLength: CLIENT_SECRET.length,
-          channelLogin: CHANNEL_LOGIN
-        }
-      });
-    }
-
-    const tokenData = await tokenResponse.json();
-    const accessToken = tokenData.access_token;
-
-    if (!accessToken) {
-      return json({
-        configured: true,
-        isLive: false,
-        stream: null,
-        scheduleConfigured: false,
-        schedule: [],
-        scheduleMessage: "アクセストークン取得失敗"
-      });
-    }
-
-    const commonHeaders = {
-      "Client-ID": CLIENT_ID,
-      "Authorization": `Bearer ${accessToken}`
-    };
-
-    const userResponse = await fetch(
-      `https://api.twitch.tv/helix/users?login=${encodeURIComponent(CHANNEL_LOGIN)}`,
-      {
-        cache: "no-store",
-        headers: commonHeaders
-      }
-    );
-
-    if (!userResponse.ok) {
-      const text = await userResponse.text();
-
-      return json({
-        configured: true,
-        isLive: false,
-        stream: null,
-        scheduleConfigured: false,
-        schedule: [],
-        scheduleMessage: "Twitchユーザー取得エラー",
-        error: `Twitch user error: ${userResponse.status} ${text}`
-      });
-    }
-
-    const userData = await userResponse.json();
-    const user = userData.data && userData.data[0];
-
-    if (!user) {
-      return json({
-        configured: true,
-        channel: CHANNEL_LOGIN,
-        isLive: false,
-        stream: null,
-        scheduleConfigured: false,
-        schedule: [],
-        scheduleMessage: "Twitchユーザーが見つかりません"
-      });
-    }
-
-    const liveResponse = await fetch(
-      `https://api.twitch.tv/helix/streams?user_login=${encodeURIComponent(CHANNEL_LOGIN)}`,
-      {
-        cache: "no-store",
-        headers: commonHeaders
-      }
-    );
-
-    if (!liveResponse.ok) {
-      const text = await liveResponse.text();
-
-      return json({
-        configured: true,
-        channel: CHANNEL_LOGIN,
-        isLive: false,
-        stream: null,
-        scheduleConfigured: false,
-        schedule: [],
-        scheduleMessage: "ライブ情報取得エラー",
-        error: `Twitch live error: ${liveResponse.status} ${text}`
-      });
-    }
-
-    const liveData = await liveResponse.json();
-    const live = liveData.data && liveData.data[0];
-
-    let scheduleConfigured = true;
-    let scheduleMessage = "Twitchの配信予定を取得しました";
-    let schedule = [];
-
-    try {
-      const scheduleResponse = await fetch(
-        `https://api.twitch.tv/helix/schedule?broadcaster_id=${encodeURIComponent(user.id)}&first=10`,
-        {
-          cache: "no-store",
-          headers: commonHeaders
-        }
-      );
-
-      if (scheduleResponse.ok) {
-        const scheduleData = await scheduleResponse.json();
-
-        const segments =
-          scheduleData.data &&
-          Array.isArray(scheduleData.data.segments)
-            ? scheduleData.data.segments
-            : [];
-
-        const now = new Date();
-
-        schedule = segments
-          .filter((segment) => {
-            if (segment.canceled_until) return false;
-
-            const endTime = segment.end_time
-              ? new Date(segment.end_time)
-              : null;
-
-            if (endTime && endTime < now) return false;
-
-            return true;
-          })
-          .slice(0, 5)
-          .map((segment) => ({
-            startTime: segment.start_time || "",
-            endTime: segment.end_time || "",
-            title: segment.title || "配信予定",
-            category:
-              segment.category && segment.category.name
-                ? segment.category.name
-                : "カテゴリ未設定"
-          }));
-      } else {
-        scheduleConfigured = false;
-        scheduleMessage = "スケジュール取得失敗";
-      }
-    } catch (scheduleError) {
-      scheduleConfigured = false;
-      scheduleMessage = "スケジュール取得例外";
-    }
-
-    return json({
-      configured: true,
-      channel: CHANNEL_LOGIN,
-      isLive: Boolean(live),
-      stream: live
-        ? {
-            title: live.title || "配信中",
-            gameName: live.game_name || "未設定",
-            viewerCount: live.viewer_count || 0,
-            startedAt: live.started_at || "",
-            thumbnailUrl: live.thumbnail_url
-              ? live.thumbnail_url
-                  .replace("{width}", "640")
-                  .replace("{height}", "360")
-              : ""
-          }
-        : null,
-      scheduleConfigured,
-      scheduleMessage,
-      schedule
-    });
-  } catch (error) {
-    return json({
-      configured: true,
-      channel: CHANNEL_LOGIN,
-      isLive: false,
-      stream: null,
-      scheduleConfigured: false,
-      schedule: [],
-      scheduleMessage: "Twitch API取得エラー",
-      error: error.message
-    });
+  .x-profile-main strong{
+    font-size:21px;
   }
 }
 
-function json(data) {
-  return new Response(JSON.stringify(data), {
-    headers: {
-      "Content-Type": "application/json; charset=utf-8",
-      "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
-      "Pragma": "no-cache",
-      "Expires": "0"
-    }
-  });
+
+/* ===== v10: stream history / daily word / visual effects ===== */
+.extra-cards{
+  margin-top:22px;
+}
+
+.history-lead{
+  color:var(--muted);
+  font-weight:900;
+  line-height:1.7;
+  margin:0 0 16px;
+}
+
+.history-list{
+  display:grid;
+  gap:12px;
+}
+
+.history-day{
+  border:1px solid rgba(216,180,254,.30);
+  border-radius:16px;
+  background:
+    radial-gradient(circle at top left, rgba(168,85,247,.15), transparent 42%),
+    rgba(10,4,20,.56);
+  padding:14px 16px;
+  box-shadow:inset 0 0 18px rgba(255,255,255,.03);
+}
+
+.history-date{
+  display:block;
+  color:#d8f3ff;
+  font-weight:1000;
+  text-shadow:0 0 12px rgba(112,214,255,.42);
+  margin-bottom:8px;
+}
+
+.history-games{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+.history-game{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  border:1px solid rgba(216,180,254,.36);
+  border-radius:999px;
+  padding:7px 11px;
+  color:#fff;
+  background:rgba(168,85,247,.14);
+  font-size:13px;
+  font-weight:900;
+  box-shadow:0 0 12px rgba(168,85,247,.16);
+}
+
+.daily-word-card{
+  position:relative;
+  overflow:hidden;
+}
+
+.daily-word-card:before{
+  content:"";
+  position:absolute;
+  inset:-40%;
+  background:radial-gradient(circle, rgba(112,214,255,.12), transparent 38%);
+  animation:dailyGlow 7s ease-in-out infinite alternate;
+  pointer-events:none;
+}
+
+@keyframes dailyGlow{
+  from{transform:translate(-8%, -4%) scale(.95);opacity:.45}
+  to{transform:translate(8%, 5%) scale(1.08);opacity:.85}
+}
+
+.daily-word-box{
+  position:relative;
+  min-height:150px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border:1px solid rgba(112,214,255,.42);
+  border-radius:20px;
+  background:
+    radial-gradient(circle at top left, rgba(112,214,255,.16), transparent 42%),
+    radial-gradient(circle at bottom right, rgba(168,85,247,.16), transparent 45%),
+    rgba(5,2,10,.54);
+  padding:24px;
+  margin-bottom:18px;
+  box-shadow:
+    inset 0 0 24px rgba(112,214,255,.08),
+    0 0 22px rgba(112,214,255,.14);
+}
+
+.daily-word-box p{
+  position:relative;
+  margin:0;
+  color:#fff;
+  font-size:clamp(20px,2.5vw,28px);
+  line-height:1.7;
+  font-weight:1000;
+  text-align:center;
+  text-shadow:
+    0 0 12px rgba(168,85,247,.72),
+    0 0 22px rgba(112,214,255,.35);
+}
+
+.word-reroll-btn{
+  position:relative;
+  width:100%;
+  border:1px solid rgba(216,180,254,.50);
+  border-radius:999px;
+  padding:13px 18px;
+  cursor:pointer;
+  color:#fff;
+  font-weight:1000;
+  background:linear-gradient(180deg,rgba(126,34,206,.78),rgba(88,28,135,.86));
+  box-shadow:0 0 16px rgba(168,85,247,.28);
+  transition:.18s ease;
+}
+
+.word-reroll-btn:hover{
+  transform:translateY(-2px);
+  box-shadow:0 0 28px rgba(168,85,247,.48);
+}
+
+.shooting-stars{
+  position:fixed;
+  inset:0;
+  overflow:hidden;
+  pointer-events:none;
+  z-index:1;
+}
+
+.shooting-stars span{
+  position:absolute;
+  top:20%;
+  left:110%;
+  width:140px;
+  height:2px;
+  border-radius:999px;
+  background:linear-gradient(90deg, rgba(216,180,254,0), rgba(216,180,254,.95), rgba(112,214,255,.70));
+  box-shadow:0 0 14px rgba(216,180,254,.75);
+  transform:rotate(-28deg);
+  animation:shootingStar 8.5s linear infinite;
+  opacity:0;
+}
+
+.shooting-stars span:nth-child(2){
+  top:46%;
+  animation-delay:3.6s;
+  animation-duration:10.5s;
+  width:110px;
+}
+
+.shooting-stars span:nth-child(3){
+  top:70%;
+  animation-delay:6.2s;
+  animation-duration:12s;
+  width:160px;
+}
+
+@keyframes shootingStar{
+  0%,58%{transform:translateX(0) translateY(0) rotate(-28deg);opacity:0}
+  62%{opacity:.95}
+  78%{transform:translateX(-145vw) translateY(62vh) rotate(-28deg);opacity:0}
+  100%{opacity:0}
+}
+
+.particle-layer{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:3;
+  overflow:hidden;
+}
+
+.cursor-particle{
+  position:absolute;
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  background:rgba(216,180,254,.90);
+  box-shadow:
+    0 0 10px rgba(216,180,254,.95),
+    0 0 18px rgba(112,214,255,.45);
+  animation:particleFade .85s ease-out forwards;
+}
+
+.cursor-particle:after{
+  content:"✦";
+  position:absolute;
+  inset:-8px;
+  color:rgba(216,180,254,.75);
+  font-size:14px;
+  line-height:1;
+}
+
+@keyframes particleFade{
+  from{transform:translate(0,0) scale(1);opacity:.95}
+  to{transform:translate(var(--px), var(--py)) scale(.2);opacity:0}
+}
+
+@media (max-width:520px){
+  .history-day{
+    padding:13px;
+  }
+
+  .daily-word-box{
+    min-height:130px;
+    padding:20px;
+  }
+
+  .shooting-stars span{
+    width:95px;
+  }
+}
+
+
+/* ===== v11: daily quote once per day ===== */
+.daily-word-note{
+  position:relative;
+  color:var(--muted);
+  font-weight:900;
+  line-height:1.7;
+  margin:0 0 14px;
+}
+
+.daily-word-box p small{
+  display:block;
+  margin-top:16px;
+  color:#d8f3ff;
+  font-size:15px;
+  font-weight:900;
+  text-shadow:0 0 10px rgba(112,214,255,.36);
+}
+
+.quote-mark{
+  color:#d8b4fe;
+  text-shadow:0 0 12px rgba(168,85,247,.80);
+  padding:0 2px;
+}
+
+.word-reroll-btn{
+  display:none;
+}
+
+
+/* ===== v12: schedule and history side by side ===== */
+.single-card-row{
+  grid-template-columns:1fr;
+}
+
+.single-card-row .daily-word-card{
+  max-width:none;
+}
+
+.stream-history-card{
+  min-height:100%;
+}
+
+
+/* ===== v13-based: remove history and widen schedule ===== */
+.schedule-wide-section{
+  grid-template-columns:1fr !important;
+  margin-top:22px;
+}
+
+.schedule-wide-card{
+  width:100%;
+  min-height:auto;
+}
+
+.schedule-wide-card .schedule-list{
+  grid-template-columns:repeat(2,minmax(0,1fr));
+}
+
+.schedule-wide-card .schedule-list li{
+  min-height:86px;
+}
+
+@media (max-width:820px){
+  .schedule-wide-card .schedule-list{
+    grid-template-columns:1fr;
+  }
 }

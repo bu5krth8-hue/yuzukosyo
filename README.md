@@ -1,3 +1,123 @@
-# yuzukosyo site
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>柚胡椒の秘密基地 - YUZUKOSHO</title>
+  <meta name="description" content="柚胡椒の秘密基地。Twitch配信、X、Discord、YouTubeへのリンクとお知らせ。" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="cursor-light" id="cursorLight"></div>
+  <div class="bg-glow glow-a"></div>
+  <div class="bg-glow glow-b"></div>
+  <div class="stars" aria-hidden="true"></div>
+  <div class="shooting-stars" aria-hidden="true"><span></span><span></span><span></span></div>
+  <div class="particle-layer" id="particleLayer" aria-hidden="true"></div>
 
-Cloudflare Pages用サイトデータ。
+  <header class="topbar">
+    <button class="menu" aria-label="menu">☰</button>
+    <a class="schedule-btn" href="#schedule">🔔 配信予定</a>
+  </header>
+
+  <main class="page">
+    <section class="hero">
+      <p class="eyebrow">- YUZUKOSHO -</p>
+      <div class="logo-image-wrap" aria-label="柚胡椒の秘密基地">
+        <img class="site-logo-image" src="assets/logo-secret-base.jpeg" alt="柚胡椒の秘密基地" />
+      </div>
+
+      <p class="catchcopy">今日もゆるくゲーム中。秘密基地に集合。</p>
+
+      <a class="live-badge is-checking" id="liveBadge" href="https://www.twitch.tv/yuzukosyo07?lang=ja" target="_blank" rel="noopener">
+        <span class="live-dot"></span><b id="liveBadgeText">LIVE確認中</b>
+      </a>
+
+      <div class="live-panel" id="livePanel">
+        <div class="live-info">
+          <p class="live-detail" id="liveDetail">Twitchの配信状態を確認してるよ…</p>
+          <p class="today-game" id="todayGame">🎮 今日のゲーム：準備中</p>
+        </div>
+        <img class="live-thumb" id="liveThumb" alt="Twitch配信サムネイル" hidden />
+      </div>
+
+      <p class="lead">ふらっと来て、のんびり見て、気軽にコメントしてってね〜！</p>
+
+      <nav class="social-switches" aria-label="SNS links">
+        <a class="switch x" href="https://x.com/yuzukosyo1106?s=11&t=owj0KlSTEMC6u3jtdjbP8A" target="_blank" rel="noopener">
+          <span class="icon">𝕏</span><strong>X</strong><small>最新ポスト</small>
+        </a>
+        <a class="switch discord" href="https://discord.gg/8ZUwSmmccK" target="_blank" rel="noopener">
+          <span class="icon brand-icon"><img src="assets/discord.svg" alt="Discord"></span><strong>Discord</strong><small>集会所</small>
+        </a>
+        <a class="switch twitch" id="twitchSwitch" href="https://www.twitch.tv/yuzukosyo07?lang=ja" target="_blank" rel="noopener">
+          <span class="icon brand-icon"><img src="assets/twitch.svg" alt="Twitch"></span><strong>Twitch</strong><small id="twitchSwitchText">配信状態を確認中</small>
+        </a>
+        <a class="switch youtube" href="https://youtube.com/@yuzukosho25?si=EWgYkPZEMo-T1OEH" target="_blank" rel="noopener">
+          <span class="icon">▶</span><strong>YouTube</strong><small>動画置き場</small>
+        </a>
+      </nav>
+    </section>
+
+    <section class="mascot-area" aria-label="案内役">
+      <div class="guide ghost-guide">
+        <img id="ghostMascot" src="assets/ghost.png" alt="幽霊の案内役" />
+        <div class="bubble primary-bubble" id="ghostBubble">Xでお知らせ出すから見てね！</div>
+      </div>
+      <div class="guide tanu-guide">
+        <img id="tanuMascot" src="assets/tanuchan.png" alt="たぬちゃん" />
+        <div class="bubble tanu-bubble" id="tanuBubble">Discordでも待ってるよ〜！</div>
+      </div>
+    </section>
+
+    <section class="cards schedule-wide-section">
+
+      <article class="card schedule-wide-card" id="schedule">
+        <h2>📅 配信予定</h2>
+        <p class="schedule-status" id="scheduleStatus">Twitchの配信予定を確認中…</p>
+        <ul id="scheduleList" class="schedule-list">
+          <li>読み込み中…</li>
+        </ul>
+        <p class="schedule-note" id="scheduleNote">予定が未登録の場合は、X・Discordでお知らせするよ。</p>
+        <a class="mini-btn" href="https://www.twitch.tv/yuzukosyo07/schedule" target="_blank" rel="noopener">Twitch予定を見る →</a>
+      </article>
+    </section>
+
+
+    <section class="cards extra-cards single-card-row">
+      <article class="card daily-word-card">
+        <h2>👻 今日の格言</h2>
+        <p class="daily-word-note">1日に1回、ランダムで格言が表示されます。</p>
+        <div class="daily-word-box">
+          <p id="dailyWordText">今日の格言を準備中…</p>
+        </div>
+      </article>
+    </section>
+
+    <section class="gear-card" aria-label="配信で使ってるもの">
+      <div class="gear-head">
+        <p class="ad-label">おすすめ・小さめ広告エリア</p>
+        <h2>🎮 配信で使ってるもの</h2>
+        <p>Amazonアソシエイトやおすすめ機材リンクをここに置けるよ。</p>
+      </div>
+      <div class="gear-grid">
+        <a class="gear-item" href="#"><span>🖥️</span><strong>配信PC</strong><small>スペック紹介</small></a>
+        <a class="gear-item" href="#"><span>🎙️</span><strong>マイク</strong><small>声まわり</small></a>
+        <a class="gear-item" href="#"><span>⌨️</span><strong>キーボード</strong><small>ゲーム用</small></a>
+        <a class="gear-item" href="#"><span>🖱️</span><strong>マウス</strong><small>操作環境</small></a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-links">
+      <a href="https://x.com/yuzukosyo1106?s=11&t=owj0KlSTEMC6u3jtdjbP8A" target="_blank" rel="noopener">𝕏</a>
+      <a href="https://discord.gg/8ZUwSmmccK" target="_blank" rel="noopener">Discord</a>
+      <a href="https://www.twitch.tv/yuzukosyo07?lang=ja" target="_blank" rel="noopener">Twitch</a>
+      <a href="https://youtube.com/@yuzukosho25?si=EWgYkPZEMo-T1OEH" target="_blank" rel="noopener">YouTube</a>
+    </div>
+    <p>© 2026 柚胡椒の秘密基地 All Rights Reserved.</p>
+  </footer>
+  <script src="script.js"></script>
+</body>
+</html>
