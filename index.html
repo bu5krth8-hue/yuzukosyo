@@ -12,6 +12,8 @@
   <div class="bg-glow glow-a"></div>
   <div class="bg-glow glow-b"></div>
   <div class="stars" aria-hidden="true"></div>
+  <div class="shooting-stars" aria-hidden="true"><span></span><span></span><span></span></div>
+  <div class="particle-layer" id="particleLayer" aria-hidden="true"></div>
 
   <header class="topbar">
     <button class="menu" aria-label="menu">☰</button>
@@ -78,6 +80,23 @@
         </ul>
         <p class="schedule-note" id="scheduleNote">予定が未登録の場合は、X・Discordでお知らせするよ。</p>
         <a class="mini-btn" href="https://www.twitch.tv/yuzukosyo07/schedule" target="_blank" rel="noopener">Twitch予定を見る →</a>
+      </article>
+    </section>
+
+
+    <section class="cards two-col extra-cards">
+      <article class="card stream-history-card">
+        <h2>📺 配信履歴</h2>
+        <p class="history-lead">最近配信した日付とゲームをまとめています。</p>
+        <div class="history-list" id="streamHistoryList"></div>
+      </article>
+
+      <article class="card daily-word-card">
+        <h2>👻 今日の格言</h2>
+        <p class="daily-word-note">1日に1回、ランダムで格言が表示されます。</p>
+        <div class="daily-word-box">
+          <p id="dailyWordText">今日の格言を準備中…</p>
+        </div>
       </article>
     </section>
 

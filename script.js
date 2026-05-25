@@ -326,3 +326,138 @@ checkLiveStatus();
 setInterval(checkLiveStatus, 60000);
 
 setInterval(rotateMascots, 7000);
+
+// 配信履歴：同じ日に複数ゲームを入れられます。
+// 例：{ date: "2026年5月25日", games: ["VALORANT", "雑談"] }
+const streamHistory = [
+  {
+    date: "2026年5月25日",
+    games: ["雑談", "ゲーム配信"]
+  },
+  {
+    date: "2026年5月24日",
+    games: ["のんびり配信"]
+  },
+  {
+    date: "2026年5月23日",
+    games: ["Twitch配信"]
+  }
+];
+
+const dailyQuotes = [
+  {
+    text: "成功とは、失敗を重ねても情熱を失わないことだ。",
+    author: "ウィンストン・チャーチル"
+  },
+  {
+    text: "困難の中に、機会がある。",
+    author: "アルベルト・アインシュタイン"
+  },
+  {
+    text: "人生に失敗がないと、人生を失敗する。",
+    author: "斎藤茂太"
+  },
+  {
+    text: "夢を見ることができるなら、それは実現できる。",
+    author: "ウォルト・ディズニー"
+  },
+  {
+    text: "最も大切なのは、問い続けることをやめないことだ。",
+    author: "アルベルト・アインシュタイン"
+  },
+  {
+    text: "努力する人は希望を語り、怠ける人は不満を語る。",
+    author: "井上靖"
+  },
+  {
+    text: "明日死ぬかのように生きよ。永遠に生きるかのように学べ。",
+    author: "マハトマ・ガンジー"
+  },
+  {
+    text: "できると思えばできる。できないと思えばできない。",
+    author: "ヘンリー・フォード"
+  },
+  {
+    text: "勝つことばかり知りて、負くることを知らざれば、害その身に至る。",
+    author: "徳川家康"
+  },
+  {
+    text: "為せば成る、為さねば成らぬ何事も。",
+    author: "上杉鷹山"
+  },
+  {
+    text: "今日という日は、残りの人生の最初の日である。",
+    author: "チャールズ・ディードリッヒ"
+  },
+  {
+    text: "小さいことを積み重ねることが、とんでもないところへ行くただ一つの道だ。",
+    author: "イチロー"
+  },
+  {
+    text: "準備しておこう。チャンスはいつか訪れるものだ。",
+    author: "エイブラハム・リンカーン"
+  },
+  {
+    text: "人を信じよ、しかし、その百倍も自らを信じよ。",
+    author: "手塚治虫"
+  },
+  {
+    text: "過去から学び、今日のために生き、未来に希望を持て。",
+    author: "アルベルト・アインシュタイン"
+  }
+];
+
+function getTodayKey() {
+  const now = new Date();
+  return [
+    now.getFullYear(),
+    String(now.getMonth() + 1).padStart(2, "0"),
+    String(now.getDate()).padStart(2, "0")
+  ].join("-");
+}
+
+function setDailyQuote() {
+  const text = document.getElementById("dailyWordText");
+  if (!text) return;
+
+  const todayKey = getTodayKey();
+  const storageKey = "yuzukosyoDailyQuote";
+  let saved = null;
+
+  try {
+    saved = JSON.parse(localStorage.getItem(storageKey) || "null");
+  } catch (error) {
+    saved = null;
+  }
+
+  let quote = null;
+
+  if (
+    saved &&
+    saved.date === todayKey &&
+    Number.isInteger(saved.index) &&
+    dailyQuotes[saved.index]
+  ) {
+    quote = dailyQuotes[saved.index];
+  } else {
+    const index = Math.floor(Math.random() * dailyQuotes.length);
+    quote = dailyQuotes[index];
+
+    try {
+      localStorage.setItem(storageKey, JSON.stringify({
+        date: todayKey,
+        index
+      }));
+    } catch (error) {
+      // localStorageが使えない環境でも表示は続ける
+    }
+  }
+
+  text.innerHTML = `
+    <span class="quote-mark">“</span>${escapeHtml(quote.text)}<span class="quote-mark">”</span>
+    <small>— ${escapeHtml(quote.author)}</small>
+  `;
+}
+
+setDailyQuote();
+setupCursorParticles();

@@ -312,3 +312,250 @@ footer{position:relative;z-index:2;text-align:center;padding:28px 0 50px;color:v
     font-size:21px;
   }
 }
+
+
+/* ===== v10: stream history / daily word / visual effects ===== */
+.extra-cards{
+  margin-top:22px;
+}
+
+.history-lead{
+  color:var(--muted);
+  font-weight:900;
+  line-height:1.7;
+  margin:0 0 16px;
+}
+
+.history-list{
+  display:grid;
+  gap:12px;
+}
+
+.history-day{
+  border:1px solid rgba(216,180,254,.30);
+  border-radius:16px;
+  background:
+    radial-gradient(circle at top left, rgba(168,85,247,.15), transparent 42%),
+    rgba(10,4,20,.56);
+  padding:14px 16px;
+  box-shadow:inset 0 0 18px rgba(255,255,255,.03);
+}
+
+.history-date{
+  display:block;
+  color:#d8f3ff;
+  font-weight:1000;
+  text-shadow:0 0 12px rgba(112,214,255,.42);
+  margin-bottom:8px;
+}
+
+.history-games{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+.history-game{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  border:1px solid rgba(216,180,254,.36);
+  border-radius:999px;
+  padding:7px 11px;
+  color:#fff;
+  background:rgba(168,85,247,.14);
+  font-size:13px;
+  font-weight:900;
+  box-shadow:0 0 12px rgba(168,85,247,.16);
+}
+
+.daily-word-card{
+  position:relative;
+  overflow:hidden;
+}
+
+.daily-word-card:before{
+  content:"";
+  position:absolute;
+  inset:-40%;
+  background:radial-gradient(circle, rgba(112,214,255,.12), transparent 38%);
+  animation:dailyGlow 7s ease-in-out infinite alternate;
+  pointer-events:none;
+}
+
+@keyframes dailyGlow{
+  from{transform:translate(-8%, -4%) scale(.95);opacity:.45}
+  to{transform:translate(8%, 5%) scale(1.08);opacity:.85}
+}
+
+.daily-word-box{
+  position:relative;
+  min-height:150px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border:1px solid rgba(112,214,255,.42);
+  border-radius:20px;
+  background:
+    radial-gradient(circle at top left, rgba(112,214,255,.16), transparent 42%),
+    radial-gradient(circle at bottom right, rgba(168,85,247,.16), transparent 45%),
+    rgba(5,2,10,.54);
+  padding:24px;
+  margin-bottom:18px;
+  box-shadow:
+    inset 0 0 24px rgba(112,214,255,.08),
+    0 0 22px rgba(112,214,255,.14);
+}
+
+.daily-word-box p{
+  position:relative;
+  margin:0;
+  color:#fff;
+  font-size:clamp(20px,2.5vw,28px);
+  line-height:1.7;
+  font-weight:1000;
+  text-align:center;
+  text-shadow:
+    0 0 12px rgba(168,85,247,.72),
+    0 0 22px rgba(112,214,255,.35);
+}
+
+.word-reroll-btn{
+  position:relative;
+  width:100%;
+  border:1px solid rgba(216,180,254,.50);
+  border-radius:999px;
+  padding:13px 18px;
+  cursor:pointer;
+  color:#fff;
+  font-weight:1000;
+  background:linear-gradient(180deg,rgba(126,34,206,.78),rgba(88,28,135,.86));
+  box-shadow:0 0 16px rgba(168,85,247,.28);
+  transition:.18s ease;
+}
+
+.word-reroll-btn:hover{
+  transform:translateY(-2px);
+  box-shadow:0 0 28px rgba(168,85,247,.48);
+}
+
+.shooting-stars{
+  position:fixed;
+  inset:0;
+  overflow:hidden;
+  pointer-events:none;
+  z-index:1;
+}
+
+.shooting-stars span{
+  position:absolute;
+  top:20%;
+  left:110%;
+  width:140px;
+  height:2px;
+  border-radius:999px;
+  background:linear-gradient(90deg, rgba(216,180,254,0), rgba(216,180,254,.95), rgba(112,214,255,.70));
+  box-shadow:0 0 14px rgba(216,180,254,.75);
+  transform:rotate(-28deg);
+  animation:shootingStar 8.5s linear infinite;
+  opacity:0;
+}
+
+.shooting-stars span:nth-child(2){
+  top:46%;
+  animation-delay:3.6s;
+  animation-duration:10.5s;
+  width:110px;
+}
+
+.shooting-stars span:nth-child(3){
+  top:70%;
+  animation-delay:6.2s;
+  animation-duration:12s;
+  width:160px;
+}
+
+@keyframes shootingStar{
+  0%,58%{transform:translateX(0) translateY(0) rotate(-28deg);opacity:0}
+  62%{opacity:.95}
+  78%{transform:translateX(-145vw) translateY(62vh) rotate(-28deg);opacity:0}
+  100%{opacity:0}
+}
+
+.particle-layer{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:3;
+  overflow:hidden;
+}
+
+.cursor-particle{
+  position:absolute;
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  background:rgba(216,180,254,.90);
+  box-shadow:
+    0 0 10px rgba(216,180,254,.95),
+    0 0 18px rgba(112,214,255,.45);
+  animation:particleFade .85s ease-out forwards;
+}
+
+.cursor-particle:after{
+  content:"✦";
+  position:absolute;
+  inset:-8px;
+  color:rgba(216,180,254,.75);
+  font-size:14px;
+  line-height:1;
+}
+
+@keyframes particleFade{
+  from{transform:translate(0,0) scale(1);opacity:.95}
+  to{transform:translate(var(--px), var(--py)) scale(.2);opacity:0}
+}
+
+@media (max-width:520px){
+  .history-day{
+    padding:13px;
+  }
+
+  .daily-word-box{
+    min-height:130px;
+    padding:20px;
+  }
+
+  .shooting-stars span{
+    width:95px;
+  }
+}
+
+
+/* ===== v11: daily quote once per day ===== */
+.daily-word-note{
+  position:relative;
+  color:var(--muted);
+  font-weight:900;
+  line-height:1.7;
+  margin:0 0 14px;
+}
+
+.daily-word-box p small{
+  display:block;
+  margin-top:16px;
+  color:#d8f3ff;
+  font-size:15px;
+  font-weight:900;
+  text-shadow:0 0 10px rgba(112,214,255,.36);
+}
+
+.quote-mark{
+  color:#d8b4fe;
+  text-shadow:0 0 12px rgba(168,85,247,.80);
+  padding:0 2px;
+}
+
+.word-reroll-btn{
+  display:none;
+}
