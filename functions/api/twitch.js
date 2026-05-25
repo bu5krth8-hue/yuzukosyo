@@ -1,16 +1,32 @@
-const CHANNEL_LOGIN = "yuzukosyo07";
-
 export async function onRequest(context) {
-  const CLIENT_ID = context.env.TWITCH_CLIENT_ID;
-  const CLIENT_SECRET = context.env.TWITCH_CLIENT_SECRET;
+  const CLIENT_ID =
+    context.env?.TWITCH_CLIENT_ID ||
+    globalThis.TWITCH_CLIENT_ID ||
+    "";
+
+  const CLIENT_SECRET =
+    context.env?.TWITCH_CLIENT_SECRET ||
+    globalThis.TWITCH_CLIENT_SECRET ||
+    "";
+
+  const CHANNEL_LOGIN =
+    context.env?.TWITCH_CHANNEL_LOGIN ||
+    globalThis.TWITCH_CHANNEL_LOGIN ||
+    "yuzukosyo07";
 
   if (!CLIENT_ID || !CLIENT_SECRET) {
     return json({
       configured: false,
       isLive: false,
+      stream: null,
       scheduleConfigured: false,
       schedule: [],
-      scheduleMessage: "Twitch APIキー未設定"
+      scheduleMessage: "Twitch APIキー未設定",
+      debug: {
+        hasClientId: Boolean(CLIENT_ID),
+        hasClientSecret: Boolean(CLIENT_SECRET),
+        channelLogin: CHANNEL_LOGIN
+      }
     });
   }
 
@@ -29,18 +45,37 @@ export async function onRequest(context) {
 
     if (!tokenResponse.ok) {
       const text = await tokenResponse.text();
-      throw new Error(`Twitch token error: ${tokenResponse.status} ${text}`);
+
+      return json({
+        configured: true,
+        isLive: false,
+        stream: null,
+        scheduleConfigured: false,
+        schedule: [],
+        scheduleMessage: "Twitchトークン取得エラー",
+        error: `Twitch token error: ${tokenResponse.status} ${text}`
+      });
     }
 
     const tokenData = await tokenResponse.json();
     const accessToken = tokenData.access_token;
+
+    if (!accessToken) {
+      return json({
+        configured: true,
+        isLive: false,
+        stream: null,
+        scheduleConfigured: false,
+        schedule: [],
+        scheduleMessage: "Twitchアクセストークンが取得できませんでした"
+      });
+    }
 
     const commonHeaders = {
       "Client-ID": CLIENT_ID,
       "Authorization": `Bearer ${accessToken}`
     };
 
-    // ユーザーID取得（配信予定APIに必要）
     const userResponse = await fetch(
       `https://api.twitch.tv/helix/users?login=${encodeURIComponent(CHANNEL_LOGIN)}`,
       { headers: commonHeaders }
@@ -48,7 +83,16 @@ export async function onRequest(context) {
 
     if (!userResponse.ok) {
       const text = await userResponse.text();
-      throw new Error(`Twitch user error: ${userResponse.status} ${text}`);
+
+      return json({
+        configured: true,
+        isLive: false,
+        stream: null,
+        scheduleConfigured: false,
+        schedule: [],
+        scheduleMessage: "Twitchユーザー取得エラー",
+        error: `Twitch user error: ${userResponse.status} ${text}`
+      });
     }
 
     const userData = await userResponse.json();
@@ -57,14 +101,15 @@ export async function onRequest(context) {
     if (!user) {
       return json({
         configured: true,
+        channel: CHANNEL_LOGIN,
         isLive: false,
+        stream: null,
         scheduleConfigured: false,
         schedule: [],
         scheduleMessage: "Twitchユーザーが見つかりませんでした"
       });
     }
 
-    // LIVE情報取得
     const liveResponse = await fetch(
       `https://api.twitch.tv/helix/streams?user_login=${encodeURIComponent(CHANNEL_LOGIN)}`,
       { headers: commonHeaders }
@@ -72,13 +117,22 @@ export async function onRequest(context) {
 
     if (!liveResponse.ok) {
       const text = await liveResponse.text();
-      throw new Error(`Twitch live error: ${liveResponse.status} ${text}`);
+
+      return json({
+        configured: true,
+        channel: CHANNEL_LOGIN,
+        isLive: false,
+        stream: null,
+        scheduleConfigured: false,
+        schedule: [],
+        scheduleMessage: "Twitchライブ情報取得エラー",
+        error: `Twitch live error: ${liveResponse.status} ${text}`
+      });
     }
 
     const liveData = await liveResponse.json();
     const live = liveData.data && liveData.data[0];
 
-    // 配信予定取得
     let scheduleConfigured = true;
     let scheduleMessage = "Twitchの配信予定を取得しました";
     let schedule = [];
@@ -91,48 +145,55 @@ export async function onRequest(context) {
 
       if (scheduleResponse.ok) {
         const scheduleData = await scheduleResponse.json();
-        const segments = scheduleData.data && Array.isArray(scheduleData.data.segments)
-          ? scheduleData.data.segments
-          : [];
+        const segments =
+          scheduleData.data && Array.isArray(scheduleData.data.segments)
+            ? scheduleData.data.segments
+            : [];
 
         schedule = segments.map((segment) => ({
           startTime: segment.start_time || "",
           endTime: segment.end_time || "",
           title: segment.title || "配信予定",
-          category: segment.category && segment.category.name
-            ? segment.category.name
-            : "カテゴリ未設定"
+          category:
+            segment.category && segment.category.name
+              ? segment.category.name
+              : "カテゴリ未設定"
         }));
       } else {
+        const text = await scheduleResponse.text();
         scheduleConfigured = false;
-        scheduleMessage = "Twitch配信予定を取得できませんでした";
+        scheduleMessage = `Twitch配信予定を取得できませんでした: ${scheduleResponse.status} ${text}`;
       }
     } catch (scheduleError) {
       scheduleConfigured = false;
-      scheduleMessage = "Twitch配信予定を取得できませんでした";
+      scheduleMessage = `Twitch配信予定を取得できませんでした: ${scheduleError.message}`;
     }
 
     return json({
       configured: true,
       channel: CHANNEL_LOGIN,
       isLive: Boolean(live),
-      stream: live ? {
-        title: live.title || "配信中",
-        gameName: live.game_name || "未設定",
-        viewerCount: live.viewer_count || 0,
-        startedAt: live.started_at || "",
-        thumbnailUrl: live.thumbnail_url
-          ? live.thumbnail_url.replace("{width}", "640").replace("{height}", "360")
-          : ""
-      } : null,
+      stream: live
+        ? {
+            title: live.title || "配信中",
+            gameName: live.game_name || "未設定",
+            viewerCount: live.viewer_count || 0,
+            startedAt: live.started_at || "",
+            thumbnailUrl: live.thumbnail_url
+              ? live.thumbnail_url
+                  .replace("{width}", "640")
+                  .replace("{height}", "360")
+              : ""
+          }
+        : null,
       scheduleConfigured,
       scheduleMessage,
       schedule
     });
-
   } catch (error) {
     return json({
       configured: true,
+      channel: CHANNEL_LOGIN,
       isLive: false,
       stream: null,
       scheduleConfigured: false,
