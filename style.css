@@ -559,3 +559,17 @@ footer{position:relative;z-index:2;text-align:center;padding:28px 0 50px;color:v
 .word-reroll-btn{
   display:none;
 }
+
+
+/* ===== v12: schedule and history side by side ===== */
+.single-card-row{
+  grid-template-columns:1fr;
+}
+
+.single-card-row .daily-word-card{
+  max-width:none;
+}
+
+.stream-history-card{
+  min-height:100%;
+}
