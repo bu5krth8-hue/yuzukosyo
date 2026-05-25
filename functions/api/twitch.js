@@ -24,6 +24,7 @@ export async function onRequest(context) {
   try {
     const tokenResponse = await fetch("https://id.twitch.tv/oauth2/token", {
       method: "POST",
+      cache: "no-store",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded"
       },
@@ -77,11 +78,15 @@ export async function onRequest(context) {
 
     const userResponse = await fetch(
       `https://api.twitch.tv/helix/users?login=${encodeURIComponent(CHANNEL_LOGIN)}`,
-      { headers: commonHeaders }
+      {
+        cache: "no-store",
+        headers: commonHeaders
+      }
     );
 
     if (!userResponse.ok) {
       const text = await userResponse.text();
+
       return json({
         configured: true,
         isLive: false,
@@ -110,11 +115,15 @@ export async function onRequest(context) {
 
     const liveResponse = await fetch(
       `https://api.twitch.tv/helix/streams?user_login=${encodeURIComponent(CHANNEL_LOGIN)}`,
-      { headers: commonHeaders }
+      {
+        cache: "no-store",
+        headers: commonHeaders
+      }
     );
 
     if (!liveResponse.ok) {
       const text = await liveResponse.text();
+
       return json({
         configured: true,
         channel: CHANNEL_LOGIN,
@@ -136,8 +145,11 @@ export async function onRequest(context) {
 
     try {
       const scheduleResponse = await fetch(
-        `https://api.twitch.tv/helix/schedule?broadcaster_id=${encodeURIComponent(user.id)}&first=5`,
-        { headers: commonHeaders }
+        `https://api.twitch.tv/helix/schedule?broadcaster_id=${encodeURIComponent(user.id)}&first=10`,
+        {
+          cache: "no-store",
+          headers: commonHeaders
+        }
       );
 
       if (scheduleResponse.ok) {
@@ -149,15 +161,30 @@ export async function onRequest(context) {
             ? scheduleData.data.segments
             : [];
 
-        schedule = segments.map((segment) => ({
-          startTime: segment.start_time || "",
-          endTime: segment.end_time || "",
-          title: segment.title || "配信予定",
-          category:
-            segment.category && segment.category.name
-              ? segment.category.name
-              : "カテゴリ未設定"
-        }));
+        const now = new Date();
+
+        schedule = segments
+          .filter((segment) => {
+            if (segment.canceled_until) return false;
+
+            const endTime = segment.end_time
+              ? new Date(segment.end_time)
+              : null;
+
+            if (endTime && endTime < now) return false;
+
+            return true;
+          })
+          .slice(0, 5)
+          .map((segment) => ({
+            startTime: segment.start_time || "",
+            endTime: segment.end_time || "",
+            title: segment.title || "配信予定",
+            category:
+              segment.category && segment.category.name
+                ? segment.category.name
+                : "カテゴリ未設定"
+          }));
       } else {
         scheduleConfigured = false;
         scheduleMessage = "スケジュール取得失敗";
@@ -206,7 +233,9 @@ function json(data) {
   return new Response(JSON.stringify(data), {
     headers: {
       "Content-Type": "application/json; charset=utf-8",
-      "Cache-Control": "no-store"
+      "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
+      "Pragma": "no-cache",
+      "Expires": "0"
     }
   });
 }
