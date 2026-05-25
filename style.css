@@ -657,3 +657,30 @@ footer{position:relative;z-index:2;text-align:center;padding:28px 0 50px;color:v
   width:100%;
   margin:0 auto;
 }
+
+
+/* ===== center the schedule empty/list card itself ===== */
+.schedule-wide-card .schedule-list{
+  display:flex !important;
+  flex-direction:column;
+  align-items:center !important;
+  justify-content:center !important;
+  width:100%;
+}
+
+.schedule-wide-card .schedule-list li{
+  width:min(560px, 100%) !important;
+  margin-left:auto !important;
+  margin-right:auto !important;
+  text-align:center !important;
+}
+
+.schedule-wide-card .schedule-list li span{
+  text-align:center !important;
+}
+
+.schedule-wide-card .schedule-title,
+.schedule-wide-card .schedule-category,
+.schedule-wide-card .schedule-date{
+  text-align:center !important;
+}
