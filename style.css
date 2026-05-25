@@ -19,50 +19,75 @@ footer{position:relative;z-index:2;text-align:center;padding:28px 0 50px;color:v
 .brand-icon img{width:42px;height:42px;display:block;object-fit:contain;color:var(--text);filter:drop-shadow(0 0 10px rgba(216,180,254,.45))}.switch.discord:hover .brand-icon img,.switch.twitch:hover .brand-icon img{filter:drop-shadow(0 0 16px rgba(168,85,247,.8))}.schedule-status{margin:0 0 12px;color:#d8f3ff;font-weight:900;text-shadow:0 0 12px rgba(112,214,255,.35)}.schedule-list{list-style:none!important;margin:0 0 18px!important;padding:0!important;display:grid;gap:10px}.schedule-list li{border:1px solid rgba(216,180,254,.25);border-radius:14px;background:rgba(10,4,20,.48);padding:12px 14px;line-height:1.55!important}.schedule-date{display:block;color:#d8b4fe;font-weight:1000}.schedule-title{display:block;color:#fff;font-weight:1000}.schedule-category{display:block;color:var(--muted);font-size:13px;font-weight:800;margin-top:2px}.schedule-note{color:var(--muted);font-size:13px;font-weight:800;line-height:1.7;margin:0 0 16px}
 
 
-/* ===== Brand icon color tuning ===== */
+/* ===== v2: brand icon visibility fix ===== */
+.switch .brand-icon{
+  width:52px;
+  height:52px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.switch .brand-icon img{
+  width:52px;
+  height:52px;
+  display:block;
+  object-fit:contain;
+  opacity:1 !important;
+  filter:none !important;
+}
 
 .switch.discord{
-  border-color: rgba(88,101,242,.95);
+  border-color:rgba(88,101,242,.98) !important;
   box-shadow:
-    0 0 28px rgba(88,101,242,.38),
-    inset 0 0 22px rgba(88,101,242,.12);
+    0 0 22px rgba(88,101,242,.55),
+    0 0 44px rgba(88,101,242,.28),
+    inset 0 0 22px rgba(88,101,242,.14) !important;
 }
 
 .switch.discord:hover{
   box-shadow:
-    0 0 42px rgba(88,101,242,.65),
-    inset 0 0 28px rgba(88,101,242,.18);
+    0 0 34px rgba(88,101,242,.75),
+    0 0 64px rgba(88,101,242,.38),
+    inset 0 0 28px rgba(88,101,242,.20) !important;
+}
+
+.switch.discord strong{
+  color:#ffffff !important;
+  text-shadow:0 0 12px rgba(88,101,242,.9);
+}
+
+.switch.discord small{
+  color:#dfe3ff !important;
 }
 
 .switch.twitch{
-  border-color: rgba(145,70,255,.92);
+  border-color:rgba(145,70,255,.98) !important;
   box-shadow:
-    0 0 28px rgba(145,70,255,.34),
-    inset 0 0 22px rgba(145,70,255,.10);
+    0 0 22px rgba(145,70,255,.62),
+    0 0 44px rgba(145,70,255,.30),
+    inset 0 0 22px rgba(145,70,255,.16) !important;
 }
 
 .switch.twitch:hover{
   box-shadow:
-    0 0 42px rgba(145,70,255,.62),
-    inset 0 0 28px rgba(145,70,255,.18);
-}
-
-.switch.discord .brand-icon img{
-  filter:
-    drop-shadow(0 0 10px rgba(88,101,242,.55))
-    drop-shadow(0 0 20px rgba(88,101,242,.35));
-}
-
-.switch.twitch .brand-icon img{
-  filter:
-    drop-shadow(0 0 10px rgba(145,70,255,.55))
-    drop-shadow(0 0 20px rgba(145,70,255,.35));
-}
-
-.switch.discord strong{
-  color:#dfe3ff;
+    0 0 34px rgba(145,70,255,.82),
+    0 0 64px rgba(145,70,255,.42),
+    inset 0 0 28px rgba(145,70,255,.22) !important;
 }
 
 .switch.twitch strong{
-  color:#efe3ff;
+  color:#ffffff !important;
+  text-shadow:0 0 12px rgba(145,70,255,.95);
+}
+
+.switch.twitch small{
+  color:#efe3ff !important;
+}
+
+/* 幽霊の画像崩れ対策：PNGは元データに戻し、ブラウザ補間だけ安定化 */
+.guide img{
+  image-rendering:auto;
+  backface-visibility:hidden;
+  transform:translateZ(0);
 }
