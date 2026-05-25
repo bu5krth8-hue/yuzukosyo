@@ -204,3 +204,111 @@ footer{position:relative;z-index:2;text-align:center;padding:28px 0 50px;color:v
 .x-fallback a:hover{
   box-shadow:0 0 28px rgba(112,214,255,.38);
 }
+
+
+/* ===== v8: reliable X profile panel ===== */
+.x-profile-card{
+  min-height:360px;
+}
+
+.x-profile-lead{
+  color:var(--muted);
+  font-weight:900;
+  line-height:1.8;
+  margin:0 0 18px;
+}
+
+.x-profile-box{
+  display:flex;
+  align-items:center;
+  gap:18px;
+  border:1px solid rgba(112,214,255,.50);
+  border-radius:20px;
+  background:
+    radial-gradient(circle at top left, rgba(112,214,255,.16), transparent 42%),
+    radial-gradient(circle at bottom right, rgba(168,85,247,.14), transparent 45%),
+    rgba(5,2,10,.58);
+  box-shadow:
+    inset 0 0 24px rgba(112,214,255,.10),
+    0 0 24px rgba(112,214,255,.18);
+  padding:22px;
+  margin-bottom:20px;
+}
+
+.x-profile-icon{
+  width:72px;
+  height:72px;
+  flex:0 0 72px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:22px;
+  border:1px solid rgba(112,214,255,.75);
+  color:#fff;
+  font-size:40px;
+  font-weight:1000;
+  background:linear-gradient(180deg, rgba(112,214,255,.18), rgba(168,85,247,.12));
+  box-shadow:
+    0 0 22px rgba(112,214,255,.35),
+    inset 0 0 18px rgba(255,255,255,.05);
+}
+
+.x-profile-main strong{
+  display:block;
+  color:#fff;
+  font-size:24px;
+  text-shadow:0 0 14px rgba(168,85,247,.62);
+}
+
+.x-profile-main span{
+  display:block;
+  color:#d8f3ff;
+  font-weight:900;
+  margin-top:2px;
+}
+
+.x-profile-main p{
+  color:var(--muted);
+  font-weight:800;
+  line-height:1.75;
+  margin:10px 0 0;
+}
+
+.x-action-grid{
+  display:flex;
+  gap:14px;
+  flex-wrap:wrap;
+  margin-bottom:14px;
+}
+
+.x-follow-btn{
+  background:linear-gradient(180deg, rgba(112,214,255,.42), rgba(88,28,135,.86));
+  border-color:rgba(112,214,255,.55);
+}
+
+.x-profile-note{
+  color:rgba(199,183,221,.78);
+  font-size:12px;
+  font-weight:800;
+  line-height:1.7;
+  margin:0;
+}
+
+@media (max-width:520px){
+  .x-profile-box{
+    align-items:flex-start;
+    padding:18px;
+  }
+
+  .x-profile-icon{
+    width:56px;
+    height:56px;
+    flex-basis:56px;
+    font-size:30px;
+    border-radius:18px;
+  }
+
+  .x-profile-main strong{
+    font-size:21px;
+  }
+}

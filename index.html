@@ -69,30 +69,25 @@
     </section>
 
     <section class="cards two-col">
-      <article class="card x-timeline-card">
-        <h2>𝕏 柚胡椒の最新ポスト</h2>
-        <p class="x-timeline-note">Xの最新投稿をここに表示します。</p>
+      <article class="card x-profile-card">
+        <h2>𝕏 柚胡椒のX</h2>
+        <p class="x-profile-lead">最新ポスト・配信告知・お知らせはXで更新中。</p>
 
-        <div class="x-timeline-box" id="xTimelineBox">
-          <a
-            class="twitter-timeline"
-            data-theme="dark"
-            data-height="380"
-            data-width="100%"
-            data-dnt="true"
-            data-chrome="noheader nofooter noborders transparent"
-            href="https://twitter.com/yuzukosyo1106?ref_src=twsrc%5Etfw"
-          >
-            Tweets by yuzukosyo1106
-          </a>
-
-          <div class="x-fallback" id="xFallback">
-            <p>投稿が表示されない場合は、X側で開いて確認できます。</p>
-            <a href="https://x.com/yuzukosyo1106" target="_blank" rel="noopener">Xで柚胡椒を見る →</a>
+        <div class="x-profile-box">
+          <div class="x-profile-icon">𝕏</div>
+          <div class="x-profile-main">
+            <strong>柚胡椒</strong>
+            <span>@yuzukosyo1106</span>
+            <p>配信予定、ゲームのお知らせ、最新ポストはこちらから確認できます。</p>
           </div>
         </div>
 
-        <a class="mini-btn" href="https://x.com/yuzukosyo1106" target="_blank" rel="noopener">Xで開く →</a>
+        <div class="x-action-grid">
+          <a class="mini-btn" href="https://x.com/yuzukosyo1106" target="_blank" rel="noopener">最新ポストを見る →</a>
+          <a class="mini-btn x-follow-btn" href="https://x.com/intent/follow?screen_name=yuzukosyo1106" target="_blank" rel="noopener">フォローする →</a>
+        </div>
+
+        <p class="x-profile-note">※ Xの埋め込み表示はブラウザ・広告ブロック・X側仕様で空欄になる場合があるため、確実に動くリンク型に変更しました。</p>
       </article>
 
       <article class="card" id="schedule">
@@ -137,27 +132,5 @@
     <p>© 2026 柚胡椒の秘密基地 All Rights Reserved.</p>
   </footer>
   <script src="script.js"></script>
-  <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-  <script>
-    window.addEventListener("load", function () {
-      const fallback = document.getElementById("xFallback");
-
-      function showFallbackIfNeeded() {
-        const box = document.getElementById("xTimelineBox");
-        if (!box || !fallback) return;
-
-        const iframe = box.querySelector("iframe");
-        if (!iframe) {
-          fallback.classList.add("is-visible");
-        }
-      }
-
-      if (window.twttr && window.twttr.widgets) {
-        window.twttr.widgets.load();
-      }
-
-      setTimeout(showFallbackIfNeeded, 3500);
-    });
-  </script>
 </body>
 </html>
