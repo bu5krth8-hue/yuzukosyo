@@ -632,3 +632,28 @@ footer{position:relative;z-index:2;text-align:center;padding:28px 0 50px;color:v
 .daily-word-box{
   text-align:center;
 }
+
+
+/* ===== center empty schedule box ===== */
+.schedule-item,
+.schedule-empty,
+.schedule-placeholder{
+  text-align:center !important;
+  align-items:center;
+  justify-content:center;
+}
+
+.schedule-item * ,
+.schedule-empty * ,
+.schedule-placeholder *{
+  text-align:center !important;
+}
+
+.schedule-wide-card .schedule-list{
+  justify-items:center;
+}
+
+.schedule-wide-card .schedule-list li{
+  width:100%;
+  margin:0 auto;
+}
