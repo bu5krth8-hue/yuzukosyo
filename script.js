@@ -7,6 +7,7 @@ async function checkLiveStatus() {
 
     updateLiveArea(data);
     updateScheduleArea(data);
+    updateHistoryArea(data);
 
   } catch (error) {
 
@@ -14,6 +15,7 @@ async function checkLiveStatus() {
 
     showLiveError();
     showScheduleError();
+    showHistoryError();
 
   }
 }
@@ -327,22 +329,21 @@ setInterval(checkLiveStatus, 60000);
 
 setInterval(rotateMascots, 7000);
 
-// 配信履歴：同じ日に複数ゲームを入れられます。
-// 例：{ date: "2026年5月25日", games: ["VALORANT", "雑談"] }
-const streamHistory = [
+const fallbackStreamHistory = [
   {
     date: "2026年5月25日",
-    games: ["雑談", "ゲーム配信"]
+    game: "雑談"
   },
   {
     date: "2026年5月24日",
-    games: ["のんびり配信"]
+    game: "のんびり配信"
   },
   {
     date: "2026年5月23日",
-    games: ["Twitch配信"]
+    game: "Twitch配信"
   }
 ];
+
 
 const dailyQuotes = [
   {
