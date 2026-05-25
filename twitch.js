@@ -13,9 +13,6 @@ export async function onRequest(context) {
       scheduleConfigured: false,
       schedule: [],
       scheduleMessage: "Twitch APIキー未設定",
-      historyConfigured: false,
-      streamHistory: [],
-      historyMessage: "Twitch APIキー未設定",
       debug: {
         hasClientId: Boolean(CLIENT_ID),
         hasClientSecret: Boolean(CLIENT_SECRET),
@@ -48,9 +45,6 @@ export async function onRequest(context) {
         scheduleConfigured: false,
         schedule: [],
         scheduleMessage: "Twitchトークン取得エラー",
-        historyConfigured: false,
-        streamHistory: [],
-        historyMessage: "Twitchトークン取得エラー",
         error: `Twitch token error: ${tokenResponse.status} ${text}`,
         debug: {
           hasClientId: Boolean(CLIENT_ID),
@@ -73,10 +67,7 @@ export async function onRequest(context) {
         stream: null,
         scheduleConfigured: false,
         schedule: [],
-        scheduleMessage: "アクセストークン取得失敗",
-        historyConfigured: false,
-        streamHistory: [],
-        historyMessage: "アクセストークン取得失敗"
+        scheduleMessage: "アクセストークン取得失敗"
       });
     }
 
@@ -103,9 +94,6 @@ export async function onRequest(context) {
         scheduleConfigured: false,
         schedule: [],
         scheduleMessage: "Twitchユーザー取得エラー",
-        historyConfigured: false,
-        streamHistory: [],
-        historyMessage: "Twitchユーザー取得エラー",
         error: `Twitch user error: ${userResponse.status} ${text}`
       });
     }
@@ -121,10 +109,7 @@ export async function onRequest(context) {
         stream: null,
         scheduleConfigured: false,
         schedule: [],
-        scheduleMessage: "Twitchユーザーが見つかりません",
-        historyConfigured: false,
-        streamHistory: [],
-        historyMessage: "Twitchユーザーが見つかりません"
+        scheduleMessage: "Twitchユーザーが見つかりません"
       });
     }
 
@@ -147,9 +132,6 @@ export async function onRequest(context) {
         scheduleConfigured: false,
         schedule: [],
         scheduleMessage: "ライブ情報取得エラー",
-        historyConfigured: false,
-        streamHistory: [],
-        historyMessage: "ライブ情報取得エラー",
         error: `Twitch live error: ${liveResponse.status} ${text}`
       });
     }
@@ -212,43 +194,6 @@ export async function onRequest(context) {
       scheduleMessage = "スケジュール取得例外";
     }
 
-    let historyConfigured = true;
-    let historyMessage = "Twitchの過去配信を取得しました";
-    let streamHistory = [];
-
-    try {
-      const videosResponse = await fetch(
-        `https://api.twitch.tv/helix/videos?user_id=${encodeURIComponent(user.id)}&type=archive&first=6`,
-        {
-          cache: "no-store",
-          headers: commonHeaders
-        }
-      );
-
-      if (videosResponse.ok) {
-        const videosData = await videosResponse.json();
-        const videos = Array.isArray(videosData.data)
-          ? videosData.data
-          : [];
-
-        streamHistory = videos
-          .filter((video) => video && video.created_at)
-          .slice(0, 5)
-          .map((video) => ({
-            date: video.created_at || "",
-            title: video.title || "Twitch配信",
-            game: video.game_name || "カテゴリ未設定",
-            url: video.url || ""
-          }));
-      } else {
-        historyConfigured = false;
-        historyMessage = "配信履歴取得失敗";
-      }
-    } catch (historyError) {
-      historyConfigured = false;
-      historyMessage = "配信履歴取得例外";
-    }
-
     return json({
       configured: true,
       channel: CHANNEL_LOGIN,
@@ -268,10 +213,7 @@ export async function onRequest(context) {
         : null,
       scheduleConfigured,
       scheduleMessage,
-      schedule,
-      historyConfigured,
-      historyMessage,
-      streamHistory
+      schedule
     });
   } catch (error) {
     return json({
@@ -282,9 +224,6 @@ export async function onRequest(context) {
       scheduleConfigured: false,
       schedule: [],
       scheduleMessage: "Twitch API取得エラー",
-      historyConfigured: false,
-      streamHistory: [],
-      historyMessage: "Twitch API取得エラー",
       error: error.message
     });
   }

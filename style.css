@@ -573,37 +573,3 @@ footer{position:relative;z-index:2;text-align:center;padding:28px 0 50px;color:v
 .stream-history-card{
   min-height:100%;
 }
-
-
-/* ===== v14: Twitch API auto stream history ===== */
-.history-link{
-  display:block;
-  text-decoration:none;
-  color:var(--text);
-  transition:.18s ease;
-}
-
-.history-link:hover{
-  transform:translateY(-2px);
-  border-color:rgba(112,214,255,.62);
-  box-shadow:
-    0 0 24px rgba(112,214,255,.20),
-    inset 0 0 18px rgba(255,255,255,.04);
-}
-
-.history-title{
-  display:block;
-  color:var(--muted);
-  font-size:13px;
-  font-weight:900;
-  line-height:1.55;
-  margin:-2px 0 9px;
-}
-
-.history-error-note{
-  color:rgba(199,183,221,.82);
-  font-size:12px;
-  font-weight:800;
-  line-height:1.7;
-  margin:4px 0 0;
-}
