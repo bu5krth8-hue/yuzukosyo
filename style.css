@@ -17,3 +17,52 @@ footer{position:relative;z-index:2;text-align:center;padding:28px 0 50px;color:v
 
 /* Twitch schedule / brand icons */
 .brand-icon img{width:42px;height:42px;display:block;object-fit:contain;color:var(--text);filter:drop-shadow(0 0 10px rgba(216,180,254,.45))}.switch.discord:hover .brand-icon img,.switch.twitch:hover .brand-icon img{filter:drop-shadow(0 0 16px rgba(168,85,247,.8))}.schedule-status{margin:0 0 12px;color:#d8f3ff;font-weight:900;text-shadow:0 0 12px rgba(112,214,255,.35)}.schedule-list{list-style:none!important;margin:0 0 18px!important;padding:0!important;display:grid;gap:10px}.schedule-list li{border:1px solid rgba(216,180,254,.25);border-radius:14px;background:rgba(10,4,20,.48);padding:12px 14px;line-height:1.55!important}.schedule-date{display:block;color:#d8b4fe;font-weight:1000}.schedule-title{display:block;color:#fff;font-weight:1000}.schedule-category{display:block;color:var(--muted);font-size:13px;font-weight:800;margin-top:2px}.schedule-note{color:var(--muted);font-size:13px;font-weight:800;line-height:1.7;margin:0 0 16px}
+
+
+/* ===== Brand icon color tuning ===== */
+
+.switch.discord{
+  border-color: rgba(88,101,242,.95);
+  box-shadow:
+    0 0 28px rgba(88,101,242,.38),
+    inset 0 0 22px rgba(88,101,242,.12);
+}
+
+.switch.discord:hover{
+  box-shadow:
+    0 0 42px rgba(88,101,242,.65),
+    inset 0 0 28px rgba(88,101,242,.18);
+}
+
+.switch.twitch{
+  border-color: rgba(145,70,255,.92);
+  box-shadow:
+    0 0 28px rgba(145,70,255,.34),
+    inset 0 0 22px rgba(145,70,255,.10);
+}
+
+.switch.twitch:hover{
+  box-shadow:
+    0 0 42px rgba(145,70,255,.62),
+    inset 0 0 28px rgba(145,70,255,.18);
+}
+
+.switch.discord .brand-icon img{
+  filter:
+    drop-shadow(0 0 10px rgba(88,101,242,.55))
+    drop-shadow(0 0 20px rgba(88,101,242,.35));
+}
+
+.switch.twitch .brand-icon img{
+  filter:
+    drop-shadow(0 0 10px rgba(145,70,255,.55))
+    drop-shadow(0 0 20px rgba(145,70,255,.35));
+}
+
+.switch.discord strong{
+  color:#dfe3ff;
+}
+
+.switch.twitch strong{
+  color:#efe3ff;
+}
