@@ -275,7 +275,8 @@ const ghostFaces = [
   {
     src: "assets/ghost-wink.png",
     text: "コメントくれるとめっちゃ嬉しいよ〜！"
-  },];
+  }
+];
 
 const tanuFaces = [
   {
