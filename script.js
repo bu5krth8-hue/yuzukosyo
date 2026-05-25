@@ -1,4 +1,4 @@
-const TWITCH_FUNCTION_URL = "/api/twitch";
+const TWITCH_FUNCTION_URL = "/twitch";
 
 async function checkLiveStatus() {
   try {
