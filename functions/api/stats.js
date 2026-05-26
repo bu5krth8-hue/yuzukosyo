@@ -1,4 +1,4 @@
-export async function onRequestPost(context) {
+export async function onRequest(context) {
   const env = context.env || {};
   const kv = env.SITE_STATS;
 
@@ -28,38 +28,6 @@ export async function onRequestPost(context) {
       configured: false,
       total: 0,
       message: "アクセス数の更新に失敗しました",
-      error: error.message
-    }, 500);
-  }
-}
-
-export async function onRequestGet(context) {
-  const env = context.env || {};
-  const kv = env.SITE_STATS;
-
-  if (!kv) {
-    return json({
-      configured: false,
-      total: 0,
-      message: "Cloudflare KV binding「SITE_STATS」が未設定です"
-    }, 200);
-  }
-
-  try {
-    const key = "total_access";
-    const currentValue = await kv.get(key);
-    const current = Number.parseInt(currentValue || "0", 10);
-
-    return json({
-      configured: true,
-      total: Number.isFinite(current) ? current : 0,
-      message: "アクセス数を取得しました"
-    });
-  } catch (error) {
-    return json({
-      configured: false,
-      total: 0,
-      message: "アクセス数の取得に失敗しました",
       error: error.message
     }, 500);
   }

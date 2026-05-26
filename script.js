@@ -459,10 +459,17 @@ async function updateAccessCount() {
   if (!countEl) return;
 
   try {
-    const response = await fetch(ACCESS_STATS_URL, {
+    let response = await fetch(ACCESS_STATS_URL, {
       method: "POST",
       cache: "no-store"
     });
+
+    if (!response.ok) {
+      response = await fetch(ACCESS_STATS_URL, {
+        method: "GET",
+        cache: "no-store"
+      });
+    }
 
     const data = await response.json();
 
