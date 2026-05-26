@@ -449,49 +449,60 @@ setDailyQuote();
 setupCursorParticles();
 
 
-// 累計アクセス数
-const ACCESS_STATS_URL = "/api/stats";
 
-async function updateAccessCount() {
-  const countEl = document.getElementById("totalAccessCount");
-  const noteEl = document.getElementById("accessNote");
 
-  if (!countEl) return;
+// 累計アクセス数：表示安定版
+(function () {
+  const ACCESS_STATS_URL = "/api/stats";
 
-  try {
-    let response = await fetch(ACCESS_STATS_URL, {
-      method: "POST",
-      cache: "no-store"
-    });
+  function setCounterText(value) {
+    const countEl = document.getElementById("totalAccessCount");
+    if (!countEl) return;
 
-    if (!response.ok) {
-      response = await fetch(ACCESS_STATS_URL, {
-        method: "GET",
-        cache: "no-store"
-      });
-    }
-
-    const data = await response.json();
-
-    if (!response.ok || !data.configured) {
+    if (typeof value === "number" && Number.isFinite(value)) {
+      countEl.innerText = value.toLocaleString("ja-JP");
+    } else {
       countEl.innerText = "準備中";
-      if (noteEl) {
-        noteEl.innerText = data.message || "Cloudflare KVを設定すると累計アクセス数を表示できます。";
-      }
-      return;
-    }
-
-    countEl.innerText = Number(data.total || 0).toLocaleString("ja-JP");
-
-    if (noteEl) {
-      noteEl.innerText = "アクセスされるたびに自動で更新されます。";
-    }
-  } catch (error) {
-    countEl.innerText = "準備中";
-    if (noteEl) {
-      noteEl.innerText = "アクセス数の取得に失敗しました。Cloudflare KV設定を確認してください。";
     }
   }
-}
 
-updateAccessCount();
+  function setCounterNote(text) {
+    const noteEl = document.getElementById("accessNote");
+    if (!noteEl) return;
+    noteEl.innerText = text;
+  }
+
+  async function loadAccessCount() {
+    setCounterNote("来場者数を確認中…");
+
+    try {
+      const response = await fetch(`${ACCESS_STATS_URL}?t=${Date.now()}`, {
+        method: "GET",
+        cache: "no-store",
+        headers: {
+          "Accept": "application/json"
+        }
+      });
+
+      const data = await response.json();
+
+      if (data && data.configured && typeof data.total === "number") {
+        setCounterText(data.total);
+        setCounterNote("秘密基地に来てくれた人数を自動カウント中。");
+        return;
+      }
+
+      setCounterText(null);
+      setCounterNote(data && data.message ? data.message : "来場者数を取得できませんでした。");
+    } catch (error) {
+      setCounterText(null);
+      setCounterNote("来場者数の取得に失敗しました。");
+    }
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", loadAccessCount);
+  } else {
+    loadAccessCount();
+  }
+})();
