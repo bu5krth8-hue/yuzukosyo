@@ -981,3 +981,11 @@ footer{position:relative;z-index:2;text-align:center;padding:28px 0 50px;color:v
     margin-bottom:18px;
   }
 }
+
+
+/* ===== final counter display fix ===== */
+.base-counter-number{
+  display:inline-block !important;
+  min-width:1.5em;
+  text-align:center !important;
+}

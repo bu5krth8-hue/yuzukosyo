@@ -451,32 +451,33 @@ setupCursorParticles();
 
 
 
-// 累計アクセス数：表示安定版
+
+
+// 累計アクセス数：最終安定版
 (function () {
   const ACCESS_STATS_URL = "/api/stats";
 
-  function setCounterText(value) {
+  function updateCounterDisplay(total, note) {
     const countEl = document.getElementById("totalAccessCount");
-    if (!countEl) return;
+    const noteEl = document.getElementById("accessNote");
 
-    if (typeof value === "number" && Number.isFinite(value)) {
-      countEl.innerText = value.toLocaleString("ja-JP");
-    } else {
-      countEl.innerText = "準備中";
+    if (countEl) {
+      const number = Number(total);
+      countEl.textContent = Number.isFinite(number)
+        ? number.toLocaleString("ja-JP")
+        : "0";
+    }
+
+    if (noteEl) {
+      noteEl.textContent = note || "秘密基地に来てくれた人数を自動カウント中。";
     }
   }
 
-  function setCounterNote(text) {
-    const noteEl = document.getElementById("accessNote");
-    if (!noteEl) return;
-    noteEl.innerText = text;
-  }
-
   async function loadAccessCount() {
-    setCounterNote("来場者数を確認中…");
+    updateCounterDisplay(null, "来場者数を確認中…");
 
     try {
-      const response = await fetch(`${ACCESS_STATS_URL}?t=${Date.now()}`, {
+      const response = await fetch(`${ACCESS_STATS_URL}?cacheBust=${Date.now()}`, {
         method: "GET",
         cache: "no-store",
         headers: {
@@ -486,17 +487,13 @@ setupCursorParticles();
 
       const data = await response.json();
 
-      if (data && data.configured && typeof data.total === "number") {
-        setCounterText(data.total);
-        setCounterNote("秘密基地に来てくれた人数を自動カウント中。");
-        return;
+      if (data && data.configured === true && Number.isFinite(Number(data.total))) {
+        updateCounterDisplay(Number(data.total), "秘密基地に来てくれた人数を自動カウント中。");
+      } else {
+        updateCounterDisplay(0, data && data.message ? data.message : "来場者数を取得できませんでした。");
       }
-
-      setCounterText(null);
-      setCounterNote(data && data.message ? data.message : "来場者数を取得できませんでした。");
     } catch (error) {
-      setCounterText(null);
-      setCounterNote("来場者数の取得に失敗しました。");
+      updateCounterDisplay(0, "来場者数の取得に失敗しました。");
     }
   }
 
