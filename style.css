@@ -963,3 +963,21 @@ footer{position:relative;z-index:2;text-align:center;padding:28px 0 50px;color:v
     min-width:auto;
   }
 }
+
+
+/* ===== visitor counter top position ===== */
+.hero + .base-counter-card{
+  margin-top:6px;
+  margin-bottom:24px;
+}
+
+.hero + .base-counter-card .access-note{
+  margin-top:8px;
+}
+
+@media (max-width:520px){
+  .hero + .base-counter-card{
+    margin-top:2px;
+    margin-bottom:18px;
+  }
+}
