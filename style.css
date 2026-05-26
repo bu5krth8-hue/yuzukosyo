@@ -1756,3 +1756,202 @@ footer{position:relative;z-index:2;text-align:center;padding:28px 0 50px;color:v
   .resident-cameo-bubble strong{font-size:13px;}
   .resident-cameo-bubble span{font-size:12px;}
 }
+
+
+/* ===== v25: TOP residents as mascot-style floating characters ===== */
+.mascot-area{
+  min-height:760px !important;
+  margin-top:6px;
+}
+
+.resident-cameos{
+  position:absolute !important;
+  inset:0 !important;
+  display:block !important;
+  z-index:6;
+  pointer-events:none;
+}
+
+.resident-cameo{
+  position:absolute !important;
+  display:flex !important;
+  align-items:center !important;
+  gap:14px !important;
+  width:390px !important;
+  min-height:0 !important;
+  padding:0 !important;
+  border:0 !important;
+  border-radius:0 !important;
+  background:transparent !important;
+  box-shadow:none !important;
+  backdrop-filter:none !important;
+}
+
+.resident-cameo img{
+  position:static !important;
+  flex:0 0 auto !important;
+  width:150px !important;
+  height:auto !important;
+  object-fit:contain !important;
+  border-radius:34px !important;
+  background:transparent !important;
+  box-shadow:none !important;
+  filter:
+    drop-shadow(0 0 12px rgba(216,180,254,.55))
+    drop-shadow(0 0 26px rgba(168,85,247,.36)) !important;
+  -webkit-mask-image:radial-gradient(ellipse at center, #000 58%, rgba(0,0,0,.88) 72%, transparent 91%);
+  mask-image:radial-gradient(ellipse at center, #000 58%, rgba(0,0,0,.88) 72%, transparent 91%);
+  animation:residentBuddyFloat 4.8s ease-in-out infinite !important;
+}
+
+.resident-cameo-bubble{
+  position:relative !important;
+  width:205px !important;
+  min-height:74px !important;
+  display:flex !important;
+  flex-direction:column !important;
+  justify-content:center !important;
+  padding:13px 16px !important;
+  border:1px solid rgba(216,180,254,.46) !important;
+  border-radius:22px !important;
+  background:rgba(20,8,32,.80) !important;
+  box-shadow:
+    0 0 24px rgba(168,85,247,.28),
+    inset 0 0 18px rgba(255,255,255,.04) !important;
+  backdrop-filter:blur(10px) !important;
+}
+
+.resident-cameo-bubble::before{
+  content:"";
+  position:absolute;
+  left:-8px;
+  top:50%;
+  width:14px;
+  height:14px;
+  transform:translateY(-50%) rotate(45deg);
+  background:rgba(20,8,32,.86);
+  border-left:1px solid rgba(216,180,254,.42);
+  border-bottom:1px solid rgba(216,180,254,.42);
+}
+
+.resident-cameo-bubble strong{
+  display:block !important;
+  margin-bottom:3px !important;
+  color:#fff !important;
+  font-size:14px !important;
+  font-weight:1000 !important;
+  line-height:1.25 !important;
+  text-shadow:0 0 12px rgba(168,85,247,.78) !important;
+}
+
+.resident-cameo-bubble span{
+  display:block !important;
+  color:#f5eaff !important;
+  font-size:13px !important;
+  font-weight:900 !important;
+  line-height:1.55 !important;
+}
+
+.resident-cameo-cat{
+  left:30px !important;
+  top:322px !important;
+}
+.resident-cameo-cat img{width:160px !important;}
+
+.resident-cameo-owl{
+  right:34px !important;
+  top:318px !important;
+  flex-direction:row-reverse !important;
+}
+.resident-cameo-owl img{width:158px !important;}
+.resident-cameo-owl .resident-cameo-bubble::before,
+.resident-cameo-devil .resident-cameo-bubble::before{
+  left:auto;
+  right:-8px;
+  border-left:0;
+  border-bottom:0;
+  border-right:1px solid rgba(216,180,254,.42);
+  border-top:1px solid rgba(216,180,254,.42);
+}
+
+.resident-cameo-chest{
+  left:132px !important;
+  top:520px !important;
+}
+.resident-cameo-chest img{width:172px !important;}
+
+.resident-cameo-devil{
+  right:122px !important;
+  top:514px !important;
+  flex-direction:row-reverse !important;
+}
+.resident-cameo-devil img{width:165px !important;}
+
+.resident-cameo-owl .resident-cameo-bubble{
+  border-color:rgba(255,215,128,.48) !important;
+  box-shadow:0 0 24px rgba(255,215,128,.18), inset 0 0 18px rgba(255,255,255,.04) !important;
+}
+.resident-cameo-chest .resident-cameo-bubble{
+  border-color:rgba(255,193,90,.50) !important;
+  box-shadow:0 0 24px rgba(255,193,90,.20), inset 0 0 18px rgba(255,255,255,.04) !important;
+}
+.resident-cameo-devil .resident-cameo-bubble{
+  border-color:rgba(255,80,210,.48) !important;
+  box-shadow:0 0 24px rgba(255,80,210,.20), inset 0 0 18px rgba(255,255,255,.04) !important;
+}
+
+@keyframes residentBuddyFloat{
+  0%,100%{transform:translateY(0) rotate(0deg)}
+  50%{transform:translateY(-12px) rotate(1deg)}
+}
+
+@media (max-width:980px){
+  .mascot-area{min-height:860px !important;}
+  .resident-cameo{width:340px !important;gap:10px !important;}
+  .resident-cameo img{width:128px !important;}
+  .resident-cameo-bubble{width:188px !important;padding:12px 14px !important;}
+  .resident-cameo-cat{left:4px !important;top:330px !important;}
+  .resident-cameo-owl{right:2px !important;top:330px !important;}
+  .resident-cameo-chest{left:36px !important;top:540px !important;}
+  .resident-cameo-devil{right:30px !important;top:540px !important;}
+}
+
+@media (max-width:820px){
+  .mascot-area{min-height:1240px !important;}
+  .resident-cameos{top:0 !important;}
+  .resident-cameo{
+    left:0 !important;
+    right:auto !important;
+    width:100% !important;
+    max-width:520px !important;
+    gap:12px !important;
+  }
+  .resident-cameo img{width:130px !important;}
+  .resident-cameo-bubble{width:min(300px,calc(100vw - 170px)) !important;min-height:74px !important;}
+  .resident-cameo-cat{top:550px !important;}
+  .resident-cameo-owl{top:705px !important;flex-direction:row !important;}
+  .resident-cameo-chest{top:860px !important;}
+  .resident-cameo-devil{top:1015px !important;flex-direction:row !important;}
+  .resident-cameo-owl .resident-cameo-bubble::before,
+  .resident-cameo-devil .resident-cameo-bubble::before{
+    left:-8px;
+    right:auto;
+    border-right:0;
+    border-top:0;
+    border-left:1px solid rgba(216,180,254,.42);
+    border-bottom:1px solid rgba(216,180,254,.42);
+  }
+}
+
+@media (max-width:520px){
+  .mascot-area{min-height:1250px !important;}
+  .resident-cameo{gap:8px !important;}
+  .resident-cameo img{width:112px !important;border-radius:24px !important;}
+  .resident-cameo-bubble{width:calc(100vw - 150px) !important;min-height:66px !important;padding:10px 12px !important;border-radius:18px !important;}
+  .resident-cameo-bubble strong{font-size:12.5px !important;}
+  .resident-cameo-bubble span{font-size:11.5px !important;line-height:1.45 !important;}
+  .resident-cameo-cat{top:535px !important;}
+  .resident-cameo-owl{top:690px !important;}
+  .resident-cameo-chest{top:845px !important;}
+  .resident-cameo-devil{top:1000px !important;}
+}
