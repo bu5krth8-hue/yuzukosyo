@@ -447,3 +447,44 @@ function setDailyQuote() {
 
 setDailyQuote();
 setupCursorParticles();
+
+
+// 累計アクセス数
+const ACCESS_STATS_URL = "/api/stats";
+
+async function updateAccessCount() {
+  const countEl = document.getElementById("totalAccessCount");
+  const noteEl = document.getElementById("accessNote");
+
+  if (!countEl) return;
+
+  try {
+    const response = await fetch(ACCESS_STATS_URL, {
+      method: "POST",
+      cache: "no-store"
+    });
+
+    const data = await response.json();
+
+    if (!response.ok || !data.configured) {
+      countEl.innerText = "準備中";
+      if (noteEl) {
+        noteEl.innerText = data.message || "Cloudflare KVを設定すると累計アクセス数を表示できます。";
+      }
+      return;
+    }
+
+    countEl.innerText = Number(data.total || 0).toLocaleString("ja-JP");
+
+    if (noteEl) {
+      noteEl.innerText = "アクセスされるたびに自動で更新されます。";
+    }
+  } catch (error) {
+    countEl.innerText = "準備中";
+    if (noteEl) {
+      noteEl.innerText = "アクセス数の取得に失敗しました。Cloudflare KV設定を確認してください。";
+    }
+  }
+}
+
+updateAccessCount();

@@ -823,3 +823,143 @@ footer{position:relative;z-index:2;text-align:center;padding:28px 0 50px;color:v
     width:98px;
   }
 }
+
+
+/* ===== access counter ===== */
+.access-card{
+  margin-top:22px;
+  text-align:center;
+}
+
+.access-lead{
+  color:var(--muted);
+  font-weight:900;
+  line-height:1.7;
+  margin:0 0 18px;
+}
+
+.access-count-box{
+  width:min(520px,100%);
+  margin:0 auto 16px;
+  border:1px solid rgba(112,214,255,.50);
+  border-radius:22px;
+  background:
+    radial-gradient(circle at top left, rgba(112,214,255,.18), transparent 42%),
+    radial-gradient(circle at bottom right, rgba(168,85,247,.18), transparent 45%),
+    rgba(5,2,10,.58);
+  box-shadow:
+    inset 0 0 26px rgba(112,214,255,.10),
+    0 0 28px rgba(112,214,255,.18);
+  padding:24px;
+}
+
+.access-label{
+  display:block;
+  color:#d8f3ff;
+  font-size:13px;
+  font-weight:1000;
+  letter-spacing:.18em;
+  margin-bottom:8px;
+  text-shadow:0 0 12px rgba(112,214,255,.45);
+}
+
+.access-count-box strong{
+  display:block;
+  color:#fff;
+  font-size:clamp(42px,7vw,76px);
+  line-height:1;
+  font-weight:1000;
+  text-shadow:
+    0 0 18px rgba(168,85,247,.82),
+    0 0 34px rgba(112,214,255,.38);
+}
+
+.access-note{
+  color:rgba(199,183,221,.82);
+  font-size:13px;
+  font-weight:800;
+  line-height:1.7;
+  margin:0;
+}
+
+
+/* ===== secret base visitor counter style ===== */
+.base-counter-card{
+  width:min(760px,92vw);
+  margin:22px auto 0;
+  text-align:center;
+  position:relative;
+  z-index:2;
+}
+
+.base-counter-inner{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+  flex-wrap:wrap;
+  border:1px solid rgba(216,180,254,.46);
+  border-radius:999px;
+  background:
+    radial-gradient(circle at top left, rgba(112,214,255,.18), transparent 42%),
+    linear-gradient(180deg, rgba(21,8,38,.82), rgba(9,4,18,.78));
+  box-shadow:
+    0 0 22px rgba(168,85,247,.28),
+    0 0 36px rgba(112,214,255,.12),
+    inset 0 0 22px rgba(255,255,255,.04);
+  padding:16px 28px;
+}
+
+.base-counter-icon{
+  font-size:24px;
+  filter:drop-shadow(0 0 10px rgba(216,180,254,.72));
+}
+
+.base-counter-label{
+  color:#f7ecff;
+  font-weight:1000;
+  font-size:clamp(16px,2.2vw,22px);
+  text-shadow:0 0 12px rgba(168,85,247,.70);
+}
+
+.base-counter-inner strong{
+  color:#fff;
+  font-size:clamp(28px,4vw,46px);
+  line-height:1;
+  font-weight:1000;
+  min-width:84px;
+  text-align:center;
+  text-shadow:
+    0 0 14px rgba(168,85,247,.92),
+    0 0 26px rgba(112,214,255,.48);
+}
+
+.base-counter-unit{
+  color:#d8f3ff;
+  font-weight:1000;
+  font-size:clamp(16px,2vw,22px);
+  text-shadow:0 0 10px rgba(112,214,255,.55);
+}
+
+.base-counter-card .access-note{
+  margin-top:10px;
+  color:rgba(199,183,221,.76);
+  font-size:12px;
+  font-weight:800;
+}
+
+@media (max-width:520px){
+  .base-counter-inner{
+    gap:8px;
+    padding:14px 18px;
+    border-radius:24px;
+  }
+
+  .base-counter-label{
+    width:100%;
+  }
+
+  .base-counter-inner strong{
+    min-width:auto;
+  }
+}
