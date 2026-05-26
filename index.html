@@ -5,7 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>柚胡椒の秘密基地 - YUZUKOSHO</title>
   <meta name="description" content="柚胡椒の秘密基地。Twitch配信、X、Discord、YouTubeへのリンクとお知らせ。" />
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css?v=18" />
+
+  <style id="v18-visible-gear-fix">
+    /* v18: cache-proof visible gear jump switch + centered Amazon section title */
+    .topbar-actions{display:flex;flex-direction:column;align-items:flex-end;gap:10px;pointer-events:auto;}
+    .floating-gear-jump{position:fixed;top:86px;right:18px;z-index:999;display:inline-flex;align-items:center;justify-content:center;text-decoration:none;color:#d8b4fe;background:rgba(20,8,32,.82);border:1px solid rgba(190,120,255,.55);border-radius:18px;padding:15px 20px;font-weight:900;white-space:nowrap;box-shadow:0 0 18px rgba(168,85,247,.25);backdrop-filter:blur(12px);transition:transform .18s ease,box-shadow .18s ease;}
+    .floating-gear-jump:hover{transform:translateY(-2px) scale(1.04);box-shadow:0 0 28px rgba(168,85,247,.55);}
+    .gear-market-head{display:block!important;text-align:center!important;}
+    .gear-market-title{display:block!important;width:100%!important;text-align:center!important;margin:0 0 22px!important;font-size:clamp(24px,3vw,32px)!important;}
+    .gear-market-copy{text-align:left!important;width:100%!important;}
+    .gear-market-copy .ad-label,.gear-market-copy p{text-align:left!important;}
+    #stream-gear{scroll-margin-top:150px;}
+    @media (max-width:520px){.floating-gear-jump{top:76px;right:12px;padding:11px 13px;font-size:13px;border-radius:16px;}#stream-gear{scroll-margin-top:130px;}}
+  </style>
 </head>
 <body>
   <div class="cursor-light" id="cursorLight"></div>
@@ -17,8 +30,11 @@
 
   <header class="topbar">
     <button class="menu" aria-label="menu">☰</button>
-    <a class="schedule-btn" href="#schedule">🔔 配信予定</a>
+    <div class="topbar-actions" aria-label="ページ内リンク">
+      <a class="schedule-btn" href="#schedule">🔔 配信予定</a>
+    </div>
   </header>
+  <a class="floating-gear-jump" href="#stream-gear" aria-label="配信で使ってるものへ移動">🎮 配信で使ってるもの</a>
 
   <main class="page">
     <section class="hero">
@@ -119,11 +135,13 @@
       </article>
     </section>
 
-    <section class="gear-card gear-market-section" aria-label="配信で使ってるもの">
+    <section class="gear-card gear-market-section" id="stream-gear" aria-label="配信で使ってるもの">
       <div class="gear-head gear-market-head">
-        <p class="ad-label">Amazonリンク・使用機材エリア</p>
-        <h2>🎮 配信で使ってるもの</h2>
-        <p>実際に使っている配信まわりの機材・飲み物・おつまみを画像付きでまとめています。</p>
+        <h2 class="gear-market-title">🎮 配信で使ってるもの</h2>
+        <div class="gear-market-copy">
+          <p class="ad-label">Amazonリンク・使用機材エリア</p>
+          <p>実際に使っている配信まわりの機材・飲み物・おつまみを画像付きでまとめています。</p>
+        </div>
       </div>
 
       <div class="gear-product-grid">
@@ -312,7 +330,7 @@
     </div>
     <p>© 2026 柚胡椒の秘密基地 All Rights Reserved.</p>
   </footer>
-  <script src="script.js"></script>
-  <script src="stats-counter.js?v=20260526-1"></script>
+  <script src="script.js?v=18"></script>
+  <script src="stats-counter.js?v=20260526-2"></script>
 </body>
 </html>
