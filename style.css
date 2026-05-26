@@ -824,6 +824,63 @@ footer{position:relative;z-index:2;text-align:center;padding:28px 0 50px;color:v
   }
 }
 
+/* ===== v21: profile title mascots ===== */
+.profile-hero{
+  position:relative;
+}
+
+.profile-title-row{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:clamp(14px,2.4vw,28px);
+  margin:8px 0 12px;
+}
+
+.profile-title-row .sub-page-title{
+  margin:0;
+}
+
+.profile-title-mascot{
+  width:clamp(58px,7vw,98px);
+  height:auto;
+  object-fit:contain;
+  flex:0 0 auto;
+  filter:drop-shadow(0 0 16px rgba(216,180,254,.58)) drop-shadow(0 0 26px rgba(168,85,247,.34));
+  animation:profileTitleMascotFloat 4.6s ease-in-out infinite;
+  user-select:none;
+  pointer-events:none;
+}
+
+.profile-title-ghost{
+  transform-origin:center bottom;
+}
+
+.profile-title-tanu{
+  animation-delay:.75s;
+  transform-origin:center bottom;
+}
+
+@keyframes profileTitleMascotFloat{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-8px)}
+}
+
+@media (max-width:520px){
+  .profile-title-row{
+    gap:8px;
+  }
+
+  .profile-title-row .sub-page-title{
+    font-size:clamp(27px,8.2vw,34px);
+    white-space:nowrap;
+  }
+
+  .profile-title-mascot{
+    width:42px;
+  }
+}
+
 
 /* ===== access counter ===== */
 .access-card{
