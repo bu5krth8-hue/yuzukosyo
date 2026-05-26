@@ -1165,3 +1165,68 @@ footer{position:relative;z-index:2;text-align:center;padding:28px 0 50px;color:v
     aspect-ratio:16/10;
   }
 }
+
+
+/* compact gear cards */
+.gear-product-grid{
+  grid-template-columns:repeat(auto-fit,minmax(180px,1fr)) !important;
+  gap:14px !important;
+}
+
+.gear-product-card{
+  border-radius:16px !important;
+  overflow:hidden;
+}
+
+.gear-product-image-wrap{
+  aspect-ratio:1/1 !important;
+  padding:6px !important;
+}
+
+.gear-product-image-wrap img{
+  width:100% !important;
+  height:100% !important;
+  object-fit:contain !important;
+}
+
+.gear-product-body{
+  padding:10px !important;
+}
+
+.gear-product-kicker{
+  font-size:10px !important;
+  margin-bottom:4px !important;
+}
+
+.gear-product-body h3{
+  font-size:15px !important;
+  margin-bottom:5px !important;
+}
+
+.gear-product-body p{
+  font-size:10px !important;
+  line-height:1.45 !important;
+  margin-bottom:8px !important;
+}
+
+.amazon-btn{
+  padding:8px 10px !important;
+  font-size:11px !important;
+  min-height:auto !important;
+}
+
+@media (max-width:720px){
+  .gear-product-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  }
+}
+
+@media (max-width:520px){
+  .gear-product-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  }
+
+  .gear-product-image-wrap{
+    aspect-ratio:1/1 !important;
+  }
+}
