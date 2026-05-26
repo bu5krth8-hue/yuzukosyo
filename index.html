@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>柚胡椒の秘密基地 - YUZUKOSHO</title>
   <meta name="description" content="柚胡椒の秘密基地。Twitch配信、X、Discord、YouTubeへのリンクとお知らせ。" />
-  <link rel="stylesheet" href="style.css?v=19" />
+  <link rel="stylesheet" href="style.css?v=20" />
 
-  <style id="v19-right-nav-fix">
-    /* v19: remove unused menu button, add TOP jump, keep right-side switches stacked */
+  <style id="v20-mobile-right-nav-compact">
+    /* v20: remove unused menu button, add TOP jump, compact right-side switches on smartphone only */
     .topbar{justify-content:flex-end!important;align-items:flex-start!important;}
     .menu{display:none!important;}
     .topbar-actions{display:flex!important;flex-direction:column!important;align-items:flex-end!important;gap:10px!important;pointer-events:auto!important;}
@@ -41,9 +41,11 @@
     #stream-gear{scroll-margin-top:170px;}
     #top{scroll-margin-top:0;}
     @media (max-width:520px){
-      .topbar{top:12px!important;right:12px!important;}
-      .top-jump-btn,.floating-gear-jump,.schedule-btn{min-width:182px;padding:11px 13px!important;font-size:13px;border-radius:16px!important;}
-      #stream-gear{scroll-margin-top:150px;}
+      .topbar{top:8px!important;right:8px!important;}
+      .topbar-actions{gap:7px!important;transform:scale(.88);transform-origin:top right;}
+      .top-jump-btn,.floating-gear-jump,.schedule-btn{min-width:152px!important;min-height:36px!important;padding:8px 10px!important;font-size:11.5px!important;line-height:1.15!important;border-radius:13px!important;box-shadow:0 0 12px rgba(168,85,247,.22)!important;}
+      .top-jump-btn:hover,.floating-gear-jump:hover{transform:none!important;}
+      #stream-gear{scroll-margin-top:120px;}
     }
   </style>
 </head>
