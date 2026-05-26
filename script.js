@@ -453,19 +453,19 @@ setupCursorParticles();
 
 
 
-// 累計アクセス数：最終安定版
+
+
+// 累計アクセス数：POST加算 + GET取得版
 (function () {
   const ACCESS_STATS_URL = "/api/stats";
 
-  function updateCounterDisplay(total, note) {
+  function setCounter(total, note) {
     const countEl = document.getElementById("totalAccessCount");
     const noteEl = document.getElementById("accessNote");
 
     if (countEl) {
-      const number = Number(total);
-      countEl.textContent = Number.isFinite(number)
-        ? number.toLocaleString("ja-JP")
-        : "0";
+      const n = Number(total);
+      countEl.textContent = Number.isFinite(n) ? n.toLocaleString("ja-JP") : "0";
     }
 
     if (noteEl) {
@@ -473,27 +473,41 @@ setupCursorParticles();
     }
   }
 
+  async function fetchJson(method) {
+    const response = await fetch(`${ACCESS_STATS_URL}?t=${Date.now()}`, {
+      method,
+      cache: "no-store",
+      headers: {
+        "Accept": "application/json"
+      }
+    });
+
+    return response.json();
+  }
+
   async function loadAccessCount() {
-    updateCounterDisplay(null, "来場者数を確認中…");
+    setCounter(0, "来場者数を確認中…");
 
     try {
-      const response = await fetch(`${ACCESS_STATS_URL}?cacheBust=${Date.now()}`, {
-        method: "GET",
-        cache: "no-store",
-        headers: {
-          "Accept": "application/json"
-        }
-      });
+      // まずこのアクセスを1回カウント
+      const postData = await fetchJson("POST");
 
-      const data = await response.json();
-
-      if (data && data.configured === true && Number.isFinite(Number(data.total))) {
-        updateCounterDisplay(Number(data.total), "秘密基地に来てくれた人数を自動カウント中。");
-      } else {
-        updateCounterDisplay(0, data && data.message ? data.message : "来場者数を取得できませんでした。");
+      if (postData && postData.configured && Number.isFinite(Number(postData.total))) {
+        setCounter(Number(postData.total), "秘密基地に来てくれた人数を自動カウント中。");
+        return;
       }
+
+      // POSTが何かの理由で数字を返さない場合だけGETで確認
+      const getData = await fetchJson("GET");
+
+      if (getData && getData.configured && Number.isFinite(Number(getData.total))) {
+        setCounter(Number(getData.total), "秘密基地に来てくれた人数を自動カウント中。");
+        return;
+      }
+
+      setCounter(0, getData && getData.message ? getData.message : "来場者数を取得できませんでした。");
     } catch (error) {
-      updateCounterDisplay(0, "来場者数の取得に失敗しました。");
+      setCounter(0, "来場者数の取得に失敗しました。");
     }
   }
 

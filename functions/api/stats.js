@@ -1,4 +1,12 @@
-export async function onRequest(context) {
+export async function onRequestGet(context) {
+  return handleStats(context, false);
+}
+
+export async function onRequestPost(context) {
+  return handleStats(context, true);
+}
+
+async function handleStats(context, shouldIncrement) {
   const env = context.env || {};
   const kv = env.SITE_STATS;
 
@@ -14,20 +22,24 @@ export async function onRequest(context) {
     const key = "total_access";
     const currentValue = await kv.get(key);
     const current = Number.parseInt(currentValue || "0", 10);
-    const next = Number.isFinite(current) ? current + 1 : 1;
+    const safeCurrent = Number.isFinite(current) ? current : 0;
 
-    await kv.put(key, String(next));
+    const total = shouldIncrement ? safeCurrent + 1 : safeCurrent;
+
+    if (shouldIncrement) {
+      await kv.put(key, String(total));
+    }
 
     return json({
       configured: true,
-      total: next,
-      message: "アクセス数を更新しました"
+      total,
+      message: shouldIncrement ? "アクセス数を更新しました" : "アクセス数を取得しました"
     });
   } catch (error) {
     return json({
       configured: false,
       total: 0,
-      message: "アクセス数の更新に失敗しました",
+      message: "アクセス数の処理に失敗しました",
       error: error.message
     }, 500);
   }
