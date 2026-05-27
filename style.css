@@ -1481,3 +1481,409 @@ footer{position:relative;z-index:2;text-align:center;padding:28px 0 50px;color:v
     gap:8px;
   }
 }
+
+
+/* ===== v25: animation upgrade pack ===== */
+:root{
+  --motion-purple: rgba(168,85,247,.72);
+  --motion-purple-soft: rgba(216,180,254,.42);
+  --motion-blue-soft: rgba(112,214,255,.34);
+  --motion-red-soft: rgba(255,66,95,.45);
+}
+
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:0;
+  background:
+    radial-gradient(circle at 20% 18%, rgba(168,85,247,.11), transparent 28%),
+    radial-gradient(circle at 76% 22%, rgba(112,214,255,.08), transparent 26%),
+    radial-gradient(circle at 52% 82%, rgba(255,66,95,.07), transparent 30%);
+  animation:secretBaseAura 11s ease-in-out infinite alternate;
+}
+
+@keyframes secretBaseAura{
+  0%{opacity:.72;filter:hue-rotate(0deg) blur(0)}
+  100%{opacity:1;filter:hue-rotate(10deg) blur(.5px)}
+}
+
+/* 1. ロゴの微発光 */
+.logo-image-wrap{
+  position:relative;
+  animation:logoBreath 4.8s ease-in-out infinite;
+  will-change:filter, transform;
+}
+
+.logo-image-wrap::before{
+  content:"";
+  position:absolute;
+  inset:-18px;
+  border-radius:28px;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(216,180,254,.24), transparent 56%),
+    linear-gradient(120deg, transparent 18%, rgba(216,180,254,.20), transparent 52%);
+  opacity:.72;
+  filter:blur(18px);
+  transform:scale(.98);
+  animation:logoHaloSweep 6.5s ease-in-out infinite;
+  pointer-events:none;
+}
+
+.logo-image-wrap:hover{
+  filter:
+    drop-shadow(0 0 28px rgba(216,180,254,.82))
+    drop-shadow(0 0 70px rgba(168,85,247,.62));
+  transform:translateY(-2px) scale(1.012);
+}
+
+.site-logo-image{
+  position:relative;
+  z-index:1;
+}
+
+@keyframes logoBreath{
+  0%,100%{
+    filter:
+      drop-shadow(0 0 18px rgba(216,180,254,.48))
+      drop-shadow(0 0 42px rgba(168,85,247,.34));
+  }
+  48%{
+    filter:
+      drop-shadow(0 0 30px rgba(216,180,254,.78))
+      drop-shadow(0 0 72px rgba(168,85,247,.58));
+  }
+  52%{
+    filter:
+      drop-shadow(0 0 20px rgba(216,180,254,.54))
+      drop-shadow(0 0 50px rgba(168,85,247,.42));
+  }
+}
+
+@keyframes logoHaloSweep{
+  0%,100%{opacity:.42;transform:scale(.96) rotate(0deg)}
+  48%{opacity:.9;transform:scale(1.03) rotate(1deg)}
+  52%{opacity:.58;transform:scale(.99) rotate(-.5deg)}
+}
+
+/* 2. 背景パーティクル */
+.ambient-particle{
+  position:fixed;
+  left:var(--x);
+  top:var(--y);
+  width:var(--s);
+  height:var(--s);
+  border-radius:999px;
+  pointer-events:none;
+  z-index:1;
+  opacity:0;
+  background:rgba(216,180,254,.82);
+  box-shadow:
+    0 0 10px rgba(216,180,254,.75),
+    0 0 22px rgba(168,85,247,.38);
+  animation:ambientFloat var(--d) ease-in-out var(--delay) infinite;
+}
+
+.ambient-particle:nth-child(3n){
+  background:rgba(112,214,255,.75);
+  box-shadow:0 0 10px rgba(112,214,255,.70),0 0 22px rgba(168,85,247,.26);
+}
+
+.ambient-particle:nth-child(5n)::after{
+  content:"✦";
+  position:absolute;
+  left:-5px;
+  top:-8px;
+  color:rgba(216,180,254,.72);
+  font-size:13px;
+  line-height:1;
+  text-shadow:0 0 12px rgba(216,180,254,.75);
+}
+
+@keyframes ambientFloat{
+  0%{transform:translate3d(0,14px,0) scale(.72);opacity:0}
+  18%{opacity:.72}
+  52%{transform:translate3d(var(--dx), calc(var(--dy) * -1),0) scale(1)}
+  86%{opacity:.58}
+  100%{transform:translate3d(calc(var(--dx) * -1), -52px,0) scale(.68);opacity:0}
+}
+
+/* 3. ボタン hover アニメーション強化 */
+.switch,
+.mini-btn,
+.amazon-btn,
+.schedule-btn,
+.top-jump-btn,
+.floating-gear-jump,
+.word-reroll-btn{
+  position:relative;
+  overflow:hidden;
+  transform:translateZ(0);
+}
+
+.switch::before,
+.mini-btn::before,
+.amazon-btn::before,
+.schedule-btn::before,
+.top-jump-btn::before,
+.floating-gear-jump::before,
+.word-reroll-btn::before{
+  content:"";
+  position:absolute;
+  inset:-2px;
+  background:linear-gradient(120deg, transparent 0%, rgba(216,180,254,.12) 26%, rgba(112,214,255,.28) 48%, rgba(216,180,254,.12) 68%, transparent 100%);
+  transform:translateX(-125%);
+  transition:transform .58s ease;
+  pointer-events:none;
+}
+
+.switch:hover::before,
+.mini-btn:hover::before,
+.amazon-btn:hover::before,
+.schedule-btn:hover::before,
+.top-jump-btn:hover::before,
+.floating-gear-jump:hover::before,
+.word-reroll-btn:hover::before{
+  transform:translateX(125%);
+}
+
+.switch:hover,
+.mini-btn:hover,
+.amazon-btn:hover,
+.schedule-btn:hover,
+.top-jump-btn:hover,
+.floating-gear-jump:hover{
+  border-color:rgba(216,180,254,.72)!important;
+}
+
+/* 外枠が少し走る演出 */
+.mini-btn,
+.amazon-btn,
+.schedule-btn,
+.top-jump-btn,
+.floating-gear-jump{
+  background-size:200% 200%;
+}
+
+.mini-btn:hover,
+.amazon-btn:hover,
+.schedule-btn:hover,
+.top-jump-btn:hover,
+.floating-gear-jump:hover{
+  animation:borderRun 1.25s linear infinite;
+}
+
+@keyframes borderRun{
+  0%{box-shadow:0 0 18px rgba(168,85,247,.30), inset 0 0 14px rgba(216,180,254,.04)}
+  50%{box-shadow:0 0 32px rgba(216,180,254,.62), inset 0 0 22px rgba(112,214,255,.10)}
+  100%{box-shadow:0 0 18px rgba(168,85,247,.30), inset 0 0 14px rgba(216,180,254,.04)}
+}
+
+/* 4. スクロール出現 */
+.reveal-on-scroll{
+  opacity:0;
+  transform:translateY(26px);
+  transition:
+    opacity .72s ease,
+    transform .72s cubic-bezier(.2,.8,.2,1),
+    filter .72s ease;
+  filter:blur(2px);
+}
+
+.reveal-on-scroll.is-visible{
+  opacity:1;
+  transform:translateY(0);
+  filter:blur(0);
+}
+
+.reveal-on-scroll.reveal-delay-1{transition-delay:.07s}
+.reveal-on-scroll.reveal-delay-2{transition-delay:.14s}
+.reveal-on-scroll.reveal-delay-3{transition-delay:.21s}
+
+/* 5. OFFLINE/ONLINE演出 */
+.live-badge.is-checking{
+  animation:statusCheckingGlow 1.7s ease-in-out infinite alternate;
+}
+
+.live-badge.is-offline{
+  animation:offlineBreath 2.8s ease-in-out infinite;
+}
+
+.live-badge.is-live{
+  animation:liveGlow 1.35s ease-in-out infinite alternate, liveBadgeBump 2.4s ease-in-out infinite;
+}
+
+.live-badge.is-live .live-dot{
+  animation:liveDotPulse .82s ease-in-out infinite;
+}
+
+.live-badge.is-offline .live-dot{
+  animation:offlineDotBreath 2.2s ease-in-out infinite;
+}
+
+.schedule-btn.is-live{
+  animation:liveBtnPulse 1.6s ease-in-out infinite alternate;
+}
+
+@keyframes statusCheckingGlow{
+  from{box-shadow:0 0 18px rgba(112,214,255,.22), inset 0 0 12px rgba(112,214,255,.05)}
+  to{box-shadow:0 0 34px rgba(112,214,255,.46), inset 0 0 20px rgba(112,214,255,.10)}
+}
+
+@keyframes offlineBreath{
+  0%,100%{box-shadow:0 0 16px rgba(168,85,247,.22),inset 0 0 16px rgba(168,85,247,.06)}
+  50%{box-shadow:0 0 30px rgba(168,85,247,.42),inset 0 0 24px rgba(168,85,247,.10)}
+}
+
+@keyframes offlineDotBreath{
+  0%,100%{transform:scale(.82);opacity:.55}
+  50%{transform:scale(1.06);opacity:.95}
+}
+
+@keyframes liveDotPulse{
+  0%,100%{transform:scale(.88);filter:brightness(1)}
+  50%{transform:scale(1.28);filter:brightness(1.35)}
+}
+
+@keyframes liveBadgeBump{
+  0%,100%{transform:translateY(0) scale(1)}
+  50%{transform:translateY(-1px) scale(1.01)}
+}
+
+@keyframes liveBtnPulse{
+  from{box-shadow:0 0 18px rgba(255,66,95,.32), inset 0 0 12px rgba(255,66,95,.08)}
+  to{box-shadow:0 0 34px rgba(255,66,95,.62), inset 0 0 20px rgba(255,66,95,.14)}
+}
+
+/* 6. たぬちゃん / ghost 微モーション */
+.guide img{
+  animation:mascotIdleGlow 5.5s ease-in-out infinite;
+}
+
+.ghost-guide img{
+  animation:mascotIdleGlow 5.5s ease-in-out infinite, ghostBlink 6.8s ease-in-out infinite;
+}
+
+.tanu-guide img{
+  animation:mascotIdleGlow 5.2s ease-in-out infinite, tanuTailMood 4.7s ease-in-out infinite;
+  transform-origin:50% 85%;
+}
+
+.guide:hover img,
+.mascot-profile-card img:hover,
+.mascot-profile-images img:hover{
+  filter:
+    drop-shadow(0 0 26px rgba(216,180,254,.76))
+    brightness(1.08);
+}
+
+.mascot-profile-card img,
+.mascot-profile-images img{
+  transition:transform .28s ease, filter .28s ease;
+  animation:profileMascotFloat 4.8s ease-in-out infinite;
+}
+
+.mascot-profile-images img:nth-child(2){animation-delay:.35s}
+.mascot-profile-images img:nth-child(3){animation-delay:.7s}
+
+.mascot-profile-card img:hover,
+.mascot-profile-images img:hover{
+  transform:translateY(-6px) scale(1.035) rotate(1deg);
+}
+
+@keyframes mascotIdleGlow{
+  0%,100%{filter:drop-shadow(0 0 18px rgba(216,180,254,.42))}
+  50%{filter:drop-shadow(0 0 28px rgba(216,180,254,.70)) brightness(1.04)}
+}
+
+@keyframes ghostBlink{
+  0%,92%,100%{opacity:1}
+  94%{opacity:.78;filter:drop-shadow(0 0 28px rgba(112,214,255,.48)) brightness(1.14)}
+  96%{opacity:1}
+}
+
+@keyframes tanuTailMood{
+  0%,100%{transform:rotate(0deg)}
+  45%{transform:rotate(-1.2deg)}
+  65%{transform:rotate(1.4deg)}
+}
+
+@keyframes profileMascotFloat{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-8px)}
+}
+
+/* 7. マウス追従ライト */
+.cursor-light{
+  mix-blend-mode:screen;
+  opacity:.58;
+  transition:opacity .3s ease;
+  will-change:transform;
+}
+
+body:not(.has-pointer) .cursor-light{
+  opacity:0;
+}
+
+/* cards hover extra */
+.card,
+.gear-product-card,
+.gear-card{
+  transition:
+    transform .24s ease,
+    border-color .24s ease,
+    box-shadow .24s ease,
+    background .24s ease;
+}
+
+.card:hover,
+.gear-product-card:hover{
+  transform:translateY(-3px);
+  border-color:rgba(216,180,254,.42);
+  box-shadow:0 0 34px rgba(168,85,247,.24), inset 0 0 22px rgba(216,180,254,.04);
+}
+
+/* motion safety */
+@media (prefers-reduced-motion: reduce){
+  *,
+  *::before,
+  *::after{
+    animation-duration:.001ms!important;
+    animation-iteration-count:1!important;
+    scroll-behavior:auto!important;
+    transition-duration:.001ms!important;
+  }
+
+  .reveal-on-scroll{
+    opacity:1!important;
+    transform:none!important;
+    filter:none!important;
+  }
+
+  .cursor-light,
+  .ambient-particle,
+  .cursor-particle{
+    display:none!important;
+  }
+}
+
+@media (max-width:520px){
+  .cursor-light{
+    display:none;
+  }
+
+  .ambient-particle{
+    opacity:.45;
+  }
+
+  .logo-image-wrap::before{
+    inset:-10px;
+    filter:blur(12px);
+  }
+
+  .card:hover,
+  .gear-product-card:hover{
+    transform:none;
+  }
+}

@@ -446,6 +446,124 @@ function setDailyQuote() {
 }
 
 setDailyQuote();
+
+
+/* ===== v25: animation upgrade pack ===== */
+function setupCursorParticles() {
+  const cursorLight = document.getElementById("cursorLight");
+  const particleLayer = document.getElementById("particleLayer");
+  const canHover = window.matchMedia && window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+  const prefersReducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  if (!canHover || prefersReducedMotion) {
+    if (cursorLight) cursorLight.style.display = "none";
+    return;
+  }
+
+  document.body.classList.add("has-pointer");
+
+  let lastParticleAt = 0;
+  let mouseX = window.innerWidth / 2;
+  let mouseY = window.innerHeight / 2;
+
+  const moveLight = () => {
+    if (cursorLight) {
+      cursorLight.style.transform = `translate(${mouseX - 110}px, ${mouseY - 110}px)`;
+    }
+    requestAnimationFrame(moveLight);
+  };
+  requestAnimationFrame(moveLight);
+
+  window.addEventListener("mousemove", (event) => {
+    mouseX = event.clientX;
+    mouseY = event.clientY;
+
+    const now = Date.now();
+    if (!particleLayer || now - lastParticleAt < 54) return;
+    lastParticleAt = now;
+
+    const particle = document.createElement("span");
+    particle.className = "cursor-particle";
+    particle.style.left = `${event.clientX}px`;
+    particle.style.top = `${event.clientY}px`;
+    particle.style.setProperty("--px", `${Math.round((Math.random() - 0.5) * 48)}px`);
+    particle.style.setProperty("--py", `${Math.round((Math.random() - 0.8) * 54)}px`);
+
+    particleLayer.appendChild(particle);
+    window.setTimeout(() => particle.remove(), 900);
+  }, { passive: true });
+}
+
+function setupAmbientParticles() {
+  const particleLayer = document.getElementById("particleLayer");
+  const prefersReducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (!particleLayer || prefersReducedMotion) return;
+
+  const count = window.innerWidth < 520 ? 18 : 34;
+  const fragment = document.createDocumentFragment();
+
+  for (let i = 0; i < count; i += 1) {
+    const particle = document.createElement("span");
+    particle.className = "ambient-particle";
+    particle.style.setProperty("--x", `${Math.round(Math.random() * 100)}vw`);
+    particle.style.setProperty("--y", `${Math.round(Math.random() * 100)}vh`);
+    particle.style.setProperty("--s", `${Math.round(2 + Math.random() * 4)}px`);
+    particle.style.setProperty("--dx", `${Math.round((Math.random() - 0.5) * 90)}px`);
+    particle.style.setProperty("--dy", `${Math.round(28 + Math.random() * 84)}px`);
+    particle.style.setProperty("--d", `${Math.round(8 + Math.random() * 11)}s`);
+    particle.style.setProperty("--delay", `${Math.round(Math.random() * -14)}s`);
+    fragment.appendChild(particle);
+  }
+
+  particleLayer.appendChild(fragment);
+}
+
+function setupScrollReveal() {
+  const targets = [
+    ".hero",
+    ".base-counter-card",
+    ".mascot-area",
+    ".cards > article",
+    ".gear-card",
+    ".gear-product-card",
+    ".profile-card",
+    ".mascot-profile-card",
+    ".update-history-card"
+  ];
+
+  const elements = Array.from(document.querySelectorAll(targets.join(",")));
+  if (!elements.length) return;
+
+  elements.forEach((el, index) => {
+    el.classList.add("reveal-on-scroll", `reveal-delay-${(index % 3) + 1}`);
+  });
+
+  if (!("IntersectionObserver" in window)) {
+    elements.forEach((el) => el.classList.add("is-visible"));
+    return;
+  }
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) return;
+      entry.target.classList.add("is-visible");
+      observer.unobserve(entry.target);
+    });
+  }, {
+    threshold: 0.12,
+    rootMargin: "0px 0px -8% 0px"
+  });
+
+  elements.forEach((el) => observer.observe(el));
+}
+
+function setupAnimationPack() {
+  setupAmbientParticles();
+  setupScrollReveal();
+}
+
+setupAnimationPack();
+
 setupCursorParticles();
 
 
