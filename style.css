@@ -1,7 +1,14 @@
 :root{
   --bg:#05020a;--panel:rgba(21,8,38,.78);--panel2:rgba(9,4,18,.72);--purple:#a855f7;--purple2:#d8b4fe;--blue:#70d6ff;--red:#ff425f;--text:#f7ecff;--muted:#c7b7dd;--line:rgba(190,120,255,.45)
 }
-*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;min-height:100vh;color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP","Segoe UI",sans-serif;background:radial-gradient(circle at top,rgba(126,34,206,.22),transparent 34rem),radial-gradient(circle at 15% 45%,rgba(80,170,255,.14),transparent 28rem),linear-gradient(180deg,#07020d 0%,#090315 48%,#030006 100%);overflow-x:hidden}body:before{content:"";position:fixed;inset:0;pointer-events:none;background:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:48px 48px;mask-image:linear-gradient(to bottom,black,transparent 92%)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;min-height:100vh;color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP","Segoe UI",sans-serif;background:radial-gradient(circle at top,rgba(126,34,206,.22),transparent 34rem),radial-gradient(circle at 15% 45%,rgba(80,170,255,.14),transparent 28rem),linear-gradient(180deg,#07020d 0%,#090315 48%,#030006 100%);overflow-x:hidden}
+
+/* v38: hidden属性を最優先し、管理解除前の編集エリア露出を防止 */
+[hidden]{
+  display:none!important;
+}
+
+body:before{content:"";position:fixed;inset:0;pointer-events:none;background:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:48px 48px;mask-image:linear-gradient(to bottom,black,transparent 92%)}
 .cursor-light{position:fixed;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(168,85,247,.22),transparent 65%);pointer-events:none;z-index:1;transform:translate(-50%,-50%);opacity:.65}.stars:before,.stars:after{content:"✦  ✧     ✦    ✧  ✦       ✧     ✦";position:fixed;left:0;right:0;top:20px;color:rgba(216,180,254,.8);letter-spacing:42px;font-size:15px;animation:twinkle 4s ease-in-out infinite alternate;pointer-events:none}.stars:after{top:52%;opacity:.55;animation-duration:6s;transform:scale(.85)}@keyframes twinkle{from{opacity:.25}to{opacity:.85}}.bg-glow{position:fixed;width:360px;height:360px;border-radius:50%;filter:blur(80px);opacity:.28;pointer-events:none}.glow-a{background:#7c3aed;left:-120px;top:130px}.glow-b{background:#ef4444;right:-120px;top:190px}
 .topbar{position:fixed;top:18px;left:18px;right:18px;z-index:10;display:flex;justify-content:space-between;align-items:center;pointer-events:none}.topbar>*{pointer-events:auto}.menu,.schedule-btn,.top-status{border:1px solid var(--line);background:rgba(20,8,32,.75);color:var(--purple2);border-radius:18px;box-shadow:0 0 18px rgba(168,85,247,.25);backdrop-filter:blur(12px)}.menu{width:52px;height:52px;font-size:28px}.top-status{padding:13px 18px;font-weight:900;letter-spacing:.05em}.schedule-btn{text-decoration:none;padding:15px 20px;font-weight:900;transition:.18s ease}.schedule-btn:hover{transform:translateY(-2px) scale(1.04);box-shadow:0 0 28px rgba(168,85,247,.55)}.schedule-btn.is-live{border-color:rgba(255,66,95,.95);color:#ffd1d9;box-shadow:0 0 30px rgba(255,66,95,.65);animation:bellShake 1.8s infinite}@keyframes bellShake{0%,80%,100%{transform:rotate(0)}84%{transform:rotate(-4deg)}88%{transform:rotate(4deg)}92%{transform:rotate(-3deg)}}
 .page{width:min(1080px,92vw);margin:0 auto;padding:70px 0 28px;position:relative;z-index:2}.hero{text-align:center;padding:22px 0 14px}.eyebrow{letter-spacing:9px;color:var(--muted);font-weight:900;margin:38px 0 6px}.logo-image-wrap{display:block;margin:8px auto 18px;width:min(720px,92vw);line-height:0;filter:drop-shadow(0 0 18px rgba(216,180,254,.56)) drop-shadow(0 0 42px rgba(168,85,247,.42))}.site-logo-image{width:100%;height:auto;display:block;border-radius:18px;mix-blend-mode:screen}.catchcopy{font-size:clamp(18px,2.4vw,28px);font-weight:1000;margin:8px 0 20px;text-shadow:0 0 18px rgba(168,85,247,.65)}
@@ -2608,6 +2615,10 @@ body:not(.has-pointer) .cursor-light{
   gap:22px;
 }
 
+.meigen-admin-panel[hidden]{
+  display:none!important;
+}
+
 .meigen-admin-list{
   display:grid;
   gap:12px;
@@ -2696,4 +2707,32 @@ body:not(.has-pointer) .cursor-light{
   .admin-meigen-actions{
     justify-content:flex-start;
   }
+}
+
+
+/* ===== v38: meigen submit receiver ===== */
+.meigen-submit-status{
+  min-height:1.5em;
+  margin:2px 0 0!important;
+  color:#d8f3ff!important;
+  font-weight:1000!important;
+  text-align:center;
+}
+
+.meigen-submission-list-card{
+  scroll-margin-top:96px;
+}
+
+.admin-submission-item{
+  border-color:rgba(168,85,247,.38);
+  background:linear-gradient(135deg,rgba(88,28,135,.20),rgba(10,4,20,.52));
+}
+
+.admin-submission-item p + p{
+  margin-top:2px!important;
+}
+
+.admin-submission-item .admin-meigen-actions button:first-child{
+  border-color:rgba(112,214,255,.46);
+  background:rgba(112,214,255,.12);
 }

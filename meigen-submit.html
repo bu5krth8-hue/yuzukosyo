@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="style.css?v=36" />
+  <link rel="stylesheet" href="style.css?v=38" />
   <title>迷言案を送る｜柚胡椒の秘密基地</title>
   <meta name="description" content="柚胡椒の迷言集へ載せたい迷言案を送るためのフォームです。" />
   <meta name="robots" content="index, follow" />
@@ -60,24 +60,12 @@
               <span>補足</span>
               <input name="memo" type="text" placeholder="どんな流れで出たか、必要なら書いてね" />
             </label>
-            <button class="mini-btn" type="submit">送信用の文章を作る</button>
+            <button class="mini-btn" type="submit" id="meigenSubmitSendBtn">送信</button>
+            <p class="meigen-submit-status" id="meigenSubmitStatus" aria-live="polite"></p>
           </form>
         </div>
       </article>
 
-      <article class="card quote-room-card submit-output-card" hidden>
-        <div>
-          <p class="section-kicker">SEND TEXT</p>
-          <h2>📨 送信用メモ</h2>
-          <p>下の内容をコピーして、DiscordやXのDMなどで柚胡椒へ送ってね。</p>
-          <textarea class="meigen-export-area" id="meigenSubmitOutput" rows="9"></textarea>
-          <div class="meigen-action-grid">
-            <button class="mini-btn" id="meigenSubmitCopyBtn" type="button">内容をコピー</button>
-            <a class="mini-btn" id="meigenSubmitMailBtn" href="#" aria-disabled="true">メールで送る</a>
-          </div>
-          <p class="meigen-note">メール送信先は未設定です。公開用メールアドレスを入れると、メールアプリ送信用にもできます。</p>
-        </div>
-      </article>
     </section>
   </main>
 
@@ -90,8 +78,8 @@
     <p>© 2026 柚胡椒の秘密基地 All Rights Reserved.</p>
   </footer>
 
-  <script src="script.js?v=36"></script>
-  <script src="meigen-data.js?v=36"></script>
-  <script src="meigen.js?v=36"></script>
+  <script src="script.js?v=38"></script>
+  <script src="meigen-data.js?v=38"></script>
+  <script src="meigen.js?v=38"></script>
 </body>
 </html>
