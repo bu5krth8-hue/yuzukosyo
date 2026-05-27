@@ -1384,3 +1384,22 @@ footer{position:relative;z-index:2;text-align:center;padding:28px 0 50px;color:v
     scroll-margin-top:120px;
   }
 }
+
+
+/* v22 SEO text blocks */
+.seo-intro-card{
+  max-width:860px;
+  margin:22px auto 0;
+  padding:18px 20px;
+  border:1px solid rgba(216,180,254,.28);
+  border-radius:22px;
+  background:rgba(18,8,34,.58);
+  box-shadow:0 0 24px rgba(168,85,247,.16);
+  color:rgba(255,255,255,.88);
+  line-height:1.9;
+}
+.seo-intro-card p{margin:.35em 0;}
+.profile-seo-text,
+.mascot-seo-text{
+  border-color:rgba(216,180,254,.32)!important;
+}

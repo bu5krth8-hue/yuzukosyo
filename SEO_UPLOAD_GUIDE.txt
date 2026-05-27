@@ -1,0 +1,27 @@
+SEO対応版です。
+
+【このZIPで追加・修正したもの】
+- robots.txt を追加
+- sitemap.xml を追加
+- index.html / profile.html / mascots.html の title・description・canonical・OGP を修正
+- トップページ、プロフィール、住人ページに検索用の説明文を追加
+- style.css にSEO説明文用のデザインを追加
+
+【Google Search Consoleの所有権確認について】
+Search Consoleでダウンロードした googleXXXXXXXX.html は、このZIPの中の index.html と同じ階層に入れてください。
+
+例：
+index.html
+profile.html
+mascots.html
+robots.txt
+sitemap.xml
+googleXXXXXXXX.html
+
+このファイル名は人によって違うため、こちらでは作れません。
+ダウンロードした googleXXXXXXXX.html を送ってくれれば、こちらで入れた完成ZIPを作れます。
+
+【Cloudflare Pagesにアップロード後に確認するURL】
+https://yuzukosyo.pages.dev/robots.txt
+https://yuzukosyo.pages.dev/sitemap.xml
+https://yuzukosyo.pages.dev/googleXXXXXXXX.html
