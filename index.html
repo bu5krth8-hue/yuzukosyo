@@ -13,7 +13,7 @@
   <meta property="og:description" content="Twitchでゲーム配信をしている柚胡椒の公式ホームページ。配信予定、プロフィール、YouTube、X、Discord、参加型ゲーム配信の情報をまとめています。" />
   <meta property="og:url" content="https://yuzukosyo.pages.dev/" />
   <meta name="twitter:card" content="summary" />
-  <link rel="stylesheet" href="style.css?v=33" />
+  <link rel="stylesheet" href="style.css?v=36" />
 
   <style id="v20-mobile-right-nav-compact">
     /* v20: remove unused menu button, add TOP jump, compact right-side switches on smartphone only */
@@ -201,6 +201,14 @@
           <li>
             <time datetime="2026-05-27">2026/05/27</time>
             <div>
+              <strong>トップページ迷言日替わり表示追加</strong>
+              <p>今日の格言の下に、公開中の迷言から1日1回ランダム表示する「柚胡椒の迷言集」カードを追加しました。</p>
+            </div>
+          </li>
+
+          <li>
+            <time datetime="2026-05-27">2026/05/27</time>
+            <div>
               <strong>迷言集管理機能追加</strong>
               <p>柚胡椒の迷言集に投稿案フォーム、管理ページ、公開/非公開切り替え、ローカル保存機能を追加しました。</p>
             </div>
@@ -298,6 +306,17 @@
             <p id="dailyWordText">今日の格言を準備中…</p>
           </div>
           <p class="daily-word-jump">今日の格言の部屋を見る →</p>
+        </a>
+      </article>
+
+      <article class="card daily-word-card quote-link-card daily-meigen-link-card">
+        <a class="daily-word-link" href="meigen.html" aria-label="柚胡椒の迷言集へ移動">
+          <h2>🗯️ 柚胡椒の迷言集</h2>
+          <p class="daily-word-note">1日に1回、公開中の迷言からランダム表示されます。押すと迷言集の部屋に移動するよ。</p>
+          <div class="daily-word-box">
+            <p id="dailyMeigenText">今日の迷言を準備中…</p>
+          </div>
+          <p class="daily-word-jump">柚胡椒の迷言集を見る →</p>
         </a>
       </article>
     </section>
@@ -528,7 +547,8 @@
     </div>
     <p>© 2026 柚胡椒の秘密基地 All Rights Reserved.</p>
   </footer>
-  <script src="script.js?v=33"></script>
-  <script src="stats-counter.js?v=33"></script>
+  <script src="meigen-data.js?v=36"></script>
+  <script src="script.js?v=36"></script>
+  <script src="stats-counter.js?v=36"></script>
 </body>
 </html>

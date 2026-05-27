@@ -27,13 +27,85 @@ function meigenSaveLocalItems(items) {
   localStorage.setItem(MEIGEN_STORAGE_KEY, JSON.stringify(items));
 }
 
+function meigenNormalizeItemValue(value) {
+  return String(value || "").trim().replace(/\s+/g, " ");
+}
+
+function meigenItemSignature(item) {
+  return [
+    meigenNormalizeItemValue(item?.text),
+    meigenNormalizeItemValue(item?.speaker || "未設定"),
+    meigenNormalizeItemValue(item?.place || "未設定"),
+    meigenNormalizeItemValue(item?.date || "未設定")
+  ].join("|");
+}
+
 function meigenAllItems() {
   const publicItems = Array.isArray(window.YUZUKOSYO_PUBLIC_MEIGEN) ? window.YUZUKOSYO_PUBLIC_MEIGEN : [];
-  return [...publicItems, ...meigenGetLocalItems()];
+  const localItems = meigenGetLocalItems();
+  const seen = new Set();
+
+  return [...publicItems, ...localItems].filter((item) => {
+    const signature = meigenItemSignature(item);
+    if (!signature.trim() || seen.has(signature)) return false;
+    seen.add(signature);
+    return true;
+  });
 }
 
 function meigenVisibleItems() {
-  return meigenAllItems().filter((item) => item.visible !== false);
+  return meigenAllItems().filter((item) =>
+    item &&
+    item.visible !== false &&
+    String(item.text || "").trim()
+  );
+}
+
+function meigenTodayKey() {
+  const now = new Date();
+  return [
+    now.getFullYear(),
+    String(now.getMonth() + 1).padStart(2, "0"),
+    String(now.getDate()).padStart(2, "0")
+  ].join("-");
+}
+
+function meigenGetDailyItem(items) {
+  const todayKey = meigenTodayKey();
+  const storageKey = "yuzukosyoDailyMeigen";
+  let saved = null;
+
+  try {
+    saved = JSON.parse(localStorage.getItem(storageKey) || "null");
+  } catch (error) {
+    saved = null;
+  }
+
+  if (saved && saved.date === todayKey) {
+    if (saved.id) {
+      const savedItem = items.find((item) => item.id === saved.id);
+      if (savedItem) return savedItem;
+    }
+
+    if (Number.isInteger(saved.index) && items[saved.index]) {
+      return items[saved.index];
+    }
+  }
+
+  const index = Math.floor(Math.random() * items.length);
+  const item = items[index];
+
+  try {
+    localStorage.setItem(storageKey, JSON.stringify({
+      date: todayKey,
+      index,
+      id: item.id || ""
+    }));
+  } catch (error) {
+    // localStorageが使えない環境でも表示は続ける
+  }
+
+  return item;
 }
 
 function meigenCardTemplate(item) {
@@ -70,10 +142,10 @@ function renderMeigenList() {
     if (!items.length) {
       random.textContent = "今日の迷言を準備中…";
     } else {
-      const today = new Date();
-      const seed = Number(`${today.getFullYear()}${today.getMonth() + 1}${today.getDate()}`);
-      const item = items[seed % items.length];
-      random.innerHTML = `“${meigenEscapeHtml(item.text)}”<small>${meigenEscapeHtml(item.speaker || "未設定")}</small>`;
+      const item = meigenGetDailyItem(items);
+      const speaker = item.speaker || "未設定";
+      const place = item.place ? ` / ${item.place}` : "";
+      random.innerHTML = `“${meigenEscapeHtml(item.text)}”<small>${meigenEscapeHtml(speaker + place)}</small>`;
     }
   }
 }

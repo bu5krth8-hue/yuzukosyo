@@ -445,7 +445,108 @@ function setDailyQuote() {
   `;
 }
 
+function normalizeMeigenValue(value) {
+  return String(value || "").trim().replace(/\s+/g, " ");
+}
+
+function getMeigenSignature(item) {
+  return [
+    normalizeMeigenValue(item?.text),
+    normalizeMeigenValue(item?.speaker || "未設定"),
+    normalizeMeigenValue(item?.place || "未設定"),
+    normalizeMeigenValue(item?.date || "未設定")
+  ].join("|");
+}
+
+function getVisibleMeigensForTop() {
+  const publicItems = Array.isArray(window.YUZUKOSYO_PUBLIC_MEIGEN)
+    ? window.YUZUKOSYO_PUBLIC_MEIGEN
+    : [];
+  let localItems = [];
+
+  try {
+    const raw = localStorage.getItem("yuzukosyoMeigenItems");
+    const parsed = raw ? JSON.parse(raw) : [];
+    localItems = Array.isArray(parsed) ? parsed : [];
+  } catch (error) {
+    localItems = [];
+  }
+
+  const seen = new Set();
+
+  return [...publicItems, ...localItems].filter((item) => {
+    if (!item || item.visible === false || !String(item.text || "").trim()) return false;
+    const signature = getMeigenSignature(item);
+    if (!signature.trim() || seen.has(signature)) return false;
+    seen.add(signature);
+    return true;
+  });
+}
+
+function getDailyMeigenForTop(items) {
+  const todayKey = getTodayKey();
+  const storageKey = "yuzukosyoDailyMeigen";
+  let saved = null;
+
+  try {
+    saved = JSON.parse(localStorage.getItem(storageKey) || "null");
+  } catch (error) {
+    saved = null;
+  }
+
+  if (saved && saved.date === todayKey) {
+    if (saved.id) {
+      const savedItem = items.find((item) => item.id === saved.id);
+      if (savedItem) return savedItem;
+    }
+
+    if (Number.isInteger(saved.index) && items[saved.index]) {
+      return items[saved.index];
+    }
+  }
+
+  const index = Math.floor(Math.random() * items.length);
+  const item = items[index];
+
+  try {
+    localStorage.setItem(storageKey, JSON.stringify({
+      date: todayKey,
+      index,
+      id: item.id || ""
+    }));
+  } catch (error) {
+    // localStorageが使えない環境でも表示は続ける
+  }
+
+  return item;
+}
+
+function setDailyMeigen() {
+  const text = document.getElementById("dailyMeigenText");
+  if (!text) return;
+
+  const items = getVisibleMeigensForTop();
+
+  if (!items.length) {
+    text.innerHTML = `
+      公開中の迷言はまだありません。
+      <small>追加されたらここに出るよ</small>
+    `;
+    return;
+  }
+
+  const item = getDailyMeigenForTop(items);
+  const speaker = item.speaker || "発言者未設定";
+  const place = item.place ? ` / ${item.place}` : "";
+
+  text.innerHTML = `
+    <span class="quote-mark">“</span>${escapeHtml(item.text)}<span class="quote-mark">”</span>
+    <small>— ${escapeHtml(speaker + place)}</small>
+  `;
+}
+
 setDailyQuote();
+setDailyMeigen();
 
 
 /* ===== v25: animation upgrade pack ===== */
