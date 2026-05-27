@@ -2952,3 +2952,118 @@ body:not(.has-pointer) .cursor-light{
     grid-template-columns:1fr;
   }
 }
+
+
+/* ===== v42: right nav overlap fix ===== */
+.topbar{
+  justify-content:flex-end !important;
+  align-items:flex-start !important;
+  top:16px !important;
+  right:12px !important;
+  left:auto !important;
+  width:auto !important;
+  pointer-events:none !important;
+}
+.menu{display:none !important;}
+.topbar-actions{
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:flex-end !important;
+  gap:8px !important;
+  pointer-events:auto !important;
+}
+.top-jump-btn,
+.schedule-btn,
+.omikuji-jump-btn,
+.floating-gear-jump{
+  position:static !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  width:184px !important;
+  min-width:0 !important;
+  min-height:50px !important;
+  box-sizing:border-box !important;
+  padding:10px 10px !important;
+  font-size:14px !important;
+  line-height:1.15 !important;
+  letter-spacing:.01em !important;
+  text-align:center !important;
+  white-space:normal !important;
+  word-break:keep-all !important;
+  border-radius:16px !important;
+  box-shadow:0 0 16px rgba(168,85,247,.24) !important;
+}
+.top-jump-btn:hover,
+.schedule-btn:hover,
+.omikuji-jump-btn:hover,
+.floating-gear-jump:hover{
+  transform:translateY(-1px) scale(1.025) !important;
+  box-shadow:0 0 24px rgba(168,85,247,.48) !important;
+}
+#omikuji,
+#stream-gear{
+  scroll-margin-top:170px !important;
+}
+@media (max-width:900px){
+  .topbar{
+    top:10px !important;
+    right:10px !important;
+  }
+  .topbar-actions{
+    gap:6px !important;
+  }
+  .top-jump-btn,
+  .schedule-btn,
+  .omikuji-jump-btn,
+  .floating-gear-jump{
+    width:154px !important;
+    min-height:42px !important;
+    padding:8px 8px !important;
+    font-size:11.5px !important;
+    line-height:1.12 !important;
+    border-radius:13px !important;
+    box-shadow:0 0 12px rgba(168,85,247,.20) !important;
+  }
+  .top-jump-btn:hover,
+  .schedule-btn:hover,
+  .omikuji-jump-btn:hover,
+  .floating-gear-jump:hover{
+    transform:none !important;
+  }
+  #omikuji,
+  #stream-gear{
+    scroll-margin-top:132px !important;
+  }
+}
+@media (max-width:520px){
+  .topbar{
+    top:8px !important;
+    right:8px !important;
+  }
+  .topbar-actions{
+    display:grid !important;
+    grid-template-columns:repeat(2, minmax(0, 1fr)) !important;
+    gap:5px !important;
+    align-items:start !important;
+    justify-items:end !important;
+    transform:none !important;
+  }
+  .top-jump-btn,
+  .schedule-btn,
+  .omikuji-jump-btn,
+  .floating-gear-jump{
+    width:104px !important;
+    min-height:34px !important;
+    padding:6px 6px !important;
+    font-size:9.4px !important;
+    line-height:1.12 !important;
+    letter-spacing:0 !important;
+    border-radius:11px !important;
+    box-shadow:0 0 10px rgba(168,85,247,.18) !important;
+  }
+  #omikuji,
+  #stream-gear{
+    scroll-margin-top:92px !important;
+  }
+}
