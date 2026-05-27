@@ -13,7 +13,7 @@
   <meta property="og:description" content="Twitchでゲーム配信をしている柚胡椒の公式ホームページ。配信予定、プロフィール、YouTube、X、Discord、参加型ゲーム配信の情報をまとめています。" />
   <meta property="og:url" content="https://yuzukosyo.pages.dev/" />
   <meta name="twitter:card" content="summary" />
-  <link rel="stylesheet" href="style.css?v=26" />
+  <link rel="stylesheet" href="style.css?v=29" />
 
   <style id="v20-mobile-right-nav-compact">
     /* v20: remove unused menu button, add TOP jump, compact right-side switches on smartphone only */
@@ -80,10 +80,10 @@
         <img class="site-logo-image" src="assets/logo-secret-base.jpeg" alt="柚胡椒の秘密基地" />
       </div>
 
-      <p class="catchcopy">今日もゆるくゲーム中。秘密基地に集合。</p>
+      <p class="catchcopy">気が向いたときに、ふらっとのぞけるゲーム配信の場所。</p>
       <div class="seo-intro-card" aria-label="サイト紹介">
-        <p>柚胡椒の秘密基地は、Twitchでゲーム配信をしている柚胡椒の公式ホームページです。</p>
-        <p>参加型ゲーム配信、FPS、サバイバル、雑談配信を中心に、配信予定・プロフィール・YouTube・X・Discordへのリンクをまとめています。</p>
+        <p>柚胡椒の秘密基地は、Twitchでのゲーム配信や活動情報をまとめたホームページです。</p>
+        <p>配信予定、プロフィール、YouTube、X、Discordへのリンクを、初めて来た人にも分かりやすくまとめています。</p>
       </div>
 
 
@@ -138,6 +138,39 @@
       </div>
     </section>
 
+    <section class="cards beginner-section" aria-label="はじめて来た人へ">
+      <article class="card beginner-card">
+        <div class="beginner-head">
+          <p class="section-kicker">FIRST VISIT</p>
+          <h2>🌙 はじめて来た人へ</h2>
+          <p class="beginner-lead">柚胡椒の秘密基地は、ゲーム配信をゆるく楽しむ場所です。</p>
+        </div>
+        <div class="beginner-grid" aria-label="初見さん向け案内">
+          <div class="beginner-point">
+            <span>💬</span>
+            <strong>初見コメント歓迎</strong>
+            <p>あいさつだけでもOK。気軽にコメントしてね。</p>
+          </div>
+          <div class="beginner-point">
+            <span>👀</span>
+            <strong>ROM専もOK</strong>
+            <p>見るだけでも大丈夫。のんびり楽しんでね。</p>
+          </div>
+          <div class="beginner-point">
+            <span>🎮</span>
+            <strong>ゲーム配信中心</strong>
+            <p>Twitchでゲーム、雑談、参加型などを配信中。</p>
+          </div>
+          <div class="beginner-point">
+            <span>🔔</span>
+            <strong>予定は各SNSで案内</strong>
+            <p>X・Discord・Twitchで配信予定をお知らせします。</p>
+          </div>
+        </div>
+        <p class="beginner-note">まずはTwitchをのぞいて、気になったらDiscordやXもチェックしてね。</p>
+      </article>
+    </section>
+
     <section class="cards schedule-wide-section">
 
       <article class="card schedule-wide-card" id="schedule">
@@ -159,12 +192,42 @@
         <div class="update-history-head">
           <p class="section-kicker">UPDATE LOG</p>
           <h2>📝 更新履歴</h2>
-          <p class="update-history-lead">サイトの追加・修正内容をここに記録していきます。</p>
+          <p class="update-history-lead">追加・修正内容を事実ベースで記録します。</p>
         </div>
         <div class="update-history-viewport" id="updateHistoryViewport" aria-label="更新履歴一覧">
 
           <ol class="update-history-list">
 
+          <li>
+            <time datetime="2026-05-27">2026/05/27</time>
+            <div>
+              <strong>サイト内文言再調整</strong>
+              <p>トップページ・プロフィール・住人ページ・自動表示メッセージで、「〜してね」「めっちゃ」「ぽん」系の表現を一部復帰しました。</p>
+            </div>
+          </li>
+
+          <li>
+            <time datetime="2026-05-27">2026/05/27</time>
+            <div>
+              <strong>サイト内文言調整</strong>
+              <p>更新履歴を事実ベースの表記にし、トップページ・プロフィール・住人ページ・自動表示メッセージの案内文を柔らかい表現に変更しました。</p>
+            </div>
+          </li>
+
+          <li>
+            <time datetime="2026-05-27">2026/05/27</time>
+            <div>
+              <strong>はじめて来た人へエリア追加</strong>
+              <p>初見コメント歓迎、ROM専OK、配信予定の確認先が分かる案内エリアをトップページに追加しました。</p>
+            </div>
+          </li>
+          <li>
+            <time datetime="2026-05-27">2026/05/27</time>
+            <div>
+              <strong>住人ページの表示位置調整</strong>
+              <p>「サイトの世界観」カードの文字が中央に見えるように配置を調整しました。</p>
+            </div>
+          </li>
           <li>
             <time datetime="2026-05-27">2026/05/27</time>
             <div>
@@ -204,10 +267,10 @@
 
     <section class="cards extra-cards single-card-row">
       <article class="card daily-word-card">
-        <h2>👻 今日の格言</h2>
-        <p class="daily-word-note">1日に1回、ランダムで格言が表示されます。</p>
+        <h2>👻 今日のひとこと</h2>
+        <p class="daily-word-note">1日に1回、短いひとことが表示されます。</p>
         <div class="daily-word-box">
-          <p id="dailyWordText">今日の格言を準備中…</p>
+          <p id="dailyWordText">今日のひとことを準備中…</p>
         </div>
       </article>
     </section>
@@ -423,7 +486,7 @@
     </div>
     <p>© 2026 柚胡椒の秘密基地 All Rights Reserved.</p>
   </footer>
-  <script src="script.js?v=26"></script>
-  <script src="stats-counter.js?v=20260526-2"></script>
+  <script src="script.js?v=29"></script>
+  <script src="stats-counter.js?v=29"></script>
 </body>
 </html>

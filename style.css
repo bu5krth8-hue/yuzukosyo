@@ -2032,3 +2032,163 @@ body:not(.has-pointer) .cursor-light{
     min-height:44px;
   }
 }
+
+
+/* ===== v27: first visitor guide + mascot world centering ===== */
+.beginner-section{
+  grid-template-columns:1fr;
+  margin:22px 0;
+}
+
+.beginner-card{
+  position:relative;
+  overflow:hidden;
+  text-align:center;
+  padding:32px 30px;
+}
+
+.beginner-card::before{
+  content:"";
+  position:absolute;
+  inset:-90px auto auto -90px;
+  width:240px;
+  height:240px;
+  border-radius:50%;
+  background:radial-gradient(circle, rgba(112,214,255,.22), transparent 68%);
+  pointer-events:none;
+}
+
+.beginner-card::after{
+  content:"";
+  position:absolute;
+  inset:auto -110px -110px auto;
+  width:280px;
+  height:280px;
+  border-radius:50%;
+  background:radial-gradient(circle, rgba(168,85,247,.24), transparent 68%);
+  pointer-events:none;
+}
+
+.beginner-head,
+.beginner-grid,
+.beginner-note{
+  position:relative;
+  z-index:1;
+}
+
+.beginner-head{
+  margin-bottom:22px;
+}
+
+.beginner-head h2{
+  margin-bottom:10px;
+}
+
+.beginner-lead{
+  margin:0 auto;
+  max-width:760px;
+  color:#f5eaff;
+  font-weight:900;
+  line-height:1.9;
+  font-size:clamp(16px,2vw,20px);
+}
+
+.beginner-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:14px;
+}
+
+.beginner-point{
+  min-height:150px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-start;
+  gap:8px;
+  padding:18px 14px;
+  border:1px solid rgba(216,180,254,.32);
+  border-radius:18px;
+  background:
+    radial-gradient(circle at top, rgba(216,180,254,.14), transparent 58%),
+    rgba(10,4,20,.56);
+  box-shadow:
+    inset 0 0 18px rgba(255,255,255,.03),
+    0 0 18px rgba(168,85,247,.12);
+}
+
+.beginner-point span{
+  font-size:32px;
+  line-height:1;
+  filter:drop-shadow(0 0 12px rgba(216,180,254,.58));
+}
+
+.beginner-point strong{
+  color:#fff;
+  font-weight:1000;
+  font-size:17px;
+  text-shadow:0 0 12px rgba(168,85,247,.5);
+}
+
+.beginner-point p{
+  margin:0;
+  color:#efe5ff;
+  font-weight:800;
+  line-height:1.7;
+  font-size:14px;
+}
+
+.beginner-note{
+  margin:22px auto 0;
+  max-width:760px;
+  color:#d8f3ff;
+  font-weight:900;
+  line-height:1.8;
+  text-shadow:0 0 12px rgba(112,214,255,.28);
+}
+
+.mascot-world-card{
+  grid-template-columns:1fr !important;
+  justify-items:center;
+  text-align:center;
+  padding:36px 44px;
+}
+
+.mascot-world-card > div{
+  width:min(760px,100%);
+  margin:0 auto;
+}
+
+.mascot-world-card h2{
+  text-align:center;
+}
+
+.mascot-world-card p{
+  max-width:700px;
+  margin:0 auto 12px !important;
+  text-align:center;
+}
+
+@media (max-width:920px){
+  .beginner-grid{
+    grid-template-columns:repeat(2,1fr);
+  }
+}
+
+@media (max-width:520px){
+  .beginner-card{
+    padding:24px 18px;
+  }
+
+  .beginner-grid{
+    grid-template-columns:1fr;
+  }
+
+  .beginner-point{
+    min-height:auto;
+  }
+
+  .mascot-world-card{
+    padding:26px 20px;
+  }
+}
