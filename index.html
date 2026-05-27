@@ -13,7 +13,7 @@
   <meta property="og:description" content="Twitchでゲーム配信をしている柚胡椒の公式ホームページ。配信予定、プロフィール、YouTube、X、Discord、参加型ゲーム配信の情報をまとめています。" />
   <meta property="og:url" content="https://yuzukosyo.pages.dev/" />
   <meta name="twitter:card" content="summary" />
-  <link rel="stylesheet" href="style.css?v=25" />
+  <link rel="stylesheet" href="style.css?v=26" />
 
   <style id="v20-mobile-right-nav-compact">
     /* v20: remove unused menu button, add TOP jump, compact right-side switches on smartphone only */
@@ -161,7 +161,17 @@
           <h2>📝 更新履歴</h2>
           <p class="update-history-lead">サイトの追加・修正内容をここに記録していきます。</p>
         </div>
-        <ol class="update-history-list">
+        <div class="update-history-viewport" id="updateHistoryViewport" aria-label="更新履歴一覧">
+
+          <ol class="update-history-list">
+
+          <li>
+            <time datetime="2026-05-27">2026/05/27</time>
+            <div>
+              <strong>更新履歴の表示改善</strong>
+              <p>最新3件を初期表示し、「もっと見る」から履歴エリア内スクロールで過去ログを確認できるようにしました。</p>
+            </div>
+          </li>
           <li>
             <time datetime="2026-05-27">2026/05/27</time>
             <div>
@@ -183,7 +193,12 @@
               <p>Twitchの配信予定を確認できるエリアを追加しました。</p>
             </div>
           </li>
-        </ol>
+
+          </ol>
+
+        </div>
+
+        <button class="update-more-btn" id="updateMoreBtn" type="button" aria-expanded="false" aria-controls="updateHistoryViewport">もっと見る</button>
       </article>
     </section>
 
@@ -408,7 +423,7 @@
     </div>
     <p>© 2026 柚胡椒の秘密基地 All Rights Reserved.</p>
   </footer>
-  <script src="script.js?v=25"></script>
+  <script src="script.js?v=26"></script>
   <script src="stats-counter.js?v=20260526-2"></script>
 </body>
 </html>

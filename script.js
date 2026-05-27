@@ -573,3 +573,34 @@ setupCursorParticles();
 
 
 
+
+
+function setupUpdateHistoryMore() {
+  const card = document.querySelector(".update-history-card");
+  const button = document.getElementById("updateMoreBtn");
+  const viewport = document.getElementById("updateHistoryViewport");
+  if (!card || !button || !viewport) return;
+
+  const items = viewport.querySelectorAll(".update-history-list li");
+  if (items.length <= 3) {
+    button.style.display = "none";
+    card.classList.add("is-expanded");
+    return;
+  }
+
+  card.classList.remove("is-expanded");
+  button.textContent = "もっと見る";
+
+  button.addEventListener("click", () => {
+    const expanded = card.classList.toggle("is-expanded");
+    button.setAttribute("aria-expanded", expanded ? "true" : "false");
+    button.textContent = expanded ? "閉じる" : "もっと見る";
+
+    if (!expanded) {
+      viewport.scrollTo({ top: 0, behavior: "smooth" });
+      card.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  });
+}
+
+setupUpdateHistoryMore();

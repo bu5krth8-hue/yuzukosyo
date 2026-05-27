@@ -1887,3 +1887,148 @@ body:not(.has-pointer) .cursor-light{
     transform:none;
   }
 }
+
+
+/* ===== v26: update history compact + scroll ===== */
+.update-history-card{
+  overflow:hidden;
+}
+
+.update-history-viewport{
+  position:relative;
+  max-height:none;
+  overflow:hidden;
+  padding-right:2px;
+  transition:max-height .42s ease, box-shadow .28s ease;
+}
+
+.update-history-card:not(.is-expanded) .update-history-viewport{
+  max-height:390px;
+}
+
+.update-history-card.is-expanded .update-history-viewport{
+  max-height:520px;
+  overflow-y:auto;
+  padding-right:8px;
+  border-radius:18px;
+  scrollbar-width:thin;
+  scrollbar-color:rgba(216,180,254,.72) rgba(24,8,42,.54);
+}
+
+.update-history-card:not(.is-expanded) .update-history-viewport::after{
+  content:"";
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:0;
+  height:78px;
+  pointer-events:none;
+  background:linear-gradient(
+    to bottom,
+    rgba(18,4,30,0),
+    rgba(18,4,30,.76) 62%,
+    rgba(18,4,30,.96)
+  );
+}
+
+.update-history-card.is-expanded .update-history-viewport::-webkit-scrollbar{
+  width:9px;
+}
+
+.update-history-card.is-expanded .update-history-viewport::-webkit-scrollbar-track{
+  background:rgba(24,8,42,.55);
+  border-radius:999px;
+}
+
+.update-history-card.is-expanded .update-history-viewport::-webkit-scrollbar-thumb{
+  background:linear-gradient(180deg, rgba(216,180,254,.88), rgba(168,85,247,.72));
+  border-radius:999px;
+  box-shadow:0 0 12px rgba(216,180,254,.48);
+}
+
+.update-history-card:not(.is-expanded) .update-history-list li:nth-child(n+4){
+  display:none;
+}
+
+.update-more-btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:.45em;
+  margin:18px auto 0;
+  min-width:168px;
+  min-height:46px;
+  padding:12px 22px;
+  border-radius:999px;
+  border:1px solid rgba(216,180,254,.48);
+  background:
+    linear-gradient(135deg, rgba(168,85,247,.16), rgba(112,214,255,.08)),
+    rgba(18,4,30,.72);
+  color:#f4e8ff;
+  font-weight:900;
+  letter-spacing:.04em;
+  cursor:pointer;
+  box-shadow:
+    0 0 22px rgba(168,85,247,.24),
+    inset 0 0 18px rgba(216,180,254,.05);
+  transition:
+    transform .22s ease,
+    border-color .22s ease,
+    box-shadow .22s ease,
+    background .22s ease;
+  position:relative;
+  overflow:hidden;
+}
+
+.update-more-btn::before{
+  content:"";
+  position:absolute;
+  inset:-2px;
+  background:linear-gradient(120deg, transparent 0%, rgba(216,180,254,.13) 28%, rgba(112,214,255,.32) 50%, rgba(216,180,254,.13) 72%, transparent 100%);
+  transform:translateX(-125%);
+  transition:transform .58s ease;
+  pointer-events:none;
+}
+
+.update-more-btn:hover{
+  transform:translateY(-2px);
+  border-color:rgba(216,180,254,.82);
+  box-shadow:
+    0 0 34px rgba(216,180,254,.38),
+    0 0 52px rgba(168,85,247,.20),
+    inset 0 0 22px rgba(216,180,254,.08);
+}
+
+.update-more-btn:hover::before{
+  transform:translateX(125%);
+}
+
+.update-more-btn::after{
+  content:"▼";
+  font-size:.78em;
+  opacity:.82;
+  transition:transform .22s ease;
+}
+
+.update-history-card.is-expanded .update-more-btn::after{
+  transform:rotate(180deg);
+}
+
+.update-history-card.is-expanded .update-more-btn{
+  margin-top:16px;
+}
+
+@media (max-width:640px){
+  .update-history-card:not(.is-expanded) .update-history-viewport{
+    max-height:360px;
+  }
+
+  .update-history-card.is-expanded .update-history-viewport{
+    max-height:360px;
+  }
+
+  .update-more-btn{
+    width:100%;
+    min-height:44px;
+  }
+}
