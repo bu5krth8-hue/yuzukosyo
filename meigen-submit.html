@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="style.css?v=33" />
+  <title>迷言案を送る｜柚胡椒の秘密基地</title>
+  <meta name="description" content="柚胡椒の迷言集へ載せたい迷言案を送るためのフォームです。" />
+  <meta name="robots" content="index, follow" />
+</head>
+<body>
+  <div class="cursor-light" id="cursorLight"></div>
+  <div class="bg-glow glow-a"></div>
+  <div class="bg-glow glow-b"></div>
+  <div class="stars" aria-hidden="true"></div>
+  <div class="shooting-stars" aria-hidden="true"><span></span><span></span><span></span></div>
+  <div class="particle-layer" id="particleLayer" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <a class="schedule-btn" href="meigen.html">← 迷言集に戻る</a>
+  </header>
+
+  <main class="page sub-page meigen-submit-page">
+    <section class="hero sub-hero">
+      <p class="eyebrow">- MEIGEN POST -</p>
+      <h1 class="sub-page-title">📮 迷言案を送る</h1>
+      <p class="catchcopy">「これ迷言じゃない？」と思ったひとことを、柚胡椒へ送れるフォームです。</p>
+    </section>
+
+    <section class="quote-room-grid meigen-room-grid">
+      <article class="card quote-room-card meigen-submit-card">
+        <div>
+          <p class="section-kicker">POST FORM</p>
+          <h2>🗯️ 投稿案フォーム</h2>
+          <p>送られた内容はすぐ公開されません。柚胡椒が確認して、載せるものだけ迷言集へ追加します。</p>
+          <form class="meigen-form" id="meigenSubmitForm">
+            <label>
+              <span>迷言</span>
+              <textarea name="text" rows="3" placeholder="例：それはもう実質勝ち。" required></textarea>
+            </label>
+            <div class="meigen-form-grid">
+              <label>
+                <span>発言者</span>
+                <input name="speaker" type="text" placeholder="柚胡椒 / とある住人さん / 匿名希望" />
+              </label>
+              <label>
+                <span>出た場所</span>
+                <input name="place" type="text" placeholder="配信中 / コメント欄 / Discord" />
+              </label>
+              <label>
+                <span>日付</span>
+                <input name="date" type="text" placeholder="分かればでOK" />
+              </label>
+              <label>
+                <span>投稿者名</span>
+                <input name="sender" type="text" placeholder="返信がほしい名前 / 匿名OK" />
+              </label>
+            </div>
+            <label>
+              <span>補足</span>
+              <input name="memo" type="text" placeholder="どんな流れで出たか、必要なら書いてね" />
+            </label>
+            <button class="mini-btn" type="submit">送信用の文章を作る</button>
+          </form>
+        </div>
+      </article>
+
+      <article class="card quote-room-card submit-output-card" hidden>
+        <div>
+          <p class="section-kicker">SEND TEXT</p>
+          <h2>📨 送信用メモ</h2>
+          <p>下の内容をコピーして、DiscordやXのDMなどで柚胡椒へ送ってね。</p>
+          <textarea class="meigen-export-area" id="meigenSubmitOutput" rows="9"></textarea>
+          <div class="meigen-action-grid">
+            <button class="mini-btn" id="meigenSubmitCopyBtn" type="button">内容をコピー</button>
+            <a class="mini-btn" id="meigenSubmitMailBtn" href="#" aria-disabled="true">メールで送る</a>
+          </div>
+          <p class="meigen-note">メール送信先は未設定です。公開用メールアドレスを入れると、メールアプリ送信用にもできます。</p>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-links">
+      <a href="index.html">Home</a>
+      <a href="meigen.html">Meigen</a>
+      <a href="quotes.html">Quotes</a>
+    </div>
+    <p>© 2026 柚胡椒の秘密基地 All Rights Reserved.</p>
+  </footer>
+
+  <script src="script.js?v=33"></script>
+  <script src="meigen-data.js?v=33"></script>
+  <script src="meigen.js?v=33"></script>
+</body>
+</html>

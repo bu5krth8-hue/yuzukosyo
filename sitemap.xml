@@ -15,4 +15,23 @@
     <lastmod>2026-05-27</lastmod>
     <priority>0.7</priority>
   </url>
+  <url>
+    <loc>https://yuzukosyo.pages.dev/quotes.html</loc>
+    <lastmod>2026-05-27</lastmod>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://yuzukosyo.pages.dev/meigen.html</loc>
+    <lastmod>2026-05-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://yuzukosyo.pages.dev/meigen-submit.html</loc>
+    <lastmod>2026-05-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
 </urlset>
