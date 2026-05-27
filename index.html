@@ -13,7 +13,7 @@
   <meta property="og:description" content="Twitchでゲーム配信をしている柚胡椒の公式ホームページ。配信予定、プロフィール、YouTube、X、Discord、参加型ゲーム配信の情報をまとめています。" />
   <meta property="og:url" content="https://yuzukosyo.pages.dev/" />
   <meta name="twitter:card" content="summary" />
-  <link rel="stylesheet" href="style.css?v=38" />
+  <link rel="stylesheet" href="style.css?v=41" />
 
   <style id="v20-mobile-right-nav-compact">
     /* v20: remove unused menu button, add TOP jump, compact right-side switches on smartphone only */
@@ -21,18 +21,22 @@
     .menu{display:none!important;}
     .topbar-actions{display:flex!important;flex-direction:column!important;align-items:flex-end!important;gap:10px!important;pointer-events:auto!important;}
     .top-jump-btn,
+    .schedule-btn,
+    .omikuji-jump-btn,
     .floating-gear-jump{
       position:static!important;
       display:inline-flex!important;
       align-items:center!important;
       justify-content:center!important;
-      min-width:214px;
+      width:204px;
+      min-width:0;
+      box-sizing:border-box;
       text-decoration:none!important;
       color:#d8b4fe!important;
       background:rgba(20,8,32,.82)!important;
       border:1px solid rgba(190,120,255,.55)!important;
       border-radius:18px!important;
-      padding:15px 20px!important;
+      padding:13px 14px!important;
       font-weight:900!important;
       white-space:nowrap!important;
       box-shadow:0 0 18px rgba(168,85,247,.25)!important;
@@ -40,20 +44,22 @@
       transition:transform .18s ease,box-shadow .18s ease!important;
     }
     .top-jump-btn:hover,
+    .schedule-btn:hover,
+    .omikuji-jump-btn:hover,
     .floating-gear-jump:hover{transform:translateY(-2px) scale(1.04);box-shadow:0 0 28px rgba(168,85,247,.55)!important;}
-    .schedule-btn{min-width:214px;text-align:center;}
+    .schedule-btn,.omikuji-jump-btn{width:204px;min-width:0;text-align:center;}
     .gear-market-head{display:block!important;text-align:center!important;}
     .gear-market-title{display:block!important;width:100%!important;text-align:center!important;margin:0 0 22px!important;font-size:clamp(24px,3vw,32px)!important;}
     .gear-market-copy{text-align:left!important;width:100%!important;}
     .gear-market-copy .ad-label,.gear-market-copy p{text-align:left!important;}
-    #stream-gear{scroll-margin-top:170px;}
+    #omikuji,#stream-gear{scroll-margin-top:185px;}
     #top{scroll-margin-top:0;}
     @media (max-width:520px){
       .topbar{top:8px!important;right:8px!important;}
-      .topbar-actions{gap:7px!important;transform:scale(.88);transform-origin:top right;}
-      .top-jump-btn,.floating-gear-jump,.schedule-btn{min-width:152px!important;min-height:36px!important;padding:8px 10px!important;font-size:11.5px!important;line-height:1.15!important;border-radius:13px!important;box-shadow:0 0 12px rgba(168,85,247,.22)!important;}
-      .top-jump-btn:hover,.floating-gear-jump:hover{transform:none!important;}
-      #stream-gear{scroll-margin-top:120px;}
+      .topbar-actions{gap:6px!important;transform:scale(.86);transform-origin:top right;}
+      .top-jump-btn,.schedule-btn,.omikuji-jump-btn,.floating-gear-jump{width:146px!important;min-width:0!important;min-height:34px!important;padding:7px 8px!important;font-size:10.8px!important;line-height:1.12!important;border-radius:12px!important;box-shadow:0 0 12px rgba(168,85,247,.22)!important;}
+      .top-jump-btn:hover,.schedule-btn:hover,.omikuji-jump-btn:hover,.floating-gear-jump:hover{transform:none!important;}
+      #omikuji,#stream-gear{scroll-margin-top:126px;}
     }
   </style>
 </head>
@@ -69,6 +75,7 @@
     <div class="topbar-actions" aria-label="ページ内リンク">
       <a class="top-jump-btn" href="#top" aria-label="ページの一番上へ戻る">⬆ TOPへ戻る</a>
       <a class="schedule-btn" href="#schedule">🔔 配信予定</a>
+      <a class="omikuji-jump-btn" href="#omikuji" aria-label="今日の柚胡椒みくじへ移動">🔮 柚胡椒くじ</a>
       <a class="floating-gear-jump" href="#stream-gear" aria-label="配信で使ってるものへ移動">🎮 配信で使ってるもの</a>
     </div>
   </header>
@@ -201,6 +208,14 @@
           <li>
             <time datetime="2026-05-27">2026/05/27</time>
             <div>
+              <strong>今日の柚胡椒みくじ追加</strong>
+              <p>トップページに1日1回ランダムで運勢とコメントが出る「今日の柚胡椒みくじ」を追加しました。</p>
+            </div>
+          </li>
+
+          <li>
+            <time datetime="2026-05-27">2026/05/27</time>
+            <div>
               <strong>トップページ迷言日替わり表示追加</strong>
               <p>今日の格言の下に、公開中の迷言から1日1回ランダム表示する「柚胡椒の迷言集」カードを追加しました。</p>
             </div>
@@ -318,6 +333,30 @@
           </div>
           <p class="daily-word-jump">柚胡椒の迷言集を見る →</p>
         </a>
+      </article>
+
+      <article class="card daily-word-card omikuji-card" id="omikuji">
+        <div class="daily-word-link omikuji-inner">
+          <h2>🔮 今日の柚胡椒みくじ</h2>
+          <p class="daily-word-note">1端末につき1日1回、今日の運勢とひとことコメントが出ます。引いた後は明日まで押せないよ。</p>
+          <div class="daily-word-box omikuji-box" id="omikujiBox" aria-live="polite">
+            <div class="omikuji-ready" id="omikujiReady">
+              <img src="assets/tanuchan-wink.png" alt="たぬちゃん" class="omikuji-mascot" loading="lazy">
+              <p>今日のみくじを準備中…</p>
+            </div>
+            <div class="omikuji-result" id="omikujiResult" hidden>
+              <p class="omikuji-label">今日の運勢</p>
+              <p class="omikuji-fortune" id="omikujiFortune">-</p>
+              <p class="omikuji-comment" id="omikujiComment">-</p>
+              <dl class="omikuji-detail">
+                <div><dt>配信運</dt><dd id="omikujiStream">-</dd></div>
+                <div><dt>ゲーム運</dt><dd id="omikujiGame">-</dd></div>
+                <div><dt>コメント運</dt><dd id="omikujiChat">-</dd></div>
+              </dl>
+            </div>
+          </div>
+          <button class="omikuji-button" id="omikujiButton" type="button">今日のみくじを引く</button>
+        </div>
       </article>
     </section>
 
@@ -547,8 +586,8 @@
     </div>
     <p>© 2026 柚胡椒の秘密基地 All Rights Reserved.</p>
   </footer>
-  <script src="meigen-data.js?v=38"></script>
-  <script src="script.js?v=38"></script>
-  <script src="stats-counter.js?v=38"></script>
+  <script src="meigen-data.js?v=40"></script>
+  <script src="script.js?v=40"></script>
+  <script src="stats-counter.js?v=40"></script>
 </body>
 </html>

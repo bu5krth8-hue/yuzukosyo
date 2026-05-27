@@ -1,3 +1,1 @@
-# yuzukosyo site
-
-Cloudflare Pages用サイトデータ。
+柚胡椒の秘密基地 サイトデータ v40

@@ -545,8 +545,169 @@ function setDailyMeigen() {
   `;
 }
 
+
+const omikujiItems = [
+  {
+    fortune: "大吉",
+    comment: "今日は流れが味方しやすい日。思いついたことを小さく動かすと、次のきっかけにつながりやすいよ。",
+    stream: "初見さんとの会話が広がりやすい",
+    game: "集中力が続きやすい。強気でOK",
+    chat: "ひとことコメントが流れを作る"
+  },
+  {
+    fortune: "中吉",
+    comment: "派手な勝負より、いつものペースが強い日。無理に盛らず、自然体でいくと安定します。",
+    stream: "いつもの空気を大事にすると吉",
+    game: "深追いせず、区切りを作ると良い",
+    chat: "あいさつから会話が伸びる"
+  },
+  {
+    fortune: "小吉",
+    comment: "小さいラッキーを拾える日。大きな成果を狙うより、少し整えるだけで十分です。",
+    stream: "短めの雑談が効く",
+    game: "準備運あり。設定確認が吉",
+    chat: "軽いツッコミが刺さりやすい"
+  },
+  {
+    fortune: "吉",
+    comment: "目立つ出来事は少なくても、じわっと良い日。焦らず進めば、ちゃんと前に進めます。",
+    stream: "落ち着いた配信が合う",
+    game: "堅実プレイが安定",
+    chat: "返事を丁寧にすると吉"
+  },
+  {
+    fortune: "末吉",
+    comment: "最初は重くても、後半に流れが戻りやすい日。うまくいかない時はいったん休憩が正解。",
+    stream: "後半に空気が温まりやすい",
+    game: "序盤のミスを引きずらない",
+    chat: "聞き役に回ると流れが良くなる"
+  },
+  {
+    fortune: "ぽん吉",
+    comment: "細かいことは一回置いておく日。勢いで笑える瞬間が来たら、それが今日の当たりです。",
+    stream: "ぽんで解決する場面あり",
+    game: "ノリの良さが武器になる",
+    chat: "短いコメントほど強い"
+  },
+  {
+    fortune: "たぬ吉",
+    comment: "たぬちゃんが見守る日。無理に前へ出るより、かわいく様子見してから動くと吉。",
+    stream: "癒やし枠が強い",
+    game: "待ってから動くと成功しやすい",
+    chat: "やさしい一言が残りやすい"
+  },
+  {
+    fortune: "幽霊吉",
+    comment: "静かに存在感が出る日。目立たない一言や小ネタが、あとから効いてきます。",
+    stream: "急な一言がウケる可能性あり",
+    game: "隠密・奇襲・様子見が吉",
+    chat: "ROMからの一言に運あり"
+  },
+  {
+    fortune: "沼吉",
+    comment: "ハマりすぎ注意の日。ただし、沼った先においしい展開があるかもしれません。撤退ラインだけ決めておくと安全。",
+    stream: "沼展開はネタにすると吉",
+    game: "連敗時はいったん水分補給",
+    chat: "共感コメントが集まりやすい"
+  },
+  {
+    fortune: "配信吉",
+    comment: "配信まわりに運がある日。タイトル、音量、画面、ひとこと案内を整えると見やすさが上がります。",
+    stream: "開始前チェックが大吉行動",
+    game: "見せ場を作りやすい",
+    chat: "固定コメントや案内が効く"
+  }
+];
+
+function showOmikujiResult(item) {
+  const ready = document.getElementById("omikujiReady");
+  const result = document.getElementById("omikujiResult");
+  const fortune = document.getElementById("omikujiFortune");
+  const comment = document.getElementById("omikujiComment");
+  const stream = document.getElementById("omikujiStream");
+  const game = document.getElementById("omikujiGame");
+  const chat = document.getElementById("omikujiChat");
+
+  if (ready) ready.hidden = true;
+  if (result) result.hidden = false;
+  if (fortune) fortune.textContent = item.fortune;
+  if (comment) comment.textContent = item.comment;
+  if (stream) stream.textContent = item.stream;
+  if (game) game.textContent = item.game;
+  if (chat) chat.textContent = item.chat;
+}
+
+function setupDailyOmikuji() {
+  const button = document.getElementById("omikujiButton");
+  const box = document.getElementById("omikujiBox");
+  if (!button || !box) return;
+
+  const todayKey = getTodayKey();
+  const storageKey = "yuzukosyoDailyOmikuji";
+  let saved = null;
+
+  try {
+    saved = JSON.parse(localStorage.getItem(storageKey) || "null");
+  } catch (error) {
+    saved = null;
+  }
+
+  if (
+    saved &&
+    saved.date === todayKey &&
+    Number.isInteger(saved.index) &&
+    omikujiItems[saved.index]
+  ) {
+    showOmikujiResult(omikujiItems[saved.index]);
+    button.textContent = "今日はもう引いたよ";
+    button.classList.add("omikuji-button-done");
+    button.disabled = true;
+    button.setAttribute("aria-disabled", "true");
+  }
+
+  button.addEventListener("click", () => {
+    let index;
+
+    try {
+      const current = JSON.parse(localStorage.getItem(storageKey) || "null");
+      if (
+        current &&
+        current.date === todayKey &&
+        Number.isInteger(current.index) &&
+        omikujiItems[current.index]
+      ) {
+        index = current.index;
+      }
+    } catch (error) {
+      index = undefined;
+    }
+
+    if (!Number.isInteger(index)) {
+      index = Math.floor(Math.random() * omikujiItems.length);
+      try {
+        localStorage.setItem(storageKey, JSON.stringify({
+          date: todayKey,
+          index
+        }));
+      } catch (error) {
+        // localStorageが使えない環境でも表示は続ける
+      }
+    }
+
+    box.classList.remove("omikuji-reveal");
+    void box.offsetWidth;
+    box.classList.add("omikuji-reveal");
+    showOmikujiResult(omikujiItems[index]);
+    button.textContent = "今日はもう引いたよ";
+    button.classList.add("omikuji-button-done");
+    button.disabled = true;
+    button.setAttribute("aria-disabled", "true");
+  });
+}
+
 setDailyQuote();
 setDailyMeigen();
+setupDailyOmikuji();
 
 
 /* ===== v25: animation upgrade pack ===== */
