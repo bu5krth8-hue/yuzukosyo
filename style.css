@@ -4271,3 +4271,15 @@ body.ghost-rare-mode::after{content:"";position:fixed;inset:0;pointer-events:non
     scroll-margin-top:166px !important;
   }
 }
+
+
+/* ===== v61: update history shortcut button and jump offset ===== */
+.updates-jump-btn{
+  position:relative;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+}
+#updates{scroll-margin-top:210px;}
+@media (max-width:900px){#updates{scroll-margin-top:188px;}}
+@media (max-width:520px){#updates{scroll-margin-top:166px;}}
