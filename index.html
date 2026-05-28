@@ -13,10 +13,10 @@
   <meta property="og:description" content="Twitchでゲーム配信をしている柚胡椒の公式ホームページ。配信予定、プロフィール、YouTube、X、Discord、参加型ゲーム配信の情報をまとめています。" />
   <meta property="og:url" content="https://yuzukosyo.pages.dev/" />
   <meta name="twitter:card" content="summary" />
-  <link rel="stylesheet" href="style.css?v=43" />
+  <link rel="stylesheet" href="style.css?v=45" />
 
-  <style id="v43-right-nav-fit">
-    /* v43: right-side switches fit adjustment for desktop and smartphone */
+  <style id="v45-right-nav-fit">
+    /* v45: right-side switches fit adjustment for desktop and smartphone */
     .topbar{
       justify-content:flex-end!important;
       align-items:flex-start!important;
@@ -71,6 +71,7 @@
     .gear-market-title{display:block!important;width:100%!important;text-align:center!important;margin:0 0 22px!important;font-size:clamp(24px,3vw,32px)!important;}
     .gear-market-copy{text-align:left!important;width:100%!important;}
     .gear-market-copy .ad-label,.gear-market-copy p{text-align:left!important;}
+    #schedule{scroll-margin-top:170px;}
     #omikuji,#stream-gear{scroll-margin-top:170px;}
     #top{scroll-margin-top:0;}
     @media (max-width:900px){
@@ -78,12 +79,14 @@
       .topbar-actions{gap:6px!important;}
       .top-jump-btn,.schedule-btn,.omikuji-jump-btn,.floating-gear-jump{width:154px!important;min-height:42px!important;padding:8px 8px!important;font-size:11.5px!important;border-radius:13px!important;box-shadow:0 0 12px rgba(168,85,247,.20)!important;}
       .top-jump-btn:hover,.schedule-btn:hover,.omikuji-jump-btn:hover,.floating-gear-jump:hover{transform:none!important;}
+      #schedule{scroll-margin-top:132px;}
       #omikuji,#stream-gear{scroll-margin-top:132px;}
     }
     @media (max-width:520px){
       .topbar{top:8px!important;right:8px!important;}
       .topbar-actions{display:grid!important;grid-template-columns:repeat(2, minmax(0, 1fr))!important;gap:5px!important;align-items:start!important;justify-items:end!important;}
       .top-jump-btn,.schedule-btn,.omikuji-jump-btn,.floating-gear-jump{width:104px!important;min-height:34px!important;padding:6px 6px!important;font-size:9.4px!important;line-height:1.12!important;border-radius:11px!important;letter-spacing:0!important;box-shadow:0 0 10px rgba(168,85,247,.18)!important;}
+      #schedule{scroll-margin-top:118px;}
       #omikuji,#stream-gear{scroll-margin-top:92px;}
     }
   </style>
@@ -229,6 +232,22 @@
         <div class="update-history-viewport" id="updateHistoryViewport" aria-label="更新履歴一覧">
 
           <ol class="update-history-list">
+
+          <li>
+            <time datetime="2026-05-28">2026/05/28</time>
+            <div>
+              <strong>スマホ版の配信予定ジャンプ位置調整</strong>
+              <p>スマホで右上の「配信予定」スイッチを押した時に、配信予定欄と右上スイッチが被りにくい位置へ移動するよう調整しました。</p>
+            </div>
+          </li>
+
+          <li>
+            <time datetime="2026-05-28">2026/05/28</time>
+            <div>
+              <strong>軽量アニメーション追加</strong>
+              <p>たぬちゃん・幽霊ちゃんのゆらゆら演出、カードのふわっと表示、ネオン見出しの発光、ボタン押下演出、おみくじ開封演出を追加しました。</p>
+            </div>
+          </li>
 
           <li>
             <time datetime="2026-05-27">2026/05/27</time>
@@ -611,8 +630,8 @@
     </div>
     <p>© 2026 柚胡椒の秘密基地 All Rights Reserved.</p>
   </footer>
-  <script src="meigen-data.js?v=43"></script>
-  <script src="script.js?v=43"></script>
-  <script src="stats-counter.js?v=43"></script>
+  <script src="meigen-data.js?v=45"></script>
+  <script src="script.js?v=45"></script>
+  <script src="stats-counter.js?v=45"></script>
 </body>
 </html>

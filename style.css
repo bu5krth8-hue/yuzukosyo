@@ -3287,3 +3287,19 @@ body::before{
     animation:none !important;
   }
 }
+
+
+/* ===== v45: smartphone schedule anchor adjustment ===== */
+#schedule{
+  scroll-margin-top:170px !important;
+}
+@media (max-width:900px){
+  #schedule{
+    scroll-margin-top:132px !important;
+  }
+}
+@media (max-width:520px){
+  #schedule{
+    scroll-margin-top:118px !important;
+  }
+}
