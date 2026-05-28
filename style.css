@@ -4629,3 +4629,26 @@ body.anchor-jump-prep .gear-product-card{
   }
 }
 
+
+
+/* ===== v70: first shortcut jump stability ===== */
+body.anchor-jump-prep .visit-stamp-section,
+body.anchor-jump-prep .mascot-area,
+body.anchor-jump-prep .beginner-section,
+body.anchor-jump-prep .schedule-wide-section,
+body.anchor-jump-prep .schedule-wide-card,
+body.anchor-jump-prep .extra-cards,
+body.anchor-jump-prep .page-links-section,
+body.anchor-jump-prep .update-history-section,
+body.anchor-jump-prep .gear-market-section{
+  content-visibility:visible !important;
+  contain-intrinsic-size:none !important;
+}
+.live-panel{
+  min-height:52px;
+}
+@media (max-width:620px){
+  .live-panel{
+    min-height:72px;
+  }
+}

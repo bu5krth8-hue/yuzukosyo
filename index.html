@@ -14,7 +14,7 @@
   <meta property="og:url" content="https://yuzukosyo.pages.dev/" />
   <meta name="twitter:card" content="summary" />
   <link rel="preload" href="assets/logo-secret-base.webp" as="image" type="image/webp" fetchpriority="high" />
-  <link rel="stylesheet" href="style.css?v=69" />
+  <link rel="stylesheet" href="style.css?v=70" />
 </head>
 <body id="top">
   <div class="cursor-light" id="cursorLight"></div>
@@ -283,6 +283,14 @@
         <div class="update-history-viewport" id="updateHistoryViewport" aria-label="更新履歴一覧">
 
           <ol class="update-history-list">
+          <li>
+            <time datetime="2026-05-28">2026/05/28</time>
+            <div>
+              <strong>右上ショートカットの初回移動ズレを再調整</strong>
+              <p>初回押下時に下部セクションの高さ計算が確定しておらず、ショートカットの移動位置がズレることがあったため、移動前に対象セクションのレイアウトを確定し、スクロールアニメーションによる補正ズレが起きない方式へ変更しました。</p>
+            </div>
+          </li>
+
           <li>
             <time datetime="2026-05-28">2026/05/28</time>
             <div>
@@ -794,8 +802,8 @@
     <strong id="secretToastTitle">秘密基地メモ</strong>
     <span id="secretToastText">見つけてくれてありがとう。</span>
   </div>
-  <script src="meigen-data.js?v=69" defer></script>
-  <script src="script.js?v=69" defer></script>
-  <script src="stats-counter.js?v=69" defer></script>
+  <script src="meigen-data.js?v=70" defer></script>
+  <script src="script.js?v=70" defer></script>
+  <script src="stats-counter.js?v=70" defer></script>
 </body>
 </html>

@@ -1299,7 +1299,37 @@ function setupStableShortcutJumps() {
   if (!nav) return;
 
   const anchorMap = new Set(["#top", "#visitStamp", "#schedule", "#omikuji", "#updates", "#stream-gear"]);
-  let secondPassTimer = 0;
+  const jumpPrepareTargets = [
+    ".visit-stamp-section",
+    ".mascot-area",
+    ".beginner-section",
+    ".schedule-wide-section",
+    ".schedule-wide-card",
+    ".extra-cards",
+    ".page-links-section",
+    ".update-history-section",
+    ".gear-market-section"
+  ].join(",");
+
+  let shortcutLayoutPrepared = false;
+
+  function prepareShortcutLayoutOnce() {
+    if (shortcutLayoutPrepared) return;
+    shortcutLayoutPrepared = true;
+
+    // 初回だけズレる主因は、下部セクションの content-visibility と
+    // 初期描画中の高さ計算がショートカット押下時にまだ確定していないこと。
+    // 右上ショートカットを使う瞬間だけ先にレイアウトを確定させる。
+    document.body.classList.add("anchor-jump-prep");
+
+    document.querySelectorAll(jumpPrepareTargets).forEach((element) => {
+      element.getBoundingClientRect();
+    });
+
+    // 強制的に再計算を走らせてからスクロール位置を取る。
+    document.documentElement.getBoundingClientRect();
+    document.body.offsetHeight;
+  }
 
   function getShortcutOffset(hash) {
     if (hash === "#top") return 0;
@@ -1319,37 +1349,40 @@ function setupStableShortcutJumps() {
     return 170;
   }
 
-  function scrollToShortcutTarget(hash, behavior) {
-    const target = hash === "#top" ? document.documentElement : document.querySelector(hash);
-    if (!target) return;
+  function getTargetTop(hash) {
+    if (hash === "#top") return 0;
+
+    const target = document.querySelector(hash);
+    if (!target) return null;
 
     const offset = getShortcutOffset(hash);
-    const top = hash === "#top" ? 0 : window.scrollY + target.getBoundingClientRect().top - offset;
+    return Math.max(0, Math.round(window.scrollY + target.getBoundingClientRect().top - offset));
+  }
 
+  function scrollToShortcutTarget(hash) {
+    const top = getTargetTop(hash);
+    if (top === null) return;
+
+    // ショートカットは「確実に飛ぶ」ことを優先し、smooth補正は使わない。
+    // smooth中に高さ再計算が入ると、初回だけズレる原因になる。
     window.scrollTo({
-      top: Math.max(0, Math.round(top)),
-      behavior
+      top,
+      behavior: "auto"
     });
   }
 
   function performStableJump(hash, shouldUpdateHash) {
     if (!anchorMap.has(hash)) return;
 
-    window.clearTimeout(secondPassTimer);
+    prepareShortcutLayoutOnce();
 
     window.requestAnimationFrame(() => {
-      scrollToShortcutTarget(hash, "smooth");
+      scrollToShortcutTarget(hash);
 
-      // Initial mobile rendering can still shift after lazy/content-visibility layout.
-      // A short second pass corrects the final position without touching switch layout.
-      secondPassTimer = window.setTimeout(() => {
-        scrollToShortcutTarget(hash, "auto");
-      }, 340);
+      if (shouldUpdateHash && history.pushState) {
+        history.pushState(null, "", hash);
+      }
     });
-
-    if (shouldUpdateHash && history.pushState) {
-      history.pushState(null, "", hash);
-    }
   }
 
   nav.addEventListener("click", (event) => {
