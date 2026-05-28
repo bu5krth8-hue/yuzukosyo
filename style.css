@@ -4416,6 +4416,8 @@ body.anchor-jump-prep .extra-cards,
 body.anchor-jump-prep .page-links-section,
 body.anchor-jump-prep .update-history-section,
 body.anchor-jump-prep .gear-market-section,
+body.anchor-jump-prep .schedule-wide-card,
+body.anchor-jump-prep .update-history-list li,
 body.anchor-jump-prep .gear-product-card{
   content-visibility:visible !important;
   contain-intrinsic-size:none !important;
@@ -4625,4 +4627,10 @@ body.anchor-jump-prep .gear-product-card{
     margin-left:0 !important;
     width:calc(100vw - 32px) !important;
   }
+}
+
+
+/* ===== v68: first shortcut jump stabilization ===== */
+body.anchor-jump-prep{
+  scroll-behavior:auto !important;
 }

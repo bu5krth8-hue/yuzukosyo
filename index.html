@@ -14,7 +14,7 @@
   <meta property="og:url" content="https://yuzukosyo.pages.dev/" />
   <meta name="twitter:card" content="summary" />
   <link rel="preload" href="assets/logo-secret-base.webp" as="image" type="image/webp" fetchpriority="high" />
-  <link rel="stylesheet" href="style.css?v=67" />
+  <link rel="stylesheet" href="style.css?v=68" />
 </head>
 <body id="top">
   <div class="cursor-light" id="cursorLight"></div>
@@ -283,10 +283,29 @@
         <div class="update-history-viewport" id="updateHistoryViewport" aria-label="更新履歴一覧">
 
           <ol class="update-history-list">
-            <li>
+          <li>
+            <time datetime="2026-05-28">2026/05/28</time>
+            <div>
+              <strong>更新履歴の日付と右上ショートカット初回移動を修正</strong>
+              <p>最新更新履歴の日付表示を他の項目と同じ形式に統一し、初回押下時だけ右上ショートカットの移動位置がズレることがあったため、ページ内移動前の描画計算とスクロール補正処理を調整しました。</p>
+            </div>
+          </li>
+
+          <li>
+            <time datetime="2026-05-28">2026/05/28</time>
+            <div>
+              <strong>下部フッターリンクを削除</strong>
+              <p>サイト下部に残っていた横並びリンクを、PC表示分とスマホ非表示分のHTMLから削除し、不要になったフッターリンク用CSSを整理しました。</p>
+            </div>
+          </li>
+
+          <li>
+            <time datetime="2026-05-28">2026/05/28</time>
+            <div>
               <strong>右上ショートカットと幽霊ちゃん表示を修正</strong>
               <p>スマホ版・PC版の右上ショートカットが押しにくくなったり表示が崩れることがあったため、ボタン配置とページ内移動処理を調整しました。案内役の幽霊ちゃんが左側で見切れにくいよう表示位置も調整しました。</p>
-            </li>
+            </div>
+          </li>
 
 
           <li>
@@ -767,8 +786,8 @@
     <strong id="secretToastTitle">秘密基地メモ</strong>
     <span id="secretToastText">見つけてくれてありがとう。</span>
   </div>
-  <script src="meigen-data.js?v=67" defer></script>
-  <script src="script.js?v=67" defer></script>
-  <script src="stats-counter.js?v=67" defer></script>
+  <script src="meigen-data.js?v=68" defer></script>
+  <script src="script.js?v=68" defer></script>
+  <script src="stats-counter.js?v=68" defer></script>
 </body>
 </html>
