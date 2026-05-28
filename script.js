@@ -979,8 +979,8 @@ function setupVisitStampCard() {
   if (twoMonthCount) twoMonthCount.textContent = String(twoMonthVisits);
 
   months.innerHTML = [
-    buildStampMonth(currentMonth, stampedSet, todayKey, !hadTodayStamp),
-    buildStampMonth(previousMonth, stampedSet, todayKey, !hadTodayStamp)
+    buildStampMonth(previousMonth, stampedSet, todayKey, !hadTodayStamp),
+    buildStampMonth(currentMonth, stampedSet, todayKey, !hadTodayStamp)
   ].join("");
 
   if (!hadTodayStamp) {
