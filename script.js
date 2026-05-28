@@ -923,8 +923,8 @@ function showArrivalStampOverlay(streak, monthDate, stampedSet, todayKey) {
   overlay.classList.add("is-showing");
 
   const prefersReducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const hideDelay = prefersReducedMotion ? 1900 : 3900;
-  const removeDelay = prefersReducedMotion ? 2200 : 4550;
+  const hideDelay = prefersReducedMotion ? 5000 : 5000;
+  const removeDelay = prefersReducedMotion ? 5300 : 5650;
 
   window.setTimeout(() => {
     overlay.classList.add("is-hiding");

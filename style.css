@@ -4253,3 +4253,21 @@ body.ghost-rare-mode::after{content:"";position:fixed;inset:0;pointer-events:non
     line-height:1.08 !important;
   }
 }
+
+
+/* ===== v58: arrival stamp popup display time adjusted to 5 seconds ===== */
+
+
+/* ===== v59: mobile anchor jump position adjustment ===== */
+@media (max-width:900px){
+  #visitStamp,
+  #stream-gear{
+    scroll-margin-top:188px !important;
+  }
+}
+@media (max-width:520px){
+  #visitStamp,
+  #stream-gear{
+    scroll-margin-top:166px !important;
+  }
+}

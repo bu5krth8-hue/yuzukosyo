@@ -13,7 +13,7 @@
   <meta property="og:description" content="Twitchでゲーム配信をしている柚胡椒の公式ホームページ。配信予定、プロフィール、YouTube、X、Discord、参加型ゲーム配信の情報をまとめています。" />
   <meta property="og:url" content="https://yuzukosyo.pages.dev/" />
   <meta name="twitter:card" content="summary" />
-  <link rel="stylesheet" href="style.css?v=57" />
+  <link rel="stylesheet" href="style.css?v=59" />
 
   <style id="v54-right-nav-stamp-fit">
     /* v48: right-side switches and stamp jump fit adjustment */
@@ -75,7 +75,8 @@
     .gear-market-copy{text-align:left!important;width:100%!important;}
     .gear-market-copy .ad-label,.gear-market-copy p{text-align:left!important;}
     #schedule{scroll-margin-top:170px;}
-    #omikuji,#stream-gear{scroll-margin-top:170px;}
+    #omikuji{scroll-margin-top:170px;}
+    #visitStamp,#stream-gear{scroll-margin-top:210px;}
     #top{scroll-margin-top:0;}
     @media (max-width:900px){
       .topbar{top:10px!important;right:10px!important;}
@@ -83,14 +84,16 @@
       .top-jump-btn,.stamp-jump-btn,.schedule-btn,.omikuji-jump-btn,.floating-gear-jump{width:154px!important;height:44px!important;min-height:44px!important;padding:8px 8px!important;font-size:11.5px!important;border-radius:13px!important;box-shadow:0 0 12px rgba(168,85,247,.20)!important;}
       .top-jump-btn:hover,.stamp-jump-btn:hover,.schedule-btn:hover,.omikuji-jump-btn:hover,.floating-gear-jump:hover{transform:none!important;}
       #schedule{scroll-margin-top:132px;}
-      #omikuji,#stream-gear{scroll-margin-top:132px;}
+      #omikuji{scroll-margin-top:132px;}
+      #visitStamp,#stream-gear{scroll-margin-top:188px;}
     }
     @media (max-width:520px){
       .topbar{top:8px!important;right:8px!important;}
       .topbar-actions{display:grid!important;grid-template-columns:repeat(2, minmax(0, 1fr))!important;gap:5px!important;align-items:start!important;justify-items:end!important;}
       .top-jump-btn,.stamp-jump-btn,.schedule-btn,.omikuji-jump-btn,.floating-gear-jump{width:104px!important;height:38px!important;min-height:38px!important;padding:6px 6px!important;font-size:9.4px!important;line-height:1.12!important;border-radius:11px!important;letter-spacing:0!important;box-shadow:0 0 10px rgba(168,85,247,.18)!important;}
       #schedule{scroll-margin-top:118px;}
-      #omikuji,#visitStamp,#stream-gear{scroll-margin-top:92px;}
+      #omikuji{scroll-margin-top:92px;}
+      #visitStamp,#stream-gear{scroll-margin-top:166px;}
     }
   </style>
 </head>
@@ -284,6 +287,22 @@
         <div class="update-history-viewport" id="updateHistoryViewport" aria-label="更新履歴一覧">
 
           <ol class="update-history-list">
+
+          <li>
+            <time datetime="2026-05-28">2026/05/28</time>
+            <div>
+              <strong>スマホ版のスタンプ・配信で使ってるものジャンプ位置を調整</strong>
+              <p>スマホ版で右上スイッチの「スタンプ」「配信で使ってるもの」を押した時、見出し文字に被りにくいようにジャンプ位置を少し上へ調整しました。</p>
+            </div>
+          </li>
+
+          <li>
+            <time datetime="2026-05-28">2026/05/28</time>
+            <div>
+              <strong>来場スタンプカード演出の表示時間を調整</strong>
+              <p>その日初めてサイトに来た時に出る来場スタンプカード演出を、約5秒表示してから自動で消えるように変更しました。</p>
+            </div>
+          </li>
 
           <li>
             <time datetime="2026-05-28">2026/05/28</time>
