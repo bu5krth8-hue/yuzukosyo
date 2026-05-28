@@ -4283,3 +4283,18 @@ body.ghost-rare-mode::after{content:"";position:fixed;inset:0;pointer-events:non
 #updates{scroll-margin-top:210px;}
 @media (max-width:900px){#updates{scroll-margin-top:188px;}}
 @media (max-width:520px){#updates{scroll-margin-top:166px;}}
+
+
+/* ===== v62: initial rendering optimization ===== */
+@supports (content-visibility:auto){
+  .visit-stamp-section,
+  .mascot-area,
+  .omikuji-section,
+  .schedule-wide-card,
+  .update-history-section,
+  .gear-section,
+  footer{
+    content-visibility:auto;
+    contain-intrinsic-size: 900px;
+  }
+}

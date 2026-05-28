@@ -321,9 +321,23 @@ function rotateMascots() {
 
 }
 
-checkLiveStatus();
+function startTwitchStatusPolling() {
+  checkLiveStatus();
+  setInterval(checkLiveStatus, 60000);
+}
 
-setInterval(checkLiveStatus, 60000);
+function scheduleTwitchStatusPolling() {
+  const start = () => startTwitchStatusPolling();
+
+  if ("requestIdleCallback" in window) {
+    window.requestIdleCallback(start, { timeout: 1600 });
+    return;
+  }
+
+  window.setTimeout(start, 900);
+}
+
+scheduleTwitchStatusPolling();
 
 setInterval(rotateMascots, 7000);
 
@@ -913,6 +927,12 @@ function showArrivalStampOverlay(streak, monthDate, stampedSet, todayKey) {
   if (!overlay) return;
 
   if (streakEl) streakEl.textContent = String(streak);
+  overlay.querySelectorAll("img[data-src]").forEach((img) => {
+    if (!img.getAttribute("src")) {
+      img.setAttribute("src", img.dataset.src);
+    }
+  });
+
   if (previewEl && monthDate && stampedSet && todayKey) {
     previewEl.dataset.previewTitle = `${monthDate.getMonth() + 1}月の出席表`;
     previewEl.innerHTML = buildStampMonth(monthDate, stampedSet, todayKey, true);

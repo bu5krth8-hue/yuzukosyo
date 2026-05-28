@@ -41,9 +41,20 @@
     }
   }
 
+  function scheduleCounter() {
+    const start = () => runCounter();
+
+    if ("requestIdleCallback" in window) {
+      window.requestIdleCallback(start, { timeout: 1800 });
+      return;
+    }
+
+    window.setTimeout(start, 1200);
+  }
+
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", runCounter);
+    document.addEventListener("DOMContentLoaded", scheduleCounter);
   } else {
-    runCounter();
+    scheduleCounter();
   }
 })();
