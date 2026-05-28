@@ -13,91 +13,8 @@
   <meta property="og:description" content="Twitchでゲーム配信をしている柚胡椒の公式ホームページ。配信予定、プロフィール、YouTube、X、Discord、参加型ゲーム配信の情報をまとめています。" />
   <meta property="og:url" content="https://yuzukosyo.pages.dev/" />
   <meta name="twitter:card" content="summary" />
-  <link rel="stylesheet" href="style.css?v=62" />
-
-  <style id="v61-right-nav-update-fit">
-    /* v61: right-side switches, update jump and mobile offset fit adjustment */
-    .topbar{
-      justify-content:flex-end!important;
-      align-items:flex-start!important;
-      top:16px!important;
-      right:12px!important;
-      left:auto!important;
-      width:auto!important;
-      pointer-events:none!important;
-    }
-    .menu{display:none!important;}
-    .topbar-actions{
-      display:flex!important;
-      flex-direction:column!important;
-      align-items:flex-end!important;
-      gap:8px!important;
-      pointer-events:auto!important;
-    }
-    .top-jump-btn,
-    .stamp-jump-btn,
-    .schedule-btn,
-    .omikuji-jump-btn,
-    .updates-jump-btn,
-    .floating-gear-jump{
-      position:static!important;
-      display:inline-flex!important;
-      align-items:center!important;
-      justify-content:center!important;
-      width:184px!important;
-      min-width:0!important;
-      height:52px!important;
-      min-height:52px!important;
-      box-sizing:border-box!important;
-      text-align:center!important;
-      text-decoration:none!important;
-      color:#d8b4fe!important;
-      background:rgba(20,8,32,.84)!important;
-      border:1px solid rgba(190,120,255,.55)!important;
-      border-radius:16px!important;
-      padding:10px 10px!important;
-      font-size:14px!important;
-      line-height:1.15!important;
-      font-weight:900!important;
-      letter-spacing:.01em!important;
-      white-space:normal!important;
-      word-break:keep-all!important;
-      box-shadow:0 0 16px rgba(168,85,247,.24)!important;
-      backdrop-filter:blur(12px);
-      transition:transform .18s ease,box-shadow .18s ease!important;
-    }
-    .top-jump-btn:hover,
-    .stamp-jump-btn:hover,
-    .schedule-btn:hover,
-    .omikuji-jump-btn:hover,
-    .updates-jump-btn:hover,
-    .floating-gear-jump:hover{transform:translateY(-1px) scale(1.025)!important;box-shadow:0 0 24px rgba(168,85,247,.48)!important;}
-    .gear-market-head{display:block!important;text-align:center!important;}
-    .gear-market-title{display:block!important;width:100%!important;text-align:center!important;margin:0 0 22px!important;font-size:clamp(24px,3vw,32px)!important;}
-    .gear-market-copy{text-align:left!important;width:100%!important;}
-    .gear-market-copy .ad-label,.gear-market-copy p{text-align:left!important;}
-    #schedule{scroll-margin-top:170px;}
-    #omikuji{scroll-margin-top:170px;}
-    #visitStamp,#updates,#stream-gear{scroll-margin-top:210px;}
-    #top{scroll-margin-top:0;}
-    @media (max-width:900px){
-      .topbar{top:10px!important;right:10px!important;}
-      .topbar-actions{gap:6px!important;}
-      .top-jump-btn,.stamp-jump-btn,.schedule-btn,.omikuji-jump-btn,.updates-jump-btn,.floating-gear-jump{width:154px!important;height:44px!important;min-height:44px!important;padding:8px 8px!important;font-size:11.5px!important;border-radius:13px!important;box-shadow:0 0 12px rgba(168,85,247,.20)!important;}
-      .top-jump-btn:hover,.stamp-jump-btn:hover,.schedule-btn:hover,.omikuji-jump-btn:hover,.updates-jump-btn:hover,.floating-gear-jump:hover{transform:none!important;}
-      #schedule{scroll-margin-top:132px;}
-      #omikuji{scroll-margin-top:132px;}
-      #visitStamp,#updates,#stream-gear{scroll-margin-top:188px;}
-    }
-    @media (max-width:520px){
-      .topbar{top:8px!important;right:8px!important;}
-      .topbar-actions{display:grid!important;grid-template-columns:repeat(2, minmax(0, 1fr))!important;gap:5px!important;align-items:start!important;justify-items:end!important;}
-      .top-jump-btn,.stamp-jump-btn,.schedule-btn,.omikuji-jump-btn,.updates-jump-btn,.floating-gear-jump{width:104px!important;height:38px!important;min-height:38px!important;padding:6px 6px!important;font-size:9.4px!important;line-height:1.12!important;border-radius:11px!important;letter-spacing:0!important;box-shadow:0 0 10px rgba(168,85,247,.18)!important;}
-      #schedule{scroll-margin-top:118px;}
-      #omikuji{scroll-margin-top:92px;}
-      #visitStamp,#updates,#stream-gear{scroll-margin-top:166px;}
-    }
-  </style>
+  <link rel="preload" href="assets/logo-secret-base.webp" as="image" type="image/webp" fetchpriority="high" />
+  <link rel="stylesheet" href="style.css?v=65" />
 </head>
 <body id="top">
   <div class="cursor-light" id="cursorLight"></div>
@@ -115,8 +32,8 @@
         <aside class="arrival-stamp-mascots" aria-label="来場をよろこぶたぬちゃんと幽霊ちゃん">
           <div class="arrival-stamp-mascot-copy">来た日にスタンプがポンッ！</div>
           <div class="arrival-stamp-mascot-row">
-            <img data-src="assets/tanuchan-happy.webp" alt="よろこぶたぬちゃん" class="arrival-stamp-mascot tanuki" loading="lazy" decoding="async" />
-            <img data-src="assets/ghost-happy-banzai.webp" alt="よろこぶ幽霊ちゃん" class="arrival-stamp-mascot ghost" loading="lazy" decoding="async" />
+            <img data-src="assets/tanuchan-happy.webp" alt="よろこぶたぬちゃん" class="arrival-stamp-mascot tanuki" loading="lazy" decoding="async" width="416" height="520">
+            <img data-src="assets/ghost-happy-banzai.webp" alt="よろこぶ幽霊ちゃん" class="arrival-stamp-mascot ghost" loading="lazy" decoding="async" width="504" height="520">
           </div>
         </aside>
       </div>
@@ -141,7 +58,7 @@
     <section class="hero">
       <p class="eyebrow">- YUZUKOSHO -</p>
       <div class="logo-image-wrap" aria-label="柚胡椒の秘密基地">
-        <img class="site-logo-image" src="assets/logo-secret-base.webp" alt="柚胡椒の秘密基地" / decoding="async">
+        <img class="site-logo-image" src="assets/logo-secret-base.webp" alt="柚胡椒の秘密基地" decoding="async" width="899" height="304" loading="eager" fetchpriority="high">
       </div>
 
       <p class="catchcopy">気が向いたときに、ふらっとのぞけるゲーム配信の場所。</p>
@@ -160,7 +77,7 @@
           <p class="live-detail" id="liveDetail">Twitchの配信状態を確認してるよ…</p>
           <p class="today-game" id="todayGame">🎮 今日のゲーム：準備中</p>
         </div>
-        <img class="live-thumb" id="liveThumb" alt="Twitch配信サムネイル" hidden / decoding="async">
+        <img class="live-thumb" id="liveThumb" alt="Twitch配信サムネイル" hidden decoding="async">
       </div>
 
       <p class="lead">ふらっと来て、のんびり見て、気軽にコメントしてってね〜！</p>
@@ -170,10 +87,10 @@
           <span class="icon">𝕏</span><strong>X</strong><small>最新ポスト</small>
         </a>
         <a class="switch discord" href="https://discord.gg/8ZUwSmmccK" target="_blank" rel="noopener">
-          <span class="icon brand-icon"><img src="assets/discord.svg" alt="Discord" decoding="async"></span><strong>Discord</strong><small>集会所</small>
+          <span class="icon brand-icon"><img src="assets/discord.svg" alt="Discord" decoding="async" width="127" height="96" loading="lazy"></span><strong>Discord</strong><small>集会所</small>
         </a>
         <a class="switch twitch" id="twitchSwitch" href="https://www.twitch.tv/yuzukosyo07?lang=ja" target="_blank" rel="noopener">
-          <span class="icon brand-icon"><img src="assets/twitch.svg" alt="Twitch" decoding="async"></span><strong>Twitch</strong><small id="twitchSwitchText">配信状態を確認中</small>
+          <span class="icon brand-icon"><img src="assets/twitch.svg" alt="Twitch" decoding="async" width="2400" height="2800" loading="lazy"></span><strong>Twitch</strong><small id="twitchSwitchText">配信状態を確認中</small>
         </a>
         <a class="switch youtube" href="https://youtube.com/@yuzukosho25?si=EWgYkPZEMo-T1OEH" target="_blank" rel="noopener">
           <span class="icon">▶</span><strong>YouTube</strong><small>動画置き場</small>
@@ -222,11 +139,11 @@
 
     <section class="mascot-area" aria-label="案内役">
       <div class="guide ghost-guide">
-        <img id="ghostMascot" src="assets/ghost.webp" alt="幽霊の案内役" / decoding="async">
+        <img id="ghostMascot" src="assets/ghost.webp" alt="幽霊の案内役" decoding="async" width="441" height="520">
         <div class="bubble primary-bubble" id="ghostBubble">Xでお知らせ出すから見てね！</div>
       </div>
       <div class="guide tanu-guide">
-        <img id="tanuMascot" src="assets/tanuchan.webp" alt="たぬちゃん" / decoding="async">
+        <img id="tanuMascot" src="assets/tanuchan.webp" alt="たぬちゃん" decoding="async" width="416" height="520">
         <div class="bubble tanu-bubble" id="tanuBubble">Discordでも待ってるよ〜！</div>
       </div>
     </section>
@@ -309,7 +226,7 @@
           <p class="daily-word-note">1端末につき1日1回、今日の運勢とひとことコメントが出ます。引いた後は明日まで押せないよ。</p>
           <div class="daily-word-box omikuji-box" id="omikujiBox" aria-live="polite">
             <div class="omikuji-ready" id="omikujiReady">
-              <img src="assets/tanuchan-wink.webp" alt="たぬちゃん" class="omikuji-mascot" loading="lazy" decoding="async">
+              <img src="assets/tanuchan-wink.webp" alt="たぬちゃん" class="omikuji-mascot" loading="lazy" decoding="async" width="416" height="520">
               <p>今日のみくじを準備中…</p>
             </div>
             <div class="omikuji-result" id="omikujiResult" hidden>
@@ -366,6 +283,31 @@
         <div class="update-history-viewport" id="updateHistoryViewport" aria-label="更新履歴一覧">
 
           <ol class="update-history-list">
+
+
+          <li>
+            <time datetime="2026-05-28">2026/05/28</time>
+            <div>
+              <strong>スマホ版ショートカット移動のズレを補正</strong>
+              <p>初回来場時に右上ショートカットから「配信で使ってるもの」へ移動した際、表示位置がズレることがあったため、スマホ版のアンカー移動処理とスクロール位置を安定化しました。</p>
+            </div>
+          </li>
+
+          <li>
+            <time datetime="2026-05-28">2026/05/28</time>
+            <div>
+              <strong>サイト軽量化・読み込み調整</strong>
+              <p>見た目と既存機能を維持したまま、表示サイズに対して大きかったキャラ画像・機材画像を調整し、画像の幅高さ指定、初期表示用ロゴの優先読み込み、下部セクションの描画負荷軽減を追加しました。</p>
+            </div>
+          </li>
+
+          <li>
+            <time datetime="2026-05-28">2026/05/28</time>
+            <div>
+              <strong>配信で使ってるものの並びを変更</strong>
+              <p>「配信で使ってるもの」欄の並びを、1番目を柿ピー、2番目を麦茶、その後は元の順番に変更しました。</p>
+            </div>
+          </li>
 
           <li>
             <time datetime="2026-05-28">2026/05/28</time>
@@ -641,37 +583,7 @@
       <div class="gear-product-grid">
         <article class="gear-product-card">
           <div class="gear-product-image">
-            <img src="assets/gear-notebook-pc.webp" alt="ASUS TUF Gaming A15 ノートパソコン" loading="lazy" / decoding="async">
-          </div>
-          <div class="gear-product-content">
-            <p class="gear-product-kicker">💻 配信・ゲーム用PC</p>
-            <h3>ノートパソコン</h3>
-            <p>配信・ゲーム・動画編集で使っているメインPC。</p>
-            <a class="amazon-btn" href="https://amzn.to/4a9FMxw" target="_blank" rel="noopener sponsored">
-              <span class="amazon-mark">a</span>
-              <span>Amazonで見る</span>
-              <span>→</span>
-            </a>
-          </div>
-        </article>
-        <article class="gear-product-card">
-          <div class="gear-product-image">
-            <img src="assets/gear-yakan-mugicha.webp" alt="コカ・コーラ やかんの麦茶 from 爽健美茶 ラベルレス 650mlPET×24本" loading="lazy" / decoding="async">
-          </div>
-          <div class="gear-product-content">
-            <p class="gear-product-kicker">🍵 配信中の飲み物</p>
-            <h3>やかんの麦茶 650ml×24本</h3>
-            <p>配信中や作業中に飲むラベルレスの麦茶。</p>
-            <a class="amazon-btn" href="https://amzn.to/4nYnpBG" target="_blank" rel="noopener sponsored">
-              <span class="amazon-mark">a</span>
-              <span>Amazonで見る</span>
-              <span>→</span>
-            </a>
-          </div>
-        </article>
-        <article class="gear-product-card">
-          <div class="gear-product-image">
-            <img src="assets/gear-kakipea.webp" alt="なとり ジョリーパック 柿ピー 90g" loading="lazy" / decoding="async">
+            <img src="assets/gear-kakipea.webp" alt="なとり ジョリーパック 柿ピー 90g" loading="lazy" decoding="async" width="345" height="520">
           </div>
           <div class="gear-product-content">
             <p class="gear-product-kicker">🥜 配信中のおつまみ</p>
@@ -686,7 +598,37 @@
         </article>
         <article class="gear-product-card">
           <div class="gear-product-image">
-            <img src="assets/gear-mouse.webp" alt="マウス" loading="lazy" / decoding="async">
+            <img src="assets/gear-yakan-mugicha.webp" alt="コカ・コーラ やかんの麦茶 from 爽健美茶 ラベルレス 650mlPET×24本" loading="lazy" decoding="async" width="502" height="558">
+          </div>
+          <div class="gear-product-content">
+            <p class="gear-product-kicker">🍵 配信中の飲み物</p>
+            <h3>やかんの麦茶 650ml×24本</h3>
+            <p>配信中や作業中に飲むラベルレスの麦茶。</p>
+            <a class="amazon-btn" href="https://amzn.to/4nYnpBG" target="_blank" rel="noopener sponsored">
+              <span class="amazon-mark">a</span>
+              <span>Amazonで見る</span>
+              <span>→</span>
+            </a>
+          </div>
+        </article>
+        <article class="gear-product-card">
+          <div class="gear-product-image">
+            <img src="assets/gear-notebook-pc.webp" alt="ASUS TUF Gaming A15 ノートパソコン" loading="lazy" decoding="async" width="433" height="455">
+          </div>
+          <div class="gear-product-content">
+            <p class="gear-product-kicker">💻 配信・ゲーム用PC</p>
+            <h3>ノートパソコン</h3>
+            <p>配信・ゲーム・動画編集で使っているメインPC。</p>
+            <a class="amazon-btn" href="https://amzn.to/4a9FMxw" target="_blank" rel="noopener sponsored">
+              <span class="amazon-mark">a</span>
+              <span>Amazonで見る</span>
+              <span>→</span>
+            </a>
+          </div>
+        </article>
+        <article class="gear-product-card">
+          <div class="gear-product-image">
+            <img src="assets/gear-mouse.webp" alt="マウス" loading="lazy" decoding="async" width="520" height="513">
           </div>
           <div class="gear-product-content">
             <p class="gear-product-kicker">🖱️ ゲーム操作・普段使い</p>
@@ -701,7 +643,7 @@
         </article>
         <article class="gear-product-card">
           <div class="gear-product-image">
-            <img src="assets/gear-webcam.webp" alt="ウェブカメラ" loading="lazy" / decoding="async">
+            <img src="assets/gear-webcam.webp" alt="ウェブカメラ" loading="lazy" decoding="async" width="445" height="395">
           </div>
           <div class="gear-product-content">
             <p class="gear-product-kicker">📷 映像まわり</p>
@@ -716,7 +658,7 @@
         </article>
         <article class="gear-product-card">
           <div class="gear-product-image">
-            <img src="assets/gear-mic-arm.webp" alt="マイクスタンド" loading="lazy" / decoding="async">
+            <img src="assets/gear-mic-arm.webp" alt="マイクスタンド" loading="lazy" decoding="async" width="433" height="432">
           </div>
           <div class="gear-product-content">
             <p class="gear-product-kicker">🎙️ マイク位置調整</p>
@@ -731,7 +673,7 @@
         </article>
         <article class="gear-product-card">
           <div class="gear-product-image">
-            <img src="assets/gear-mic.webp" alt="マイク" loading="lazy" / decoding="async">
+            <img src="assets/gear-mic.webp" alt="マイク" loading="lazy" decoding="async" width="611" height="608">
           </div>
           <div class="gear-product-content">
             <p class="gear-product-kicker">🎤 声まわり</p>
@@ -746,7 +688,7 @@
         </article>
         <article class="gear-product-card">
           <div class="gear-product-image">
-            <img src="assets/gear-phone-stand.webp" alt="スマホスタンド" loading="lazy" / decoding="async">
+            <img src="assets/gear-phone-stand.webp" alt="スマホスタンド" loading="lazy" decoding="async" width="462" height="520">
           </div>
           <div class="gear-product-content">
             <p class="gear-product-kicker">📱 通話・通知確認</p>
@@ -761,7 +703,7 @@
         </article>
         <article class="gear-product-card">
           <div class="gear-product-image">
-            <img src="assets/gear-usb-hub.webp" alt="USB3.0 ハブ Type-C" loading="lazy" / decoding="async">
+            <img src="assets/gear-usb-hub.webp" alt="USB3.0 ハブ Type-C" loading="lazy" decoding="async" width="430" height="391">
           </div>
           <div class="gear-product-content">
             <p class="gear-product-kicker">🔌 USBまわり</p>
@@ -776,7 +718,7 @@
         </article>
         <article class="gear-product-card">
           <div class="gear-product-image">
-            <img src="assets/gear-capture.webp" alt="4K録画対応キャプチャー" loading="lazy" / decoding="async">
+            <img src="assets/gear-capture.webp" alt="4K録画対応キャプチャー" loading="lazy" decoding="async" width="520" height="480">
           </div>
           <div class="gear-product-content">
             <p class="gear-product-kicker">🎥 映像・録画</p>
@@ -791,7 +733,7 @@
         </article>
         <article class="gear-product-card">
           <div class="gear-product-image">
-            <img src="assets/gear-dual-hdmi.webp" alt="USB Type-C デュアルHDMIハブ" loading="lazy" / decoding="async">
+            <img src="assets/gear-dual-hdmi.webp" alt="USB Type-C デュアルHDMIハブ" loading="lazy" decoding="async" width="435" height="421">
           </div>
           <div class="gear-product-content">
             <p class="gear-product-kicker">🖥️ 映像出力・拡張</p>
@@ -832,8 +774,8 @@
     <strong id="secretToastTitle">秘密基地メモ</strong>
     <span id="secretToastText">見つけてくれてありがとう。</span>
   </div>
-  <script src="meigen-data.js?v=62"></script>
-  <script src="script.js?v=62"></script>
-  <script src="stats-counter.js?v=62"></script>
+  <script src="meigen-data.js?v=65" defer></script>
+  <script src="script.js?v=65" defer></script>
+  <script src="stats-counter.js?v=65" defer></script>
 </body>
 </html>

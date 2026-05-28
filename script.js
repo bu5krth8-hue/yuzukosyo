@@ -1292,3 +1292,93 @@ function setupUpdateHistoryMore() {
 }
 
 setupUpdateHistoryMore();
+
+
+function setupStableShortcutJumps() {
+  const nav = document.querySelector(".topbar-actions");
+  if (!nav) return;
+
+  const anchorMap = new Set(["#top", "#visitStamp", "#schedule", "#omikuji", "#updates", "#stream-gear"]);
+  let cleanupTimer = 0;
+
+  function getShortcutOffset(hash) {
+    if (hash === "#top") return 0;
+
+    const topbar = document.querySelector(".topbar");
+    const navHeight = topbar ? Math.ceil(topbar.getBoundingClientRect().height) : 0;
+    const width = window.innerWidth || document.documentElement.clientWidth || 0;
+
+    if (hash === "#stream-gear" || hash === "#updates" || hash === "#visitStamp") {
+      if (width <= 520) return Math.max(176, navHeight + 18);
+      if (width <= 900) return Math.max(196, navHeight + 22);
+      return Math.max(220, navHeight + 24);
+    }
+
+    if (width <= 520) return Math.max(118, navHeight + 16);
+    if (width <= 900) return Math.max(132, navHeight + 18);
+    return Math.max(170, navHeight + 20);
+  }
+
+  function performStableJump(hash, shouldUpdateHash) {
+    const target = hash === "#top" ? document.body : document.querySelector(hash);
+    if (!target) return;
+
+    window.clearTimeout(cleanupTimer);
+    document.body.classList.add("anchor-jump-prep");
+
+    const scrollToTarget = (behavior) => {
+      const offset = getShortcutOffset(hash);
+      const targetTop = hash === "#top" ? 0 : window.scrollY + target.getBoundingClientRect().top - offset;
+      window.scrollTo({
+        top: Math.max(0, Math.round(targetTop)),
+        behavior
+      });
+    };
+
+    const correctAfterLayout = () => {
+      scrollToTarget("smooth");
+
+      window.setTimeout(() => {
+        scrollToTarget("auto");
+      }, 280);
+
+      cleanupTimer = window.setTimeout(() => {
+        document.body.classList.remove("anchor-jump-prep");
+      }, 900);
+    };
+
+    window.requestAnimationFrame(() => {
+      // Force layout once so content-visibility sections above the target do not shift the final anchor position.
+      document.body.getBoundingClientRect();
+      if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(correctAfterLayout).catch(correctAfterLayout);
+      } else {
+        correctAfterLayout();
+      }
+    });
+
+    if (shouldUpdateHash && history.pushState) {
+      history.pushState(null, "", hash);
+    }
+  }
+
+  nav.addEventListener("click", (event) => {
+    const clicked = event.target instanceof Element ? event.target : event.target.parentElement;
+    const link = clicked ? clicked.closest('a[href^="#"]') : null;
+    if (!link) return;
+
+    const hash = link.hash;
+    if (!anchorMap.has(hash)) return;
+
+    event.preventDefault();
+    performStableJump(hash, true);
+  });
+
+  if (window.location.hash && anchorMap.has(window.location.hash)) {
+    window.addEventListener("load", () => {
+      window.setTimeout(() => performStableJump(window.location.hash, false), 120);
+    }, { once: true });
+  }
+}
+
+setupStableShortcutJumps();
