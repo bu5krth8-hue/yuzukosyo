@@ -1299,42 +1299,7 @@ function setupStableShortcutJumps() {
   if (!nav) return;
 
   const anchorMap = new Set(["#top", "#visitStamp", "#schedule", "#omikuji", "#updates", "#stream-gear"]);
-  const jumpPrepareTargets = [
-    ".visit-stamp-section",
-    ".mascot-area",
-    ".beginner-section",
-    ".schedule-wide-section",
-    ".schedule-wide-card",
-    ".extra-cards",
-    ".page-links-section",
-    ".update-history-section",
-    ".update-history-list li",
-    ".gear-market-section",
-    ".gear-product-card"
-  ].join(",");
-
-  let correctionTimers = [];
-
-  function clearCorrectionTimers() {
-    correctionTimers.forEach((timer) => window.clearTimeout(timer));
-    correctionTimers = [];
-  }
-
-  function prepareShortcutLayout() {
-    document.body.classList.add("anchor-jump-prep");
-
-    // 初回だけ content-visibility / lazy layout の計算が遅れてズレるため、
-    // 移動前に対象セクションの高さを一度確定させる。
-    document.querySelectorAll(jumpPrepareTargets).forEach((element) => {
-      element.getBoundingClientRect();
-    });
-  }
-
-  function releaseShortcutLayoutLater() {
-    correctionTimers.push(window.setTimeout(() => {
-      document.body.classList.remove("anchor-jump-prep");
-    }, 1400));
-  }
+  let secondPassTimer = 0;
 
   function getShortcutOffset(hash) {
     if (hash === "#top") return 0;
@@ -1354,22 +1319,15 @@ function setupStableShortcutJumps() {
     return 170;
   }
 
-  function getTargetTop(hash) {
-    if (hash === "#top") return 0;
-
-    const target = document.querySelector(hash);
-    if (!target) return null;
+  function scrollToShortcutTarget(hash, behavior) {
+    const target = hash === "#top" ? document.documentElement : document.querySelector(hash);
+    if (!target) return;
 
     const offset = getShortcutOffset(hash);
-    return Math.max(0, Math.round(window.scrollY + target.getBoundingClientRect().top - offset));
-  }
-
-  function scrollToShortcutTarget(hash, behavior) {
-    const top = getTargetTop(hash);
-    if (top === null) return;
+    const top = hash === "#top" ? 0 : window.scrollY + target.getBoundingClientRect().top - offset;
 
     window.scrollTo({
-      top,
+      top: Math.max(0, Math.round(top)),
       behavior
     });
   }
@@ -1377,31 +1335,21 @@ function setupStableShortcutJumps() {
   function performStableJump(hash, shouldUpdateHash) {
     if (!anchorMap.has(hash)) return;
 
-    clearCorrectionTimers();
-    prepareShortcutLayout();
+    window.clearTimeout(secondPassTimer);
+
+    window.requestAnimationFrame(() => {
+      scrollToShortcutTarget(hash, "smooth");
+
+      // Initial mobile rendering can still shift after lazy/content-visibility layout.
+      // A short second pass corrects the final position without touching switch layout.
+      secondPassTimer = window.setTimeout(() => {
+        scrollToShortcutTarget(hash, "auto");
+      }, 340);
+    });
 
     if (shouldUpdateHash && history.pushState) {
       history.pushState(null, "", hash);
     }
-
-    const prefersReducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const firstBehavior = prefersReducedMotion ? "auto" : "smooth";
-
-    window.requestAnimationFrame(() => {
-      window.requestAnimationFrame(() => {
-        scrollToShortcutTarget(hash, firstBehavior);
-
-        // 初回訪問時は画像・フォント・content-visibility の確定が後追いで入るため、
-        // 位置だけを短時間で複数回補正する。2回目以降の押下にも副作用は出さない。
-        [120, 360, 760].forEach((delay) => {
-          correctionTimers.push(window.setTimeout(() => {
-            scrollToShortcutTarget(hash, "auto");
-          }, delay));
-        });
-
-        releaseShortcutLayoutLater();
-      });
-    });
   }
 
   nav.addEventListener("click", (event) => {
@@ -1418,7 +1366,7 @@ function setupStableShortcutJumps() {
 
   if (window.location.hash && anchorMap.has(window.location.hash)) {
     window.addEventListener("load", () => {
-      window.setTimeout(() => performStableJump(window.location.hash, false), 180);
+      window.setTimeout(() => performStableJump(window.location.hash, false), 140);
     }, { once: true });
   }
 }

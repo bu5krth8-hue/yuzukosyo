@@ -4629,8 +4629,3 @@ body.anchor-jump-prep .gear-product-card{
   }
 }
 
-
-/* ===== v68: first shortcut jump stabilization ===== */
-body.anchor-jump-prep{
-  scroll-behavior:auto !important;
-}
