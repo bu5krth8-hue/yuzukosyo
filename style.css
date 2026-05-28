@@ -3067,3 +3067,223 @@ body:not(.has-pointer) .cursor-light{
     scroll-margin-top:92px !important;
   }
 }
+
+
+/* ===== v43: lightweight animation upgrade ===== */
+:root{
+  --v43-soft-purple:rgba(216,180,254,.72);
+  --v43-soft-blue:rgba(112,214,255,.42);
+}
+
+/* 背景の細い光 */
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:0;
+  background:
+    radial-gradient(circle at 18% 22%, rgba(168,85,247,.13), transparent 24%),
+    radial-gradient(circle at 78% 18%, rgba(112,214,255,.10), transparent 22%),
+    linear-gradient(115deg, transparent 0%, rgba(216,180,254,.035) 48%, transparent 62%);
+  animation:v43AmbientBreath 9s ease-in-out infinite;
+}
+
+@keyframes v43AmbientBreath{
+  0%,100%{opacity:.48;filter:brightness(1)}
+  50%{opacity:.82;filter:brightness(1.08)}
+}
+
+/* たぬちゃん・幽霊ちゃんのゆらゆらを少し強化 */
+.ghost-guide{
+  animation:v43GhostFloat 5.2s ease-in-out infinite !important;
+}
+.tanu-guide{
+  animation:v43TanuFloat 4.7s ease-in-out infinite !important;
+}
+.omikuji-mascot{
+  animation:v43TanuFloatSmall 3.3s ease-in-out infinite !important;
+}
+
+@keyframes v43GhostFloat{
+  0%,100%{transform:translateY(0) rotate(-.8deg)}
+  50%{transform:translateY(-18px) rotate(.9deg)}
+}
+@keyframes v43TanuFloat{
+  0%,100%{transform:translateY(0) rotate(-1.1deg)}
+  46%{transform:translateY(-12px) rotate(1.2deg)}
+  68%{transform:translateY(-8px) rotate(.2deg)}
+}
+@keyframes v43TanuFloatSmall{
+  0%,100%{transform:translateY(0) rotate(-3deg) scale(1)}
+  50%{transform:translateY(-9px) rotate(3deg) scale(1.035)}
+}
+
+/* ネオン見出しのじんわり発光 */
+.card h2,
+.gear-card h2,
+.profile-title-ghost,
+.gear-market-title,
+.daily-word-card h2{
+  animation:v43NeonTitle 4.8s ease-in-out infinite;
+}
+
+@keyframes v43NeonTitle{
+  0%,100%{text-shadow:0 0 10px rgba(168,85,247,.42),0 0 22px rgba(168,85,247,.16)}
+  50%{text-shadow:0 0 16px rgba(216,180,254,.72),0 0 34px rgba(112,214,255,.28)}
+}
+
+/* カードのふわっと感を少し強化 */
+.reveal-on-scroll{
+  transform:translateY(32px) scale(.985);
+}
+.reveal-on-scroll.is-visible{
+  transform:translateY(0) scale(1);
+}
+.card,
+.gear-card,
+.gear-product-card,
+.base-counter-card,
+.seo-intro-card{
+  will-change:transform, box-shadow;
+}
+.card:hover,
+.gear-product-card:hover,
+.gear-card:hover,
+.base-counter-card:hover{
+  transform:translateY(-4px);
+}
+
+/* 右上スイッチ・各ボタンの押した感 */
+.top-jump-btn:active,
+.schedule-btn:active,
+.omikuji-jump-btn:active,
+.floating-gear-jump:active,
+.mini-btn:active,
+.omikuji-button:active,
+.word-reroll-btn:active,
+.amazon-btn:active{
+  transform:translateY(1px) scale(.98) !important;
+  filter:brightness(.96);
+}
+
+.omikuji-jump-btn,
+.omikuji-button{
+  overflow:hidden;
+}
+.omikuji-jump-btn::before,
+.omikuji-button::before{
+  content:"";
+  position:absolute;
+  inset:-2px;
+  pointer-events:none;
+  background:linear-gradient(120deg, transparent 0%, rgba(255,255,255,.10) 28%, rgba(112,214,255,.28) 50%, rgba(216,180,254,.16) 68%, transparent 100%);
+  transform:translateX(-130%);
+  transition:transform .62s ease;
+}
+.omikuji-jump-btn:hover::before,
+.omikuji-button:hover::before{
+  transform:translateX(130%);
+}
+
+/* おみくじ開封演出強化 */
+.omikuji-box{
+  position:relative;
+  overflow:hidden;
+}
+.omikuji-box::before{
+  content:"";
+  position:absolute;
+  inset:-45%;
+  pointer-events:none;
+  opacity:0;
+  background:conic-gradient(from 0deg, transparent, rgba(216,180,254,.28), rgba(112,214,255,.20), transparent 38%);
+  transform:rotate(0deg) scale(.8);
+}
+.omikuji-box.omikuji-drawing::before,
+.omikuji-box.omikuji-reveal::before{
+  animation:v43OmikujiSpin .86s ease-out;
+}
+.omikuji-box.omikuji-drawing::after{
+  content:"ぽん…ぽん…ぽん…";
+  position:absolute;
+  left:50%;
+  bottom:18px;
+  transform:translateX(-50%);
+  padding:8px 14px;
+  border-radius:999px;
+  color:#fff;
+  font-weight:1000;
+  font-size:13px;
+  letter-spacing:.08em;
+  background:rgba(20,8,32,.82);
+  border:1px solid rgba(216,180,254,.35);
+  box-shadow:0 0 18px rgba(168,85,247,.34);
+  animation:v43OmikujiText .62s ease-in-out infinite alternate;
+  z-index:5;
+}
+.omikuji-result:not([hidden]) .omikuji-fortune{
+  animation:v43FortunePop .7s cubic-bezier(.2,.85,.2,1) both;
+}
+.omikuji-result:not([hidden]) .omikuji-comment{
+  animation:v43CommentSlide .78s ease both;
+}
+.omikuji-result:not([hidden]) .omikuji-detail div{
+  animation:v43DetailPop .72s ease both;
+}
+.omikuji-result:not([hidden]) .omikuji-detail div:nth-child(2){animation-delay:.06s}
+.omikuji-result:not([hidden]) .omikuji-detail div:nth-child(3){animation-delay:.12s}
+
+@keyframes v43OmikujiSpin{
+  0%{opacity:0;transform:rotate(0deg) scale(.75)}
+  38%{opacity:.75;transform:rotate(90deg) scale(1)}
+  100%{opacity:0;transform:rotate(210deg) scale(1.08)}
+}
+@keyframes v43OmikujiText{
+  from{opacity:.72;filter:brightness(1)}
+  to{opacity:1;filter:brightness(1.18)}
+}
+@keyframes v43FortunePop{
+  0%{opacity:0;transform:translateY(10px) scale(.92);filter:blur(2px)}
+  55%{opacity:1;transform:translateY(-3px) scale(1.07);filter:blur(0) brightness(1.2)}
+  100%{opacity:1;transform:translateY(0) scale(1);filter:blur(0)}
+}
+@keyframes v43CommentSlide{
+  0%{opacity:0;transform:translateY(12px)}
+  100%{opacity:1;transform:translateY(0)}
+}
+@keyframes v43DetailPop{
+  0%{opacity:0;transform:translateY(10px) scale(.96)}
+  100%{opacity:1;transform:translateY(0) scale(1)}
+}
+
+@media (max-width:520px){
+  body::before{opacity:.5;}
+  .card h2,
+  .gear-card h2,
+  .profile-title-ghost,
+  .gear-market-title,
+  .daily-word-card h2{
+    animation-duration:6.5s;
+  }
+  .card:hover,
+  .gear-product-card:hover,
+  .gear-card:hover,
+  .base-counter-card:hover{
+    transform:none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce){
+  body::before,
+  .ghost-guide,
+  .tanu-guide,
+  .omikuji-mascot,
+  .card h2,
+  .gear-card h2,
+  .profile-title-ghost,
+  .gear-market-title,
+  .daily-word-card h2{
+    animation:none !important;
+  }
+}

@@ -694,14 +694,24 @@ function setupDailyOmikuji() {
       }
     }
 
-    box.classList.remove("omikuji-reveal");
-    void box.offsetWidth;
-    box.classList.add("omikuji-reveal");
-    showOmikujiResult(omikujiItems[index]);
-    button.textContent = "今日はもう引いたよ";
-    button.classList.add("omikuji-button-done");
     button.disabled = true;
     button.setAttribute("aria-disabled", "true");
+    button.textContent = "占い中…";
+
+    box.classList.remove("omikuji-reveal", "omikuji-drawing");
+    void box.offsetWidth;
+    box.classList.add("omikuji-drawing");
+
+    window.setTimeout(() => {
+      box.classList.remove("omikuji-drawing", "omikuji-reveal");
+      void box.offsetWidth;
+      box.classList.add("omikuji-reveal");
+      showOmikujiResult(omikujiItems[index]);
+      button.textContent = "今日はもう引いたよ";
+      button.classList.add("omikuji-button-done");
+      button.disabled = true;
+      button.setAttribute("aria-disabled", "true");
+    }, 520);
   });
 }
 
