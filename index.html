@@ -13,10 +13,10 @@
   <meta property="og:description" content="Twitchでゲーム配信をしている柚胡椒の公式ホームページ。配信予定、プロフィール、YouTube、X、Discord、参加型ゲーム配信の情報をまとめています。" />
   <meta property="og:url" content="https://yuzukosyo.pages.dev/" />
   <meta name="twitter:card" content="summary" />
-  <link rel="stylesheet" href="style.css?v=45" />
+  <link rel="stylesheet" href="style.css?v=54" />
 
-  <style id="v45-right-nav-fit">
-    /* v45: right-side switches fit adjustment for desktop and smartphone */
+  <style id="v54-right-nav-stamp-fit">
+    /* v48: right-side switches and stamp jump fit adjustment */
     .topbar{
       justify-content:flex-end!important;
       align-items:flex-start!important;
@@ -87,7 +87,7 @@
       .topbar-actions{display:grid!important;grid-template-columns:repeat(2, minmax(0, 1fr))!important;gap:5px!important;align-items:start!important;justify-items:end!important;}
       .top-jump-btn,.schedule-btn,.omikuji-jump-btn,.floating-gear-jump{width:104px!important;min-height:34px!important;padding:6px 6px!important;font-size:9.4px!important;line-height:1.12!important;border-radius:11px!important;letter-spacing:0!important;box-shadow:0 0 10px rgba(168,85,247,.18)!important;}
       #schedule{scroll-margin-top:118px;}
-      #omikuji,#stream-gear{scroll-margin-top:92px;}
+      #omikuji,#visitStamp,#stream-gear{scroll-margin-top:92px;}
     }
   </style>
 </head>
@@ -97,13 +97,33 @@
   <div class="bg-glow glow-b"></div>
   <div class="stars" aria-hidden="true"></div>
   <div class="shooting-stars" aria-hidden="true"><span></span><span></span><span></span></div>
-  <div class="particle-layer" id="particleLayer" aria-hidden="true"></div>
+  <div class="arrival-stamp-overlay" id="arrivalStampOverlay" aria-live="polite" hidden>
+    <div class="arrival-stamp-card" role="status" aria-label="今日の来場スタンプを押しました">
+      <p class="arrival-stamp-kicker">VISIT STAMP</p>
+      <h2>📮 来場スタンプカード</h2>
+      <p class="arrival-stamp-copy">今月のカードに、来場した日のたぬちゃんスタンプを押します。</p>
+      <div class="arrival-stamp-body">
+        <div class="arrival-stamp-preview" id="arrivalStampPreview" aria-label="今月の来場スタンプカード"></div>
+        <aside class="arrival-stamp-mascots" aria-label="来場をよろこぶたぬちゃんと幽霊ちゃん">
+          <div class="arrival-stamp-mascot-copy">来た日にスタンプがポンッ！</div>
+          <div class="arrival-stamp-mascot-row">
+            <img src="assets/tanuchan-happy.png" alt="よろこぶたぬちゃん" class="arrival-stamp-mascot tanuki" loading="lazy" />
+            <img src="assets/ghost-happy-banzai.png" alt="よろこぶ幽霊ちゃん" class="arrival-stamp-mascot ghost" loading="lazy" />
+          </div>
+        </aside>
+      </div>
+      <div class="arrival-stamp-pon" aria-hidden="true">ポンッ</div>
+      <p class="arrival-stamp-streak">連続来場 <strong id="arrivalStampStreak">0</strong> 日</p>
+      <p class="arrival-stamp-note">今日のマスに、たぬちゃんスタンプが付きました。また明日も秘密基地で待ってるよ。</p>
+    </div>
+  </div>
 
   <header class="topbar">
     <div class="topbar-actions" aria-label="ページ内リンク">
       <a class="top-jump-btn" href="#top" aria-label="ページの一番上へ戻る">⬆ TOPへ戻る</a>
       <a class="schedule-btn" href="#schedule">🔔 配信予定</a>
       <a class="omikuji-jump-btn" href="#omikuji" aria-label="今日の柚胡椒みくじへ移動">🔮 柚胡椒くじ</a>
+      <a class="stamp-jump-btn" href="#visitStamp" aria-label="来場スタンプカードへ移動">📮 スタンプ</a>
       <a class="floating-gear-jump" href="#stream-gear" aria-label="配信で使ってるものへ移動">🎮 配信で使ってるもの</a>
     </div>
   </header>
@@ -160,6 +180,35 @@
         <span class="base-counter-unit">人</span>
       </div>
       <p class="access-note" id="accessNote">来場者数を確認中…</p>
+    </section>
+
+
+    <section class="cards visit-stamp-section" id="visitStamp" aria-label="来場スタンプカード">
+      <article class="card stamp-card">
+        <div class="stamp-head">
+          <p class="section-kicker">VISIT STAMP</p>
+          <h2>📮 来場スタンプカード</h2>
+          <p class="stamp-lead">この端末で1日1回、来場した日に自動で「済」スタンプが付きます。直近2ヶ月分を確認できます。</p>
+        </div>
+
+        <div class="stamp-status-row">
+          <div class="stamp-status-pill" id="stampTodayStatus">今日の来場スタンプ：確認中</div>
+          <div class="stamp-status-pill stamp-status-strong">連続来場 <strong id="stampStreakCount">0</strong> 日</div>
+          <div class="stamp-status-pill">2ヶ月内 <strong id="stampTwoMonthCount">0</strong> 日</div>
+        </div>
+
+        <div class="stamp-months" id="stampMonths" aria-label="直近2ヶ月のスタンプカード"></div>
+
+        <div class="secret-unlock-card" id="secretUnlockCard">
+          <strong id="secretUnlockTitle">隠しページの解放状況を確認中…</strong>
+          <p id="secretUnlockText">連続来場が増えると、秘密基地の隠しページが開きます。</p>
+          <div class="secret-unlock-progress" aria-label="隠しページ解放までの進み具合">
+            <span id="secretUnlockProgressBar"></span>
+          </div>
+          <p class="secret-unlock-progress-text" id="secretUnlockProgressText">あと15回の来場スタンプで、1回目のごほうび部屋が解放されます。</p>
+          <a class="mini-btn secret-room-link" id="secretRoomLink" href="secret-room.html" hidden>隠しページへ行く →</a>
+        </div>
+      </article>
     </section>
 
     <section class="mascot-area" aria-label="案内役">
@@ -232,6 +281,86 @@
         <div class="update-history-viewport" id="updateHistoryViewport" aria-label="更新履歴一覧">
 
           <ol class="update-history-list">
+
+          <li>
+            <time datetime="2026-05-28">2026/05/28</time>
+            <div>
+              <strong>来場スタンプカードの月表示・キャラ演出・スタンプ見た目を調整</strong>
+              <p>来場時のスタンプカード演出で「今月の出席表」をその月の「◯月の出席表」表示に変更し、たぬちゃんと幽霊ちゃんのよろこび画像を追加しました。カレンダーの済み表示も、マスからはみ出しにくいたぬちゃんスタンプに変更しました。</p>
+            </div>
+          </li>
+
+          <li>
+            <time datetime="2026-05-28">2026/05/28</time>
+            <div>
+              <strong>来場スタンプ演出をカード押印型に変更</strong>
+              <p>その日初めてホームページを開いた時、自分の来場スタンプカードが表示され、今日の日付のマスに「済」スタンプがポンッと押されてから自動で消える演出に変更しました。</p>
+            </div>
+          </li>
+
+          <li>
+            <time datetime="2026-05-28">2026/05/28</time>
+            <div>
+              <strong>来場スタンプの自動押印演出を追加</strong>
+              <p>その日初めてホームページを開いた時、スタンプカードが画面に出て「済」スタンプがポンッと押され、その後に自動で消える演出を追加しました。</p>
+            </div>
+          </li>
+
+          <li>
+            <time datetime="2026-05-28">2026/05/28</time>
+            <div>
+              <strong>スタンプ表示・押印演出調整</strong>
+              <p>連続来場数が4桁でも崩れにくい表示に調整し、その日初めてホームページを開いた時に来場スタンプが押される演出を追加しました。</p>
+            </div>
+          </li>
+
+          <li>
+            <time datetime="2026-05-28">2026/05/28</time>
+            <div>
+              <strong>隠しページの15日ごと解放に変更</strong>
+              <p>隠しページを連続15日達成日だけでなく、30日、45日など15日ごとの節目で解放される仕様に変更しました。次の解放日まであと何回かも表示します。</p>
+            </div>
+          </li>
+
+          <li>
+            <time datetime="2026-05-28">2026/05/28</time>
+            <div>
+              <strong>隠しページごほうび部屋の豪華化</strong>
+              <p>隠しページを金キラのごほうび部屋イメージに寄せ、メインビジュアルを追加しました。隠しページの解放条件を連続15日来場に変更しました。</p>
+            </div>
+          </li>
+
+          <li>
+            <time datetime="2026-05-28">2026/05/28</time>
+            <div>
+              <strong>隠しページごほうび実装</strong>
+              <p>隠しページにPC用壁紙、スマホ用壁紙、秘密基地来場記念画像、秘密基地の大切な仲間認定証、隠しページ限定おみくじを追加しました。</p>
+            </div>
+          </li>
+
+          <li>
+            <time datetime="2026-05-28">2026/05/28</time>
+            <div>
+              <strong>スタンプ導線・隠しページ解放表示調整</strong>
+              <p>右上スイッチに「スタンプ」を追加し、来場スタンプカードへ移動できるようにしました。隠しページまであと何回の来場スタンプで解放されるか、進み具合も分かりやすく表示しました。</p>
+            </div>
+          </li>
+
+          <li>
+            <time datetime="2026-05-28">2026/05/28</time>
+            <div>
+              <strong>来場スタンプ・レアおみくじ・隠し要素追加</strong>
+              <p>1端末1日1回の来場スタンプカード、低確率レアおみくじ、たぬちゃん・幽霊ちゃんの小ネタ、連続来場で開く隠しページを追加しました。</p>
+            </div>
+          </li>
+
+          <li>
+            <time datetime="2026-05-28">2026/05/28</time>
+            <div>
+              <strong>スマホ版フッター表示調整</strong>
+              <p>スマホ版では下部の英語リンク集を非表示にし、著作権表記だけが中央に収まるよう調整しました。</p>
+            </div>
+          </li>
 
           <li>
             <time datetime="2026-05-28">2026/05/28</time>
@@ -628,10 +757,15 @@
       <a href="meigen.html">Meigen</a>
       <a href="#updates">Updates</a>
     </div>
+    <button class="footer-secret-trigger" id="footerSecretTrigger" type="button" aria-label="ページ下部の隠しメッセージを見る">✦</button>
     <p>© 2026 柚胡椒の秘密基地 All Rights Reserved.</p>
   </footer>
-  <script src="meigen-data.js?v=45"></script>
-  <script src="script.js?v=45"></script>
-  <script src="stats-counter.js?v=45"></script>
+  <div class="secret-toast" id="secretToast" role="status" aria-live="polite" hidden>
+    <strong id="secretToastTitle">秘密基地メモ</strong>
+    <span id="secretToastText">見つけてくれてありがとう。</span>
+  </div>
+  <script src="meigen-data.js?v=54"></script>
+  <script src="script.js?v=54"></script>
+  <script src="stats-counter.js?v=54"></script>
 </body>
 </html>

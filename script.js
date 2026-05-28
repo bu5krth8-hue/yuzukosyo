@@ -616,6 +616,42 @@ const omikujiItems = [
     stream: "開始前チェックが大吉行動",
     game: "見せ場を作りやすい",
     chat: "固定コメントや案内が効く"
+  },
+  {
+    fortune: "超大吉",
+    comment: "かなりレアな当たり。今日は勢いを借りて、やりたいことを一つだけ前に進める日です。",
+    stream: "見せ場が自然に生まれやすい",
+    game: "勝負勘あり。大事な場面ほど落ち着く",
+    chat: "ひとことが流れを変える",
+    rare: true,
+    weight: 1
+  },
+  {
+    fortune: "伝説のぽん吉",
+    comment: "細かい理屈を置いて、なぜか全部ぽんで通る日。見つけた人はかなり運がいいです。",
+    stream: "謎の一体感が出る",
+    game: "ミスすらネタに変わる",
+    chat: "短文コメントが最強",
+    rare: true,
+    weight: 1
+  },
+  {
+    fortune: "たぬ神",
+    comment: "たぬちゃんが本気で見守っている日。焦らず、でも逃げずに動くと良い流れを拾えます。",
+    stream: "癒やしと笑いが両方出る",
+    game: "待ちからの反撃が強い",
+    chat: "やさしいコメントが刺さる",
+    rare: true,
+    weight: 1
+  },
+  {
+    fortune: "幽霊覚醒",
+    comment: "見えてないところで運が動く日。静かな一言、急なひらめき、変な偶然を拾うと吉。",
+    stream: "急な神展開に注意",
+    game: "隠密・読み合い・奇襲が強い",
+    chat: "ROM勢の一言にレア運あり",
+    rare: true,
+    weight: 1
   }
 ];
 
@@ -629,12 +665,28 @@ function showOmikujiResult(item) {
   const chat = document.getElementById("omikujiChat");
 
   if (ready) ready.hidden = true;
-  if (result) result.hidden = false;
+  if (result) {
+    result.hidden = false;
+    result.classList.toggle("is-rare-result", Boolean(item.rare));
+  }
   if (fortune) fortune.textContent = item.fortune;
   if (comment) comment.textContent = item.comment;
   if (stream) stream.textContent = item.stream;
   if (game) game.textContent = item.game;
   if (chat) chat.textContent = item.chat;
+}
+
+function pickWeightedOmikujiIndex() {
+  const totalWeight = omikujiItems.reduce((sum, item) => sum + (Number(item.weight) > 0 ? Number(item.weight) : 10), 0);
+  let random = Math.random() * totalWeight;
+
+  for (let i = 0; i < omikujiItems.length; i += 1) {
+    const weight = Number(omikujiItems[i].weight) > 0 ? Number(omikujiItems[i].weight) : 10;
+    random -= weight;
+    if (random <= 0) return i;
+  }
+
+  return Math.max(0, omikujiItems.length - 1);
 }
 
 function setupDailyOmikuji() {
@@ -683,7 +735,7 @@ function setupDailyOmikuji() {
     }
 
     if (!Number.isInteger(index)) {
-      index = Math.floor(Math.random() * omikujiItems.length);
+      index = pickWeightedOmikujiIndex();
       try {
         localStorage.setItem(storageKey, JSON.stringify({
           date: todayKey,
@@ -715,9 +767,352 @@ function setupDailyOmikuji() {
   });
 }
 
+
+
+/* ===== v48: visit stamp card, unlock progress and hidden secrets ===== */
+const VISIT_STAMP_STORAGE_KEY = "yuzukosyoVisitStampsV1";
+const SECRET_ROOM_UNLOCK_DAYS = 15;
+
+function parseDateKeyToLocalDate(dateKey) {
+  const parts = String(dateKey).split("-").map(Number);
+  if (parts.length !== 3 || parts.some(Number.isNaN)) return null;
+  return new Date(parts[0], parts[1] - 1, parts[2]);
+}
+
+function formatDateKeyFromDate(date) {
+  return [
+    date.getFullYear(),
+    String(date.getMonth() + 1).padStart(2, "0"),
+    String(date.getDate()).padStart(2, "0")
+  ].join("-");
+}
+
+function addDays(date, offset) {
+  const next = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  next.setDate(next.getDate() + offset);
+  return next;
+}
+
+function addMonths(date, offset) {
+  return new Date(date.getFullYear(), date.getMonth() + offset, 1);
+}
+
+function loadVisitStampDates() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(VISIT_STAMP_STORAGE_KEY) || "[]");
+    if (!Array.isArray(raw)) return [];
+    return Array.from(new Set(raw.filter((item) => /^\d{4}-\d{2}-\d{2}$/.test(String(item))))).sort();
+  } catch (error) {
+    return [];
+  }
+}
+
+function saveVisitStampDates(dates) {
+  try {
+    localStorage.setItem(VISIT_STAMP_STORAGE_KEY, JSON.stringify(Array.from(new Set(dates)).sort()));
+  } catch (error) {
+    // localStorageが使えない環境では表示だけ続ける
+  }
+}
+
+function getConsecutiveVisitStreak(stampedSet, todayKey) {
+  const today = parseDateKeyToLocalDate(todayKey);
+  if (!today) return 0;
+
+  let streak = 0;
+  let cursor = today;
+
+  while (stampedSet.has(formatDateKeyFromDate(cursor))) {
+    streak += 1;
+    cursor = addDays(cursor, -1);
+  }
+
+  return streak;
+}
+
+function getSecretMilestoneInfo(streak) {
+  const cycle = SECRET_ROOM_UNLOCK_DAYS;
+  const milestoneCount = streak > 0 ? Math.floor(streak / cycle) : 0;
+  const cycleProgress = streak % cycle;
+  const isMilestoneDay = streak > 0 && cycleProgress === 0;
+  const nextMilestone = isMilestoneDay ? streak + cycle : (milestoneCount + 1) * cycle;
+  const remaining = isMilestoneDay ? 0 : Math.max(0, nextMilestone - streak);
+  const progressCount = isMilestoneDay ? cycle : cycleProgress;
+  const milestoneLabel = isMilestoneDay ? `${milestoneCount}回目` : `${milestoneCount + 1}回目`;
+  return { cycle, milestoneCount, cycleProgress, isMilestoneDay, nextMilestone, remaining, progressCount, milestoneLabel };
+}
+
+function getTwoMonthRangeKeys(today) {
+  const currentMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+  const previousMonth = addMonths(currentMonth, -1);
+  return { previousMonth, currentMonth };
+}
+
+function countVisitsInTwoMonths(dates, today) {
+  const { previousMonth } = getTwoMonthRangeKeys(today);
+  const startKey = formatDateKeyFromDate(previousMonth);
+  const endKey = formatDateKeyFromDate(today);
+  return dates.filter((dateKey) => dateKey >= startKey && dateKey <= endKey).length;
+}
+
+function buildStampMonth(monthDate, stampedSet, todayKey, freshlyStampedToday = false) {
+  const year = monthDate.getFullYear();
+  const month = monthDate.getMonth();
+  const title = `${month + 1}月の出席表`;
+  const accessibleTitle = `${year}年${month + 1}月`;
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const today = parseDateKeyToLocalDate(todayKey);
+  const todayTime = today ? today.getTime() : Date.now();
+  const weekdays = ["日", "月", "火", "水", "木", "金", "土"];
+
+  const blanks = Array.from({ length: firstDay }, () => '<div class="stamp-day is-empty" aria-hidden="true"></div>').join("");
+  const days = Array.from({ length: daysInMonth }, (_, index) => {
+    const day = index + 1;
+    const date = new Date(year, month, day);
+    const dateKey = formatDateKeyFromDate(date);
+    const classes = ["stamp-day"];
+    if (stampedSet.has(dateKey)) classes.push("is-stamped");
+    if (dateKey === todayKey) classes.push("is-today");
+    if (freshlyStampedToday && dateKey === todayKey && stampedSet.has(dateKey)) classes.push("is-new-stamp");
+    if (date.getTime() > todayTime) classes.push("is-future");
+    const label = stampedSet.has(dateKey) ? `${accessibleTitle}${day}日 来場済み` : `${accessibleTitle}${day}日`;
+    return `<div class="${classes.join(" ")}" aria-label="${escapeHtml(label)}"><span>${day}</span></div>`;
+  }).join("");
+
+  return `
+    <section class="stamp-month-card" aria-label="${escapeHtml(accessibleTitle)}の来場スタンプ">
+      <h3 class="stamp-month-title">${escapeHtml(title)}</h3>
+      <div class="stamp-weekdays" aria-hidden="true">${weekdays.map((day) => `<div class="stamp-weekday">${day}</div>`).join("")}</div>
+      <div class="stamp-grid">${blanks}${days}</div>
+    </section>
+  `;
+}
+
+function triggerVisitStampAnimation(root, streak) {
+  if (!root) return;
+  const prefersReducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  root.classList.add("is-stamp-pressed");
+
+  if (!prefersReducedMotion) {
+    const effect = document.createElement("div");
+    effect.className = "stamp-press-effect";
+    effect.setAttribute("aria-hidden", "true");
+    effect.innerHTML = `<span>済</span><small>来場スタンプ押しました</small>`;
+    root.appendChild(effect);
+    window.setTimeout(() => effect.remove(), 1900);
+  }
+
+  window.setTimeout(() => root.classList.remove("is-stamp-pressed"), 1900);
+}
+
+function showArrivalStampOverlay(streak, monthDate, stampedSet, todayKey) {
+  const overlay = document.getElementById("arrivalStampOverlay");
+  const streakEl = document.getElementById("arrivalStampStreak");
+  const previewEl = document.getElementById("arrivalStampPreview");
+  if (!overlay) return;
+
+  if (streakEl) streakEl.textContent = String(streak);
+  if (previewEl && monthDate && stampedSet && todayKey) {
+    previewEl.dataset.previewTitle = `${monthDate.getMonth() + 1}月の出席表`;
+    previewEl.innerHTML = buildStampMonth(monthDate, stampedSet, todayKey, true);
+  }
+
+  overlay.hidden = false;
+  overlay.classList.remove("is-hiding");
+  overlay.classList.add("is-showing");
+
+  const prefersReducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const hideDelay = prefersReducedMotion ? 1900 : 3900;
+  const removeDelay = prefersReducedMotion ? 2200 : 4550;
+
+  window.setTimeout(() => {
+    overlay.classList.add("is-hiding");
+  }, hideDelay);
+
+  window.setTimeout(() => {
+    overlay.classList.remove("is-showing", "is-hiding");
+    overlay.hidden = true;
+    if (previewEl) { previewEl.innerHTML = ""; delete previewEl.dataset.previewTitle; }
+  }, removeDelay);
+}
+
+function setupVisitStampCard() {
+  const root = document.getElementById("visitStamp");
+  const todayStatus = document.getElementById("stampTodayStatus");
+  const streakCount = document.getElementById("stampStreakCount");
+  const twoMonthCount = document.getElementById("stampTwoMonthCount");
+  const months = document.getElementById("stampMonths");
+  const unlockCard = document.getElementById("secretUnlockCard");
+  const unlockTitle = document.getElementById("secretUnlockTitle");
+  const unlockText = document.getElementById("secretUnlockText");
+  const secretRoomLink = document.getElementById("secretRoomLink");
+  const unlockProgressBar = document.getElementById("secretUnlockProgressBar");
+  const unlockProgressText = document.getElementById("secretUnlockProgressText");
+
+  if (!root || !months) return;
+
+  const today = new Date();
+  const todayKey = getTodayKey();
+  const dates = loadVisitStampDates();
+  const hadTodayStamp = dates.includes(todayKey);
+
+  if (!hadTodayStamp) {
+    dates.push(todayKey);
+    saveVisitStampDates(dates);
+  }
+
+  const stampedSet = new Set(dates);
+  const streak = getConsecutiveVisitStreak(stampedSet, todayKey);
+  const twoMonthVisits = countVisitsInTwoMonths(dates, today);
+  const { previousMonth, currentMonth } = getTwoMonthRangeKeys(today);
+
+  if (todayStatus) {
+    todayStatus.textContent = hadTodayStamp ? "今日の来場スタンプ：済" : "今日の来場スタンプ：済（今日分を押しました）";
+    todayStatus.classList.toggle("is-new-stamp-status", !hadTodayStamp);
+  }
+  if (streakCount) {
+    streakCount.textContent = String(streak);
+    streakCount.classList.toggle("is-long-streak", String(streak).length >= 4);
+    streakCount.setAttribute("aria-label", `連続来場${streak}日`);
+  }
+  if (twoMonthCount) twoMonthCount.textContent = String(twoMonthVisits);
+
+  months.innerHTML = [
+    buildStampMonth(currentMonth, stampedSet, todayKey, !hadTodayStamp),
+    buildStampMonth(previousMonth, stampedSet, todayKey, !hadTodayStamp)
+  ].join("");
+
+  if (!hadTodayStamp) {
+    showArrivalStampOverlay(streak, currentMonth, stampedSet, todayKey);
+    triggerVisitStampAnimation(root, streak);
+  }
+
+  if (unlockTitle && unlockText && secretRoomLink) {
+    const milestone = getSecretMilestoneInfo(streak);
+    const progressPercent = Math.round((milestone.progressCount / milestone.cycle) * 100);
+    if (unlockProgressBar) unlockProgressBar.style.width = `${progressPercent}%`;
+
+    if (milestone.isMilestoneDay) {
+      unlockCard?.classList.add("is-unlocked");
+      unlockTitle.textContent = `隠しページ解放中（${milestone.milestoneLabel}）`;
+      unlockText.textContent = `連続${streak}日来場達成。今日は15日ごとの節目なので、秘密基地のごほうび部屋に入れます。`;
+      if (unlockProgressText) unlockProgressText.textContent = `${milestone.progressCount}/${milestone.cycle}日達成。次の解放日は連続${milestone.nextMilestone}日目です。`;
+      secretRoomLink.hidden = false;
+    } else {
+      unlockCard?.classList.remove("is-unlocked");
+      unlockTitle.textContent = `次の隠しページまであと${milestone.remaining}回`;
+      unlockText.textContent = `現在、連続${streak}日来場中。次は連続${milestone.nextMilestone}日目で、${milestone.milestoneLabel}のごほうび部屋が開きます。`;
+      if (unlockProgressText) unlockProgressText.textContent = `${milestone.progressCount}/${milestone.cycle}日。あと${milestone.remaining}回、毎日1回来場すると解放されます。`;
+      secretRoomLink.hidden = true;
+    }
+  }
+}
+
+let secretToastTimer = null;
+
+function showSecretToast(title, text, rare = false) {
+  const toast = document.getElementById("secretToast");
+  const toastTitle = document.getElementById("secretToastTitle");
+  const toastText = document.getElementById("secretToastText");
+  if (!toast || !toastTitle || !toastText) return;
+
+  toastTitle.textContent = title;
+  toastText.textContent = text;
+  toast.classList.toggle("is-rare", rare);
+  toast.hidden = false;
+
+  clearTimeout(secretToastTimer);
+  secretToastTimer = window.setTimeout(() => {
+    toast.hidden = true;
+    toast.classList.remove("is-rare");
+  }, rare ? 5200 : 3600);
+}
+
+function setupSecretInteractions() {
+  const tanuLines = [
+    "今日も来てくれてありがとうぽん。スタンプ押しておいたよ。",
+    "無理せず、のんびり秘密基地で休んでってね。",
+    "迷言が増えると、基地も少しにぎやかになるぽん。",
+    "水分補給してからゲームすると吉。"
+  ];
+  const ghostLines = [
+    "見つけたね。ここは少しだけ秘密の場所です。",
+    "コメント一言でも、けっこう残るものだよ。",
+    "静かに見てるだけでも、ちゃんと来場者です。",
+    "今日の小ネタはここまで。たぶん。"
+  ];
+
+  if (tanuMascot) {
+    tanuMascot.setAttribute("tabindex", "0");
+    tanuMascot.setAttribute("role", "button");
+    tanuMascot.setAttribute("aria-label", "たぬちゃんのひとことを見る");
+    const speak = () => {
+      const line = tanuLines[Math.floor(Math.random() * tanuLines.length)];
+      if (tanuBubble) tanuBubble.textContent = line;
+      tanuMascot.src = "assets/tanuchan-happy.png";
+      showSecretToast("たぬちゃんのひとこと", line);
+    };
+    tanuMascot.addEventListener("click", speak);
+    tanuMascot.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        speak();
+      }
+    });
+  }
+
+  if (ghostMascot) {
+    ghostMascot.setAttribute("tabindex", "0");
+    ghostMascot.setAttribute("role", "button");
+    ghostMascot.setAttribute("aria-label", "幽霊ちゃんの小ネタを見る");
+    const speak = () => {
+      const rare = Math.random() < 0.08;
+      if (rare) {
+        const line = "レア演出発生。幽霊ちゃんが今日は少し本気です。";
+        if (ghostBubble) ghostBubble.textContent = line;
+        ghostMascot.src = "assets/ghost-wink.png";
+        document.body.classList.remove("ghost-rare-mode");
+        void document.body.offsetWidth;
+        document.body.classList.add("ghost-rare-mode");
+        window.setTimeout(() => document.body.classList.remove("ghost-rare-mode"), 1500);
+        showSecretToast("幽霊ちゃんレア演出", line, true);
+        return;
+      }
+
+      const line = ghostLines[Math.floor(Math.random() * ghostLines.length)];
+      if (ghostBubble) ghostBubble.textContent = line;
+      showSecretToast("幽霊ちゃんの小ネタ", line);
+    };
+    ghostMascot.addEventListener("click", speak);
+    ghostMascot.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        speak();
+      }
+    });
+  }
+
+  const footerSecret = document.getElementById("footerSecretTrigger");
+  if (footerSecret) {
+    footerSecret.addEventListener("click", () => {
+      const dates = loadVisitStampDates();
+      const streak = getConsecutiveVisitStreak(new Set(dates), getTodayKey());
+      const milestone = getSecretMilestoneInfo(streak);
+      if (milestone.isMilestoneDay) {
+        showSecretToast("ページ下部の隠しメッセージ", `今日は連続${streak}日達成のごほうび日です。スタンプカードから奥の部屋へどうぞ。`, true);
+      } else {
+        showSecretToast("ページ下部の隠しメッセージ", `見つけてくれてありがとう。次の隠しページまではあと${milestone.remaining}回です。`);
+      }
+    });
+  }
+}
+
 setDailyQuote();
 setDailyMeigen();
 setupDailyOmikuji();
+setupVisitStampCard();
+setupSecretInteractions();
 
 
 /* ===== v25: animation upgrade pack ===== */
@@ -794,6 +1189,7 @@ function setupScrollReveal() {
   const targets = [
     ".hero",
     ".base-counter-card",
+    ".stamp-card",
     ".mascot-area",
     ".cards > article",
     ".gear-card",
