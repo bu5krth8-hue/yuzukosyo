@@ -4126,7 +4126,7 @@ body.ghost-rare-mode::after{content:"";position:fixed;inset:0;pointer-events:non
   content:"";
   position:absolute;
   inset:4px;
-  background:url("assets/tanuchan-happy.png") center/contain no-repeat;
+  background:url("assets/tanuchan-happy.webp") center/contain no-repeat;
   opacity:.94;
   filter:drop-shadow(0 0 6px rgba(250,204,21,.22));
 }
@@ -4191,7 +4191,7 @@ body.ghost-rare-mode::after{content:"";position:fixed;inset:0;pointer-events:non
 
 /* ===== v56: right nav order and tanuchan head stamp ===== */
 .stamp-day.is-stamped::after{
-  background-image:url("assets/tanuchan-stamp-head.png");
+  background-image:url("assets/tanuchan-stamp-head.webp");
   inset:5px;
   opacity:.98;
   filter:drop-shadow(0 0 5px rgba(250,204,21,.30));

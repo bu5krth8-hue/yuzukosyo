@@ -269,26 +269,26 @@ const tanuBubble = document.getElementById("tanuBubble");
 
 const ghostFaces = [
   {
-    src: "assets/ghost.png",
+    src: "assets/ghost.webp",
     text: "Xでお知らせ出すから見てね！"
   },
   {
-    src: "assets/ghost-wink.png",
+    src: "assets/ghost-wink.webp",
     text: "コメントくれるとめっちゃ嬉しいよ〜！"
   }
 ];
 
 const tanuFaces = [
   {
-    src: "assets/tanuchan.png",
+    src: "assets/tanuchan.webp",
     text: "Discordでも待ってるよ〜！"
   },
   {
-    src: "assets/tanuchan-wink.png",
+    src: "assets/tanuchan-wink.webp",
     text: "応援ほんとにありがとうぽん！"
   },
   {
-    src: "assets/tanuchan-happy.png",
+    src: "assets/tanuchan-happy.webp",
     text: "秘密基地でのんびりしてってね！"
   }
 ];
@@ -1050,7 +1050,7 @@ function setupSecretInteractions() {
     const speak = () => {
       const line = tanuLines[Math.floor(Math.random() * tanuLines.length)];
       if (tanuBubble) tanuBubble.textContent = line;
-      tanuMascot.src = "assets/tanuchan-happy.png";
+      tanuMascot.src = "assets/tanuchan-happy.webp";
       showSecretToast("たぬちゃんのひとこと", line);
     };
     tanuMascot.addEventListener("click", speak);
@@ -1071,7 +1071,7 @@ function setupSecretInteractions() {
       if (rare) {
         const line = "レア演出発生。幽霊ちゃんが今日は少し本気です。";
         if (ghostBubble) ghostBubble.textContent = line;
-        ghostMascot.src = "assets/ghost-wink.png";
+        ghostMascot.src = "assets/ghost-wink.webp";
         document.body.classList.remove("ghost-rare-mode");
         void document.body.offsetWidth;
         document.body.classList.add("ghost-rare-mode");
