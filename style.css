@@ -4786,3 +4786,36 @@ body.anchor-jump-prep .gear-market-section{
     padding-left:15px !important;
   }
 }
+
+
+/* ===== v73: original image cards for Amazon affiliate section ===== */
+.gear-product-original-visual{
+  width:100% !important;
+  aspect-ratio:16 / 10.5 !important;
+  min-height:132px !important;
+  padding:10px !important;
+  background:
+    radial-gradient(circle at top, rgba(112,214,255,.16), transparent 56%),
+    linear-gradient(180deg, rgba(31,13,55,.72), rgba(10,4,20,.88)) !important;
+  border-bottom:1px solid rgba(216,180,254,.22) !important;
+}
+
+.gear-product-original-visual img{
+  width:100% !important;
+  height:100% !important;
+  object-fit:cover !important;
+  border-radius:14px !important;
+  display:block !important;
+  box-shadow:0 0 18px rgba(112,214,255,.12) !important;
+}
+
+.gear-product-card:hover .gear-product-original-visual img{
+  transform:translateY(-1px) scale(1.01) !important;
+}
+
+@media (max-width:640px){
+  .gear-product-original-visual{
+    min-height:108px !important;
+    padding:8px !important;
+  }
+}
