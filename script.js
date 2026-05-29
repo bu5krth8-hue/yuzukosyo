@@ -949,7 +949,7 @@ function showArrivalStampOverlay(streak, monthDate, stampedSet, todayKey, option
   const closeButton = document.getElementById("arrivalStampClose");
   if (!overlay) return;
 
-  const { autoHide = true, hideDelay = 8000 } = options;
+  const { autoHide = true, hideDelay = 7000 } = options;
   clearTimeout(arrivalStampHideTimer);
   clearTimeout(arrivalStampRemoveTimer);
 
@@ -1044,7 +1044,7 @@ function setupVisitStampCard() {
   }
 
   if (!hadTodayStamp) {
-    showArrivalStampOverlay(streak, currentMonth, stampedSet, todayKey, { autoHide: true, hideDelay: 8000 });
+    showArrivalStampOverlay(streak, currentMonth, stampedSet, todayKey, { autoHide: true, hideDelay: 7000 });
     triggerVisitStampAnimation(root, streak);
   }
 

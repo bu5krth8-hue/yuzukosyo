@@ -3890,7 +3890,7 @@ body.ghost-rare-mode::after{content:"";position:fixed;inset:0;pointer-events:non
 .arrival-stamp-overlay{
   position:fixed;
   inset:0;
-  z-index:1200;
+  z-index:3000;
   display:grid;
   place-items:center;
   padding:22px;
@@ -4926,3 +4926,27 @@ body.anchor-jump-prep .gear-market-section{
 }
 .arrival-stamp-overlay.is-showing{pointer-events:auto;}
 .arrival-stamp-overlay.is-hiding{pointer-events:none;}
+
+/* ===== v76: arrival stamp 7s display + mobile close button position fix ===== */
+.arrival-stamp-overlay{
+  z-index:3000 !important;
+}
+@media (max-width:520px){
+  .arrival-stamp-card{
+    padding-bottom:70px !important;
+  }
+  .arrival-stamp-close{
+    top:auto !important;
+    right:50% !important;
+    bottom:16px !important;
+    width:42px !important;
+    height:42px !important;
+    font-size:23px !important;
+    transform:translateX(50%) !important;
+  }
+  .arrival-stamp-close:hover,
+  .arrival-stamp-close:focus-visible{
+    transform:translateX(50%) translateY(-1px) scale(1.04) !important;
+  }
+}
+
