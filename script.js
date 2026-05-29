@@ -785,7 +785,8 @@ function setupDailyOmikuji() {
 
 /* ===== v48: visit stamp card, unlock progress and hidden secrets ===== */
 const VISIT_STAMP_STORAGE_KEY = "yuzukosyoVisitStampsV1";
-const SECRET_ROOM_UNLOCK_DAYS = 15;
+const SECRET_ROOM_UNLOCK_DAYS = 20;
+const SECRET_REWARD_TIERS = [20, 40, 60, 80, 100];
 
 function parseDateKeyToLocalDate(dateKey) {
   const parts = String(dateKey).split("-").map(Number);
@@ -846,14 +847,19 @@ function getConsecutiveVisitStreak(stampedSet, todayKey) {
 
 function getSecretMilestoneInfo(streak) {
   const cycle = SECRET_ROOM_UNLOCK_DAYS;
-  const milestoneCount = streak > 0 ? Math.floor(streak / cycle) : 0;
+  const unlockedTiers = SECRET_REWARD_TIERS.filter((days) => streak >= days);
+  const nextTier = SECRET_REWARD_TIERS.find((days) => streak < days) || null;
+  const previousTier = unlockedTiers.length ? unlockedTiers[unlockedTiers.length - 1] : 0;
+  const isUnlocked = streak >= SECRET_ROOM_UNLOCK_DAYS;
+  const isAllUnlocked = !nextTier;
+  const nextMilestone = nextTier || SECRET_REWARD_TIERS[SECRET_REWARD_TIERS.length - 1];
+  const remaining = nextTier ? Math.max(0, nextTier - streak) : 0;
+  const progressCount = nextTier ? Math.max(0, streak - previousTier) : cycle;
   const cycleProgress = streak % cycle;
   const isMilestoneDay = streak > 0 && cycleProgress === 0;
-  const nextMilestone = isMilestoneDay ? streak + cycle : (milestoneCount + 1) * cycle;
-  const remaining = isMilestoneDay ? 0 : Math.max(0, nextMilestone - streak);
-  const progressCount = isMilestoneDay ? cycle : cycleProgress;
-  const milestoneLabel = isMilestoneDay ? `${milestoneCount}回目` : `${milestoneCount + 1}回目`;
-  return { cycle, milestoneCount, cycleProgress, isMilestoneDay, nextMilestone, remaining, progressCount, milestoneLabel };
+  const milestoneCount = unlockedTiers.length;
+  const milestoneLabel = isUnlocked ? `${milestoneCount}個目` : "1個目";
+  return { cycle, milestoneCount, cycleProgress, isMilestoneDay, isUnlocked, isAllUnlocked, nextMilestone, remaining, progressCount, milestoneLabel };
 }
 
 function getTwoMonthRangeKeys(today) {
@@ -1053,16 +1059,22 @@ function setupVisitStampCard() {
     const progressPercent = Math.round((milestone.progressCount / milestone.cycle) * 100);
     if (unlockProgressBar) unlockProgressBar.style.width = `${progressPercent}%`;
 
-    if (milestone.isMilestoneDay) {
+    if (milestone.isUnlocked) {
       unlockCard?.classList.add("is-unlocked");
-      unlockTitle.textContent = `隠しページ解放中（${milestone.milestoneLabel}）`;
-      unlockText.textContent = `連続${streak}日来場達成。今日は15日ごとの節目なので、秘密基地のごほうび部屋に入れます。`;
-      if (unlockProgressText) unlockProgressText.textContent = `${milestone.progressCount}/${milestone.cycle}日達成。次の解放日は連続${milestone.nextMilestone}日目です。`;
       secretRoomLink.hidden = false;
+      if (milestone.isAllUnlocked) {
+        unlockTitle.textContent = "連続来場特典をすべて解放済み";
+        unlockText.textContent = `連続${streak}日来場中。100日連続までの壁紙特典はすべて見られます。`;
+        if (unlockProgressText) unlockProgressText.textContent = "100日連続までの壁紙をすべて解放しました。";
+      } else {
+        unlockTitle.textContent = `隠しページ解放中（${milestone.milestoneCount}個解放済み）`;
+        unlockText.textContent = `連続${streak}日来場中。解放済みの壁紙を隠しページで見られます。次は連続${milestone.nextMilestone}日で新しい壁紙が解放されます。`;
+        if (unlockProgressText) unlockProgressText.textContent = `${milestone.progressCount}/${milestone.cycle}日。次の壁紙まであと${milestone.remaining}日です。`;
+      }
     } else {
       unlockCard?.classList.remove("is-unlocked");
-      unlockTitle.textContent = `次の隠しページまであと${milestone.remaining}回`;
-      unlockText.textContent = `現在、連続${streak}日来場中。次は連続${milestone.nextMilestone}日目で、${milestone.milestoneLabel}のごほうび部屋が開きます。`;
+      unlockTitle.textContent = `隠しページまであと${milestone.remaining}回`;
+      unlockText.textContent = `現在、連続${streak}日来場中。連続20日達成で、最初の壁紙特典が開きます。`;
       if (unlockProgressText) unlockProgressText.textContent = `${milestone.progressCount}/${milestone.cycle}日。あと${milestone.remaining}回、毎日1回来場すると解放されます。`;
       secretRoomLink.hidden = true;
     }
@@ -1159,10 +1171,11 @@ function setupSecretInteractions() {
       const dates = loadVisitStampDates();
       const streak = getConsecutiveVisitStreak(new Set(dates), getTodayKey());
       const milestone = getSecretMilestoneInfo(streak);
-      if (milestone.isMilestoneDay) {
-        showSecretToast("ページ下部の隠しメッセージ", `今日は連続${streak}日達成のごほうび日です。スタンプカードから奥の部屋へどうぞ。`, true);
+      if (milestone.isUnlocked) {
+        const nextText = milestone.isAllUnlocked ? "100日連続までの壁紙はすべて解放済みです。" : `次の壁紙まではあと${milestone.remaining}回です。`;
+        showSecretToast("ページ下部の隠しメッセージ", `隠しページ解放中です。${nextText}`, true);
       } else {
-        showSecretToast("ページ下部の隠しメッセージ", `見つけてくれてありがとう。次の隠しページまではあと${milestone.remaining}回です。`);
+        showSecretToast("ページ下部の隠しメッセージ", `見つけてくれてありがとう。隠しページまではあと${milestone.remaining}回です。`);
       }
     });
   }
