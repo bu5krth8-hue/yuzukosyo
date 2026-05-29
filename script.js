@@ -920,11 +920,38 @@ function triggerVisitStampAnimation(root, streak) {
   window.setTimeout(() => root.classList.remove("is-stamp-pressed"), 1900);
 }
 
-function showArrivalStampOverlay(streak, monthDate, stampedSet, todayKey) {
+let arrivalStampHideTimer = null;
+let arrivalStampRemoveTimer = null;
+
+function closeArrivalStampOverlay() {
+  const overlay = document.getElementById("arrivalStampOverlay");
+  const previewEl = document.getElementById("arrivalStampPreview");
+  if (!overlay || overlay.hidden) return;
+
+  clearTimeout(arrivalStampHideTimer);
+  clearTimeout(arrivalStampRemoveTimer);
+
+  overlay.classList.add("is-hiding");
+  arrivalStampRemoveTimer = window.setTimeout(() => {
+    overlay.classList.remove("is-showing", "is-hiding");
+    overlay.hidden = true;
+    if (previewEl) {
+      previewEl.innerHTML = "";
+      delete previewEl.dataset.previewTitle;
+    }
+  }, 520);
+}
+
+function showArrivalStampOverlay(streak, monthDate, stampedSet, todayKey, options = {}) {
   const overlay = document.getElementById("arrivalStampOverlay");
   const streakEl = document.getElementById("arrivalStampStreak");
   const previewEl = document.getElementById("arrivalStampPreview");
+  const closeButton = document.getElementById("arrivalStampClose");
   if (!overlay) return;
+
+  const { autoHide = true, hideDelay = 8000 } = options;
+  clearTimeout(arrivalStampHideTimer);
+  clearTimeout(arrivalStampRemoveTimer);
 
   if (streakEl) streakEl.textContent = String(streak);
   overlay.querySelectorAll("img[data-src]").forEach((img) => {
@@ -938,23 +965,28 @@ function showArrivalStampOverlay(streak, monthDate, stampedSet, todayKey) {
     previewEl.innerHTML = buildStampMonth(monthDate, stampedSet, todayKey, true);
   }
 
+  if (closeButton) {
+    closeButton.onclick = closeArrivalStampOverlay;
+  }
+
   overlay.hidden = false;
   overlay.classList.remove("is-hiding");
   overlay.classList.add("is-showing");
 
-  const prefersReducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const hideDelay = prefersReducedMotion ? 5000 : 5000;
-  const removeDelay = prefersReducedMotion ? 5300 : 5650;
+  if (!autoHide) return;
 
-  window.setTimeout(() => {
+  arrivalStampHideTimer = window.setTimeout(() => {
     overlay.classList.add("is-hiding");
   }, hideDelay);
 
-  window.setTimeout(() => {
+  arrivalStampRemoveTimer = window.setTimeout(() => {
     overlay.classList.remove("is-showing", "is-hiding");
     overlay.hidden = true;
-    if (previewEl) { previewEl.innerHTML = ""; delete previewEl.dataset.previewTitle; }
-  }, removeDelay);
+    if (previewEl) {
+      previewEl.innerHTML = "";
+      delete previewEl.dataset.previewTitle;
+    }
+  }, hideDelay + 650);
 }
 
 function setupVisitStampCard() {
@@ -963,6 +995,7 @@ function setupVisitStampCard() {
   const streakCount = document.getElementById("stampStreakCount");
   const twoMonthCount = document.getElementById("stampTwoMonthCount");
   const months = document.getElementById("stampMonths");
+  const replayButton = document.getElementById("stampReplayButton");
   const unlockCard = document.getElementById("secretUnlockCard");
   const unlockTitle = document.getElementById("secretUnlockTitle");
   const unlockText = document.getElementById("secretUnlockText");
@@ -1003,8 +1036,15 @@ function setupVisitStampCard() {
     buildStampMonth(currentMonth, stampedSet, todayKey, !hadTodayStamp)
   ].join("");
 
+  if (replayButton) {
+    replayButton.onclick = () => {
+      showArrivalStampOverlay(streak, currentMonth, stampedSet, todayKey, { autoHide: false });
+      triggerVisitStampAnimation(root, streak);
+    };
+  }
+
   if (!hadTodayStamp) {
-    showArrivalStampOverlay(streak, currentMonth, stampedSet, todayKey);
+    showArrivalStampOverlay(streak, currentMonth, stampedSet, todayKey, { autoHide: true, hideDelay: 8000 });
     triggerVisitStampAnimation(root, streak);
   }
 

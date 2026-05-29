@@ -14,7 +14,7 @@
   <meta property="og:url" content="https://yuzukosyo.pages.dev/" />
   <meta name="twitter:card" content="summary" />
   <link rel="preload" href="assets/logo-secret-base.webp" as="image" type="image/webp" fetchpriority="high" />
-  <link rel="stylesheet" href="style.css?v=73" />
+  <link rel="stylesheet" href="style.css?v=74" />
 </head>
 <body id="top">
   <div class="cursor-light" id="cursorLight"></div>
@@ -23,7 +23,8 @@
   <div class="stars" aria-hidden="true"></div>
   <div class="shooting-stars" aria-hidden="true"><span></span><span></span><span></span></div>
   <div class="arrival-stamp-overlay" id="arrivalStampOverlay" aria-live="polite" hidden>
-    <div class="arrival-stamp-card" role="status" aria-label="今日の来場スタンプを押しました">
+    <div class="arrival-stamp-card" role="dialog" aria-modal="true" aria-label="今日の来場スタンプを押しました">
+      <button class="arrival-stamp-close" id="arrivalStampClose" type="button" aria-label="来場スタンプ演出を閉じる">×</button>
       <p class="arrival-stamp-kicker">VISIT STAMP</p>
       <h2>📮 来場スタンプカード</h2>
       <p class="arrival-stamp-copy">今月のカードに、来場した日のたぬちゃんスタンプを押します。</p>
@@ -121,6 +122,18 @@
           <div class="stamp-status-pill" id="stampTodayStatus">今日の来場スタンプ：確認中</div>
           <div class="stamp-status-pill stamp-status-strong">連続来場 <strong id="stampStreakCount">0</strong> 日</div>
           <div class="stamp-status-pill">2ヶ月内 <strong id="stampTwoMonthCount">0</strong> 日</div>
+        </div>
+
+        <div class="stamp-replay-row" aria-label="来場スタンプ演出の再表示">
+          <button class="stamp-replay-btn" id="stampReplayButton" type="button">
+            <span class="stamp-replay-thumb" aria-hidden="true">
+              <img src="assets/tanuchan-stamp-head.webp" alt="" loading="lazy" decoding="async" width="180" height="180">
+            </span>
+            <span class="stamp-replay-text">
+              <strong>今日のスタンプ演出を見る</strong>
+              <small>押すと、来場時のスタンプカード演出をもう一度表示できます。</small>
+            </span>
+          </button>
         </div>
 
         <div class="stamp-months" id="stampMonths" aria-label="直近2ヶ月のスタンプカード"></div>
@@ -286,8 +299,16 @@
           <li>
             <time datetime="2026-05-29">2026/05/29</time>
             <div>
-              <strong>配信で使ってるものにオリジナル画像を追加</strong>
-              <p>Amazonの商品スクリーンショットは使わず、サイト用に作成したカテゴリ別のオリジナルイメージ画像へ差し替えました。商品説明文とAmazonリンクは維持しています。</p>
+              <strong>来場スタンプ演出の表示時間と再表示ボタンを追加</strong>
+              <p>その日初めてサイトに入った時の来場スタンプ演出を約8秒表示へ変更し、出席表のところにスタンプ演出をもう一度見られるボタンと閉じるボタンを追加しました。</p>
+            </div>
+          </li>
+
+          <li>
+            <time datetime="2026-05-29">2026/05/29</time>
+            <div>
+              <strong>商品紹介カードの表示形式を変更</strong>
+              <p>商品紹介カードを、オリジナル画像とテキスト中心の表示に変更しました。</p>
             </div>
           </li>
 
@@ -854,7 +875,7 @@
     <span id="secretToastText">見つけてくれてありがとう。</span>
   </div>
   <script src="meigen-data.js?v=72" defer></script>
-  <script src="script.js?v=72" defer></script>
+  <script src="script.js?v=74" defer></script>
   <script src="stats-counter.js?v=72" defer></script>
 </body>
 </html>
