@@ -1,3 +1,7 @@
+[v86]
+- 「配信で使ってるもの」欄の最後尾にゲーミングチェアーのAmazonリンクを追加
+- ゲーミングチェアー用のオリジナルカテゴリ画像を追加
+
 [v85]
 - assets内に残っていた未使用の旧版壁紙ファイルを削除
 - 削除対象: secret-wallpaper-pc-20.webp / secret-wallpaper-sp-20.webp / secret-wallpaper-pc-40.webp / secret-wallpaper-sp-40.webp / secret-wallpaper-pc-80.webp / secret-wallpaper-sp-80.webp / secret-wallpaper-pc-100.webp / secret-wallpaper-sp-100.webp
