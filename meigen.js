@@ -633,10 +633,27 @@ function setupMeigenSubmitForm() {
   const form = document.getElementById("meigenSubmitForm");
   const sendBtn = document.getElementById("meigenSubmitSendBtn");
   const status = document.getElementById("meigenSubmitStatus");
+  const successBox = document.getElementById("meigenSubmitSuccess");
   if (!form) return;
 
   const setStatus = (message) => {
     if (status) status.textContent = message || "";
+  };
+
+  const resetSendButton = () => {
+    if (!sendBtn) return;
+    sendBtn.disabled = false;
+    sendBtn.textContent = "送信";
+  };
+
+  const showSubmitSuccess = () => {
+    form.reset();
+    form.hidden = true;
+    setStatus("");
+    if (successBox) {
+      successBox.hidden = false;
+      successBox.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
   };
 
   form.addEventListener("submit", async (event) => {
@@ -666,10 +683,11 @@ function setupMeigenSubmitForm() {
 
     try {
       await meigenPostRemoteSubmission(item);
-      window.location.href = `${MEIGEN_ADMIN_PAGE}?posted=1#meigenSubmissionCard`;
+      showSubmitSuccess();
     } catch (error) {
-      const encoded = meigenBase64UrlEncode(JSON.stringify(item));
-      window.location.href = `${MEIGEN_ADMIN_PAGE}?submit=${encoded}#meigenSubmissionCard`;
+      console.error("迷言案送信エラー:", error);
+      setStatus("送信に失敗しました。時間をおいてもう一度送ってください。");
+      resetSendButton();
     }
   });
 }
