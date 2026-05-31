@@ -5160,3 +5160,112 @@ body.anchor-jump-prep .gear-market-section{
   .stamp-history-month-actions{align-items:stretch;flex-direction:column;text-align:center;}
   .stamp-history-save-btn{width:100%;}
 }
+
+
+/* v98: スマホ版のカード余白調整 */
+@media (max-width:760px){
+  .beginner-section,
+  .extra-cards,
+  .page-links-section{
+    content-visibility:visible !important;
+    contain-intrinsic-size:none !important;
+  }
+
+  .page-links-section{
+    margin-top:16px !important;
+    gap:16px !important;
+  }
+
+  .page-links-section.room-link-grid{
+    align-items:start !important;
+  }
+
+  .page-links-section .room-card{
+    min-height:auto !important;
+    padding:24px 20px !important;
+  }
+
+  .page-links-section .room-card p{
+    margin-bottom:0 !important;
+    line-height:1.75 !important;
+  }
+
+  .page-links-section .room-card .mini-btn{
+    margin-top:16px !important;
+  }
+}
+
+
+/* v99: みくじ・スタンプカードのSNS共有ボタン */
+.sns-share-btn{
+  cursor:pointer;
+  border:none;
+}
+.omikuji-share-btn{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:min(100%,520px);
+  min-height:46px;
+  margin:14px auto 0;
+  padding:12px 18px;
+  color:#fff;
+  border-radius:999px;
+  border:1px solid rgba(125,211,252,.55);
+  background:linear-gradient(180deg,rgba(14,165,233,.62),rgba(88,28,135,.82));
+  box-shadow:0 0 18px rgba(14,165,233,.22),inset 0 0 18px rgba(255,255,255,.04);
+  font-weight:1000;
+  transition:.18s ease;
+}
+.omikuji-share-btn:hover:not(:disabled),
+.omikuji-share-btn:focus-visible:not(:disabled),
+.stamp-share-btn:hover,
+.stamp-share-btn:focus-visible{
+  transform:translateY(-2px);
+  box-shadow:0 0 28px rgba(14,165,233,.34),0 0 24px rgba(168,85,247,.22),inset 0 0 20px rgba(255,255,255,.06);
+  outline:none;
+}
+.omikuji-share-btn:disabled{
+  opacity:.52;
+  cursor:not-allowed;
+}
+.sns-share-note{
+  margin:8px auto 0;
+  color:rgba(237,225,255,.70);
+  font-size:12px;
+  font-weight:850;
+  line-height:1.6;
+  text-align:center;
+}
+.stamp-share-row{
+  display:grid;
+  justify-items:center;
+  gap:8px;
+  margin:18px auto 0;
+  text-align:center;
+}
+.stamp-share-row p{
+  margin:0;
+  color:rgba(237,225,255,.74);
+  font-size:12px;
+  font-weight:850;
+  line-height:1.7;
+}
+.stamp-share-btn{
+  width:min(100%,560px);
+  border-color:rgba(125,211,252,.55)!important;
+  background:linear-gradient(180deg,rgba(14,165,233,.56),rgba(88,28,135,.84))!important;
+}
+@media(max-width:520px){
+  .omikuji-share-btn,
+  .stamp-share-btn{
+    width:100%;
+    min-height:44px;
+    padding:11px 14px;
+    font-size:13px;
+  }
+  .sns-share-note,
+  .stamp-share-row p{
+    font-size:11px;
+  }
+}

@@ -690,6 +690,80 @@ function showOmikujiResult(item) {
   if (chat) chat.textContent = item.chat;
 }
 
+
+const SITE_SHARE_URL = "https://yuzukosyo.pages.dev/";
+
+function wrapCanvasText(ctx, text, x, y, maxWidth, lineHeight, maxLines = 99) {
+  const rawText = String(text || "");
+  const paragraphs = rawText.split(/\n+/);
+  let lines = [];
+  paragraphs.forEach((paragraph) => {
+    let line = "";
+    Array.from(paragraph).forEach((char) => {
+      const testLine = line + char;
+      if (ctx.measureText(testLine).width > maxWidth && line) {
+        lines.push(line);
+        line = char;
+      } else {
+        line = testLine;
+      }
+    });
+    if (line) lines.push(line);
+  });
+  if (lines.length > maxLines) {
+    lines = lines.slice(0, maxLines);
+    lines[maxLines - 1] = `${lines[maxLines - 1].replace(/…$/,"")}…`;
+  }
+  lines.forEach((line, index) => ctx.fillText(line, x, y + index * lineHeight));
+  return y + lines.length * lineHeight;
+}
+
+function canvasToPngBlob(canvas) {
+  return new Promise((resolve) => {
+    canvas.toBlob((blob) => resolve(blob), "image/png");
+  });
+}
+
+function downloadBlobFile(blob, filename) {
+  if (!blob) return;
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  window.setTimeout(() => URL.revokeObjectURL(url), 1200);
+}
+
+function openXShareText(text) {
+  const shareText = `${text}\n\n#柚胡椒の秘密基地\n${SITE_SHARE_URL}`;
+  const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`;
+  window.open(url, "_blank", "noopener,noreferrer");
+}
+
+async function shareOrDownloadImage(blob, filename, text, title) {
+  if (!blob) return;
+  const file = new File([blob], filename, { type: "image/png" });
+  const shareData = {
+    title: title || "柚胡椒の秘密基地",
+    text: `${text}\n\n#柚胡椒の秘密基地\n${SITE_SHARE_URL}`,
+    files: [file]
+  };
+
+  try {
+    if (navigator.canShare && navigator.canShare({ files: [file] }) && navigator.share) {
+      await navigator.share(shareData);
+      return;
+    }
+  } catch (error) {
+    // 共有がキャンセル・失敗した場合は下の保存方式に切り替える
+  }
+
+  downloadBlobFile(blob, filename);
+  openXShareText(`${text}\n\n画像を保存したので、投稿画面で添付してね。`);
+}
+
 function pickWeightedOmikujiIndex() {
   const totalWeight = omikujiItems.reduce((sum, item) => sum + (Number(item.weight) > 0 ? Number(item.weight) : 10), 0);
   let random = Math.random() * totalWeight;
@@ -701,6 +775,157 @@ function pickWeightedOmikujiIndex() {
   }
 
   return Math.max(0, omikujiItems.length - 1);
+}
+
+
+function createOmikujiShareCanvas(item) {
+  const scale = 2;
+  const width = 980;
+  const height = 1180;
+  const canvas = document.createElement("canvas");
+  canvas.width = width * scale;
+  canvas.height = height * scale;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return null;
+
+  ctx.scale(scale, scale);
+
+  const bg = ctx.createLinearGradient(0, 0, width, height);
+  bg.addColorStop(0, "#160726");
+  bg.addColorStop(0.52, "#0b0314");
+  bg.addColorStop(1, "#21071f");
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, width, height);
+
+  ctx.fillStyle = "rgba(168,85,247,.26)";
+  ctx.beginPath();
+  ctx.arc(120, 120, 190, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "rgba(112,214,255,.16)";
+  ctx.beginPath();
+  ctx.arc(840, 180, 210, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "rgba(250,204,21,.10)";
+  ctx.beginPath();
+  ctx.arc(490, 1040, 260, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.strokeStyle = "rgba(216,180,254,.62)";
+  ctx.lineWidth = 3;
+  drawRoundedRect(ctx, 46, 46, width - 92, height - 92, 38);
+  ctx.stroke();
+
+  ctx.textAlign = "center";
+  ctx.shadowColor = "rgba(168,85,247,.85)";
+  ctx.shadowBlur = 18;
+  ctx.fillStyle = "#f7ecff";
+  ctx.font = "900 34px -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Noto Sans JP', sans-serif";
+  ctx.fillText("🔮 今日の柚胡椒みくじ", width / 2, 118);
+  ctx.shadowBlur = 0;
+
+  ctx.font = "800 20px -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Noto Sans JP', sans-serif";
+  ctx.fillStyle = "rgba(237,225,255,.76)";
+  ctx.fillText(formatDateJa(new Date()), width / 2, 156);
+
+  ctx.fillStyle = item && item.rare ? "rgba(250,204,21,.18)" : "rgba(112,214,255,.13)";
+  ctx.strokeStyle = item && item.rare ? "rgba(250,204,21,.62)" : "rgba(112,214,255,.52)";
+  ctx.lineWidth = 2;
+  drawRoundedRect(ctx, 105, 210, width - 210, 190, 28);
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.shadowColor = item && item.rare ? "rgba(250,204,21,.82)" : "rgba(112,214,255,.78)";
+  ctx.shadowBlur = 20;
+  ctx.fillStyle = "#ffffff";
+  ctx.font = "900 58px -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Noto Sans JP', sans-serif";
+  ctx.fillText(item.fortune || "-", width / 2, 322);
+  ctx.shadowBlur = 0;
+
+  ctx.textAlign = "left";
+  ctx.fillStyle = "#f7ecff";
+  ctx.font = "900 28px -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Noto Sans JP', sans-serif";
+  let y = 470;
+  ctx.fillText("ひとこと", 120, y);
+  ctx.font = "800 25px -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Noto Sans JP', sans-serif";
+  ctx.fillStyle = "rgba(245,234,255,.94)";
+  y = wrapCanvasText(ctx, item.comment || "-", 120, y + 48, width - 240, 38, 5) + 34;
+
+  const rows = [
+    ["配信運", item.stream || "-"],
+    ["ゲーム運", item.game || "-"],
+    ["コメント運", item.chat || "-"]
+  ];
+  rows.forEach(([label, value]) => {
+    ctx.fillStyle = "rgba(10,4,20,.70)";
+    ctx.strokeStyle = "rgba(216,180,254,.34)";
+    ctx.lineWidth = 2;
+    drawRoundedRect(ctx, 120, y, width - 240, 82, 20);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.fillStyle = "#d8f3ff";
+    ctx.font = "900 22px -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Noto Sans JP', sans-serif";
+    ctx.fillText(label, 150, y + 51);
+
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "900 25px -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Noto Sans JP', sans-serif";
+    wrapCanvasText(ctx, value, 310, y + 51, width - 460, 30, 1);
+    y += 102;
+  });
+
+  ctx.textAlign = "center";
+  ctx.fillStyle = "rgba(237,225,255,.78)";
+  ctx.font = "800 22px -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Noto Sans JP', sans-serif";
+  ctx.fillText("柚胡椒の秘密基地", width / 2, height - 122);
+  ctx.fillStyle = "#d8b4fe";
+  ctx.font = "900 24px -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Noto Sans JP', sans-serif";
+  ctx.fillText(SITE_SHARE_URL, width / 2, height - 84);
+
+  return canvas;
+}
+
+function getTodayOmikujiItem() {
+  const todayKey = getTodayKey();
+  try {
+    const saved = JSON.parse(localStorage.getItem("yuzukosyoDailyOmikuji") || "null");
+    if (saved && saved.date === todayKey && Number.isInteger(saved.index) && omikujiItems[saved.index]) {
+      return omikujiItems[saved.index];
+    }
+  } catch (error) {
+    return null;
+  }
+  return null;
+}
+
+function updateOmikujiShareButtonState() {
+  const shareButton = document.getElementById("omikujiShareButton");
+  if (!shareButton) return;
+  const item = getTodayOmikujiItem();
+  const disabled = !item;
+  shareButton.disabled = disabled;
+  shareButton.setAttribute("aria-disabled", disabled ? "true" : "false");
+  shareButton.textContent = disabled ? "みくじ後にSNS投稿できます" : "みくじ画像をSNSに投稿 →";
+}
+
+function setupOmikujiShareButton() {
+  const shareButton = document.getElementById("omikujiShareButton");
+  if (!shareButton) return;
+  updateOmikujiShareButtonState();
+  shareButton.addEventListener("click", async () => {
+    const item = getTodayOmikujiItem();
+    if (!item) {
+      updateOmikujiShareButtonState();
+      return;
+    }
+    const canvas = createOmikujiShareCanvas(item);
+    const blob = canvas ? await canvasToPngBlob(canvas) : null;
+    await shareOrDownloadImage(
+      blob,
+      `yuzukosyo-omikuji-${getTodayKey()}.png`,
+      `今日の柚胡椒みくじを引いたよ！\n運勢：${item.fortune}\n配信運：${item.stream}\nゲーム運：${item.game}\nコメント運：${item.chat}`,
+      "今日の柚胡椒みくじ"
+    );
+  });
 }
 
 function setupDailyOmikuji() {
@@ -729,6 +954,7 @@ function setupDailyOmikuji() {
     button.classList.add("omikuji-button-done");
     button.disabled = true;
     button.setAttribute("aria-disabled", "true");
+    updateOmikujiShareButtonState();
   }
 
   button.addEventListener("click", () => {
@@ -777,6 +1003,7 @@ function setupDailyOmikuji() {
       button.classList.add("omikuji-button-done");
       button.disabled = true;
       button.setAttribute("aria-disabled", "true");
+      updateOmikujiShareButtonState();
     }, 520);
   });
 }
@@ -1060,6 +1287,7 @@ function setupVisitStampCard() {
   const twoMonthCount = document.getElementById("stampTwoMonthCount");
   const months = document.getElementById("stampMonths");
   const replayButton = document.getElementById("stampReplayButton");
+  const stampShareButton = document.getElementById("stampShareButton");
   const unlockCard = document.getElementById("secretUnlockCard");
   const unlockTitle = document.getElementById("secretUnlockTitle");
   const unlockText = document.getElementById("secretUnlockText");
@@ -1102,6 +1330,10 @@ function setupVisitStampCard() {
       showArrivalStampOverlay(streak, currentMonth, stampedSet, todayKey, { autoHide: false });
       triggerVisitStampAnimation(root, streak);
     };
+  }
+
+  if (stampShareButton) {
+    stampShareButton.onclick = () => shareStampMonthImage(currentMonth, stampedSet, todayKey);
   }
 
   if (!hadTodayStamp) {
@@ -1182,7 +1414,8 @@ function drawRoundedRect(ctx, x, y, width, height, radius) {
   ctx.closePath();
 }
 
-function downloadStampMonthImage(monthDate, stampedSet, todayKey) {
+
+function createStampMonthCanvas(monthDate, stampedSet, todayKey) {
   const year = monthDate.getFullYear();
   const month = monthDate.getMonth();
   const monthNumber = month + 1;
@@ -1198,7 +1431,7 @@ function downloadStampMonthImage(monthDate, stampedSet, todayKey) {
   canvas.width = width * scale;
   canvas.height = height * scale;
   const ctx = canvas.getContext("2d");
-  if (!ctx) return;
+  if (!ctx) return null;
 
   ctx.scale(scale, scale);
 
@@ -1231,9 +1464,10 @@ function downloadStampMonthImage(monthDate, stampedSet, todayKey) {
   ctx.fillText(`📮 ${year}年${monthNumber}月の出席表`, width / 2, 112);
   ctx.shadowBlur = 0;
 
+  const visitCount = countVisitsInMonth(monthDate, stampedSet);
   ctx.font = "800 24px -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Noto Sans JP', sans-serif";
   ctx.fillStyle = "rgba(237,225,255,.86)";
-  ctx.fillText(`来場 ${countVisitsInMonth(monthDate, stampedSet)} 日 / 保存期間：過去24ヶ月`, width / 2, 154);
+  ctx.fillText(`来場 ${visitCount} 日 / 保存期間：過去24ヶ月`, width / 2, 154);
 
   const weekdays = ["日", "月", "火", "水", "木", "金", "土"];
   const gridX = 100;
@@ -1282,19 +1516,35 @@ function downloadStampMonthImage(monthDate, stampedSet, todayKey) {
 
   ctx.font = "800 18px -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Noto Sans JP', sans-serif";
   ctx.fillStyle = "rgba(237,225,255,.70)";
-  ctx.fillText("柚胡椒の秘密基地 / 来場スタンプカード", width / 2, height - 72);
+  ctx.fillText("柚胡椒の秘密基地 / 来場スタンプカード", width / 2, height - 102);
+  ctx.fillStyle = "#d8b4fe";
+  ctx.font = "900 20px -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Noto Sans JP', sans-serif";
+  ctx.fillText(SITE_SHARE_URL, width / 2, height - 72);
 
+  return canvas;
+}
+
+function downloadStampMonthImage(monthDate, stampedSet, todayKey) {
+  const canvas = createStampMonthCanvas(monthDate, stampedSet, todayKey);
+  if (!canvas) return;
   canvas.toBlob((blob) => {
-    if (!blob) return;
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `yuzukosyo-stamp-${year}-${String(monthNumber).padStart(2, "0")}.png`;
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    window.setTimeout(() => URL.revokeObjectURL(url), 1200);
+    const year = monthDate.getFullYear();
+    const monthNumber = monthDate.getMonth() + 1;
+    downloadBlobFile(blob, `yuzukosyo-stamp-${year}-${String(monthNumber).padStart(2, "0")}.png`);
   }, "image/png");
+}
+
+async function shareStampMonthImage(monthDate, stampedSet, todayKey) {
+  const canvas = createStampMonthCanvas(monthDate, stampedSet, todayKey);
+  const blob = canvas ? await canvasToPngBlob(canvas) : null;
+  const monthLabel = `${monthDate.getFullYear()}年${monthDate.getMonth() + 1}月`;
+  const visitCount = countVisitsInMonth(monthDate, stampedSet);
+  await shareOrDownloadImage(
+    blob,
+    `yuzukosyo-stamp-${monthDate.getFullYear()}-${String(monthDate.getMonth() + 1).padStart(2, "0")}.png`,
+    `${monthLabel}の来場スタンプカード！\n今月の来場：${visitCount}日`,
+    "来場スタンプカード"
+  );
 }
 
 function setupStampHistoryPage() {
@@ -1446,6 +1696,7 @@ function setupSecretInteractions() {
 setDailyQuote();
 setDailyMeigen();
 setupDailyOmikuji();
+setupOmikujiShareButton();
 setupVisitStampCard();
 setupStampHistoryPage();
 setupSecretInteractions();

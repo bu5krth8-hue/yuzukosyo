@@ -1,5 +1,3 @@
-// 公開用の初期迷言データです。
-// v88: 重複していた公開迷言2件を整理済みです。
 window.YUZUKOSYO_PUBLIC_MEIGEN = [
   {
     "id": "public-20260527-001",
@@ -62,6 +60,33 @@ window.YUZUKOSYO_PUBLIC_MEIGEN = [
     "place": "未設定",
     "date": "2026年5月27日",
     "memo": "",
+    "visible": true
+  },
+  {
+    "id": "local-1780194482335",
+    "text": "ここぞという時にミスるストライク、、、、",
+    "speaker": "とある住人さん",
+    "place": "配信中",
+    "date": "2026年5月31日",
+    "memo": "",
+    "visible": true
+  },
+  {
+    "id": "local-1780194399058",
+    "text": "窓枠飛びたかっただけなのに　発電機とロッカーに吸われる",
+    "speaker": "とある住人さん",
+    "place": "配信中",
+    "date": "2026年5月31日",
+    "memo": "",
+    "visible": true
+  },
+  {
+    "id": "local-1780194310319-j4y49q",
+    "text": "窓枠飛びたかっただけなのに　発電機とロッカーに吸われる",
+    "speaker": "と",
+    "place": "未設定",
+    "date": "未設定",
+    "memo": "ダイソン発電機とダイソンロッカーに吸われました",
     "visible": true
   }
 ];
