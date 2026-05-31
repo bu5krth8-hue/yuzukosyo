@@ -90,6 +90,7 @@ index,
 id:item.id || ""
 }));
 }catch(error){
+//localStorageが使えない環境でも表示は続ける
 }
 return item;
 }

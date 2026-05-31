@@ -175,6 +175,7 @@ return String(value)
 .replace(/"/g,"&quot;")
 .replace(/'/g,"&#039;");
 }
+//キャラ切り替え
 const ghostMascot=document.getElementById("ghostMascot");
 const tanuMascot=document.getElementById("tanuMascot");
 const ghostBubble=document.getElementById("ghostBubble");
@@ -236,6 +237,8 @@ window.setTimeout(start,900);
 }
 scheduleTwitchStatusPolling();
 setInterval(rotateMascots,7000);
+//配信履歴：同じ日に複数ゲームを入れられます。
+//例：{date:"2026年5月25日",games:["VALORANT","雑談"]}
 const dailyQuotes=[
 {
 text:"成功とは、失敗を重ねても情熱を失わないことだ。",
@@ -334,6 +337,7 @@ date:todayKey,
 index
 }));
 }catch(error){
+//localStorageが使えない環境でも表示は続ける
 }
 }
 text.innerHTML=`
@@ -400,6 +404,7 @@ index,
 id:item.id || ""
 }));
 }catch(error){
+//localStorageが使えない環境でも表示は続ける
 }
 return item;
 }
@@ -606,6 +611,7 @@ date:todayKey,
 index
 }));
 }catch(error){
+//localStorageが使えない環境でも表示は続ける
 }
 }
 button.disabled=true;
@@ -626,6 +632,7 @@ button.setAttribute("aria-disabled","true");
 },520);
 });
 }
+/*=====v48:visit stamp card,unlock progress and hidden secrets=====*/
 const VISIT_STAMP_STORAGE_KEY="yuzukosyoVisitStampsV1";
 const SECRET_ROOM_UNLOCK_DAYS=20;
 const SECRET_REWARD_TIERS=[20,40,60,80,100];
@@ -662,6 +669,7 @@ function saveVisitStampDates(dates){
 try{
 localStorage.setItem(VISIT_STAMP_STORAGE_KEY,JSON.stringify(Array.from(new Set(dates)).sort()));
 }catch(error){
+//localStorageが使えない環境では表示だけ続ける
 }
 }
 function getConsecutiveVisitStreak(stampedSet,todayKey){
@@ -994,6 +1002,7 @@ setDailyMeigen();
 setupDailyOmikuji();
 setupVisitStampCard();
 setupSecretInteractions();
+/*=====v25:animation upgrade pack=====*/
 function setupCursorParticles(){
 const cursorLight=document.getElementById("cursorLight");
 const particleLayer=document.getElementById("particleLayer");
@@ -1133,10 +1142,14 @@ let shortcutLayoutPrepared=false;
 function prepareShortcutLayoutOnce(){
 if(shortcutLayoutPrepared)return;
 shortcutLayoutPrepared=true;
+//初回だけズレる主因は、下部セクションの content-visibility と
+//初期描画中の高さ計算がショートカット押下時にまだ確定していないこと。
+//右上ショートカットを使う瞬間だけ先にレイアウトを確定させる。
 document.body.classList.add("anchor-jump-prep");
 document.querySelectorAll(jumpPrepareTargets).forEach((element)=>{
 element.getBoundingClientRect();
 });
+//強制的に再計算を走らせてからスクロール位置を取る。
 document.documentElement.getBoundingClientRect();
 document.body.offsetHeight;
 }
@@ -1164,6 +1177,8 @@ return Math.max(0,Math.round(window.scrollY+target.getBoundingClientRect().top-o
 function scrollToShortcutTarget(hash){
 const top=getTargetTop(hash);
 if(top===null)return;
+//ショートカットは「確実に飛ぶ」ことを優先し、smooth補正は使わない。
+//smooth中に高さ再計算が入ると、初回だけズレる原因になる。
 window.scrollTo({
 top,
 behavior:"auto"
