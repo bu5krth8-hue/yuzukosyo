@@ -1415,6 +1415,88 @@ function drawRoundedRect(ctx, x, y, width, height, radius) {
 }
 
 
+
+function drawTanukiVisitStamp(ctx, cx, cy, size = 48) {
+  const r = size / 2;
+  ctx.save();
+
+  ctx.shadowColor = "rgba(250,204,21,.46)";
+  ctx.shadowBlur = 12;
+
+  ctx.fillStyle = "rgba(250,204,21,.18)";
+  ctx.strokeStyle = "rgba(250,204,21,.70)";
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.arc(cx, cy, r + 5, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.shadowBlur = 0;
+
+  ctx.fillStyle = "#8b4a21";
+  ctx.beginPath();
+  ctx.moveTo(cx - r * 0.78, cy - r * 0.34);
+  ctx.lineTo(cx - r * 1.05, cy - r * 0.98);
+  ctx.lineTo(cx - r * 0.32, cy - r * 0.72);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.beginPath();
+  ctx.moveTo(cx + r * 0.78, cy - r * 0.34);
+  ctx.lineTo(cx + r * 1.05, cy - r * 0.98);
+  ctx.lineTo(cx + r * 0.32, cy - r * 0.72);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.fillStyle = "#b86b2d";
+  ctx.beginPath();
+  ctx.arc(cx, cy, r * 0.82, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = "#f2c48d";
+  ctx.beginPath();
+  ctx.ellipse(cx, cy + r * 0.18, r * 0.56, r * 0.42, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = "#3b1f13";
+  ctx.beginPath();
+  ctx.ellipse(cx - r * 0.32, cy - r * 0.08, r * 0.18, r * 0.22, -0.28, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.ellipse(cx + r * 0.32, cy - r * 0.08, r * 0.18, r * 0.22, 0.28, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = "#fff7ed";
+  ctx.beginPath();
+  ctx.arc(cx - r * 0.36, cy - r * 0.12, r * 0.055, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(cx + r * 0.28, cy - r * 0.12, r * 0.055, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = "#2a130b";
+  ctx.beginPath();
+  ctx.arc(cx, cy + r * 0.12, r * 0.10, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.strokeStyle = "#2a130b";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.arc(cx - r * 0.10, cy + r * 0.25, r * 0.12, 0.15, Math.PI - 0.1);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.arc(cx + r * 0.10, cy + r * 0.25, r * 0.12, 0.1, Math.PI - 0.15);
+  ctx.stroke();
+
+  ctx.strokeStyle = "rgba(255,255,255,.58)";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.arc(cx, cy, r * 0.98, -0.35, Math.PI * 1.35);
+  ctx.stroke();
+
+  ctx.restore();
+}
+
 function createStampMonthCanvas(monthDate, stampedSet, todayKey) {
   const year = monthDate.getFullYear();
   const month = monthDate.getMonth();
@@ -1505,12 +1587,7 @@ function createStampMonthCanvas(monthDate, stampedSet, todayKey) {
     ctx.fillText(String(day), x + cell / 2, y + 34);
 
     if (isStamped) {
-      ctx.font = "900 28px -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Noto Sans JP', sans-serif";
-      ctx.fillStyle = "#dffaff";
-      ctx.shadowColor = "rgba(125,211,252,.85)";
-      ctx.shadowBlur = 10;
-      ctx.fillText("済", x + cell / 2, y + 72);
-      ctx.shadowBlur = 0;
+      drawTanukiVisitStamp(ctx, x + cell / 2, y + 66, 46);
     }
   }
 
