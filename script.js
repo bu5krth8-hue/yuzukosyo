@@ -1323,7 +1323,7 @@ function setupVisitStampCard() {
   }
   if (twoMonthCount) twoMonthCount.textContent = String(retentionVisits);
 
-  months.innerHTML = buildStampMonth(currentMonth, stampedSet, todayKey, !hadTodayStamp);
+  months.innerHTML = buildStampMonth(currentMonth, stampedSet, todayKey, !hadTodayStamp, { showYear: true });
 
   if (replayButton) {
     replayButton.onclick = () => {
