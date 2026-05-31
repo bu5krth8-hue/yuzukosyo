@@ -1861,16 +1861,9 @@ function setupSecretInteractions() {
 
   const footerSecret = document.getElementById("footerSecretTrigger");
   if (footerSecret) {
+    const footerSecretMessage = "よくここが分かったねΣ（・□・；）\n君はもう立派な柚胡椒ファミリーや！！\nこれからもよろしくね♪";
     footerSecret.addEventListener("click", () => {
-      const dates = loadVisitStampDates();
-      const streak = getConsecutiveVisitStreak(new Set(dates), getTodayKey());
-      const milestone = getSecretMilestoneInfo(streak);
-      if (milestone.isUnlocked) {
-        const nextText = milestone.isAllUnlocked ? "100日連続までの壁紙はすべて解放済みです。" : `次の壁紙まではあと${milestone.remaining}回です。`;
-        showSecretToast("ページ下部の隠しメッセージ", `隠しページ解放中です。${nextText}`, true);
-      } else {
-        showSecretToast("ページ下部の隠しメッセージ", `見つけてくれてありがとう。隠しページまではあと${milestone.remaining}回です。`);
-      }
+      showSecretToast("隠しメッセージ", footerSecretMessage);
     });
   }
 }
