@@ -6,6 +6,3 @@
 
 /* v92: 格言・迷言導線をトップ表示カードへ統合 */
 .daily-meigen-link-inner{cursor:default}.daily-word-actions{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin-top:18px}.daily-word-action-btn{display:inline-flex!important;align-items:center;justify-content:center;min-width:190px;text-decoration:none;border:1px solid rgba(216,180,254,.45);border-radius:999px;padding:12px 18px;background:linear-gradient(180deg,rgba(126,34,206,.78),rgba(88,28,135,.86));box-shadow:0 0 16px rgba(168,85,247,.3);transition:.18s ease}.daily-word-action-btn:hover,.daily-word-action-btn:focus-visible{transform:translateY(-2px);box-shadow:0 0 26px rgba(168,85,247,.5);outline:none}.room-link-grid{grid-template-columns:repeat(2,minmax(0,1fr))}@media(max-width:700px){.daily-word-actions{gap:10px}.daily-word-action-btn{width:100%;min-width:0}.room-link-grid{grid-template-columns:1fr}}
-
-/* v93: サイト紹介カードとOFFLINE表示の間隔を微調整 */
-.hero .live-badge{margin-top:14px;}
