@@ -1,1 +1,36 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 420" role="img" aria-labelledby="title desc"><title id="title">USBハブのオリジナルイメージ画像</title><desc id="desc">柚胡椒の秘密基地用に作成した、商品公式画像ではないカテゴリイメージです。</desc><defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2b1152"/><stop offset=".52" stop-color="#10051f"/><stop offset="1" stop-color="#041a2e"/></linearGradient><radialGradient id="glow" cx=".52" cy=".40" r=".72"><stop offset="0" stop-color="#70d6ff" stop-opacity=".34"/><stop offset=".38" stop-color="#a855f7" stop-opacity=".20"/><stop offset="1" stop-color="#000000" stop-opacity="0"/></radialGradient><filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="7" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><rect width="640" height="420" rx="40" fill="url(#bg)"/><rect x="20" y="20" width="600" height="380" rx="32" fill="url(#glow)"/><path d="M58 328 C160 260 240 396 346 322 C430 264 484 302 582 250" fill="none" stroke="#a855f7" stroke-width="5" opacity=".55"/><path d="M58 92 C150 46 225 112 313 76 C408 38 470 76 582 44" fill="none" stroke="#70d6ff" stroke-width="4" opacity=".45"/><g filter="url(#softGlow)"><rect x="230" y="170" width="180" height="105" rx="28" fill="rgba(255,255,255,.15)" stroke="#d8f3ff" stroke-width="7"/><rect x="258" y="205" width="36" height="22" rx="6" fill="rgba(112,214,255,.55)"/><rect x="302" y="205" width="36" height="22" rx="6" fill="rgba(112,214,255,.55)"/><rect x="346" y="205" width="36" height="22" rx="6" fill="rgba(112,214,255,.55)"/><path d="M320 170 C320 112 410 112 410 162" fill="none" stroke="#ffd166" stroke-width="8" stroke-linecap="round"/><path d="M320 275 C320 335 225 335 225 292" fill="none" stroke="#a855f7" stroke-width="8" stroke-linecap="round"/></g><text x="320" y="374" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="900" letter-spacing="5" fill="#d8f3ff">USB</text><text x="320" y="398" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="13" font-weight="700" letter-spacing="2" fill="#ffd166" opacity=".9">ORIGINAL IMAGE</text></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 420" role="img" aria-labelledby="title desc">
+  <title id="title">USBハブのオリジナルイメージ画像</title>
+  <desc id="desc">柚胡椒の秘密基地用に作成した、商品公式画像ではないカテゴリイメージです。</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2b1152"/>
+      <stop offset=".52" stop-color="#10051f"/>
+      <stop offset="1" stop-color="#041a2e"/>
+    </linearGradient>
+    <radialGradient id="glow" cx=".52" cy=".40" r=".72">
+      <stop offset="0" stop-color="#70d6ff" stop-opacity=".34"/>
+      <stop offset=".38" stop-color="#a855f7" stop-opacity=".20"/>
+      <stop offset="1" stop-color="#000000" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="7" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <rect width="640" height="420" rx="40" fill="url(#bg)"/>
+  <rect x="20" y="20" width="600" height="380" rx="32" fill="url(#glow)"/>
+  <path d="M58 328 C160 260 240 396 346 322 C430 264 484 302 582 250" fill="none" stroke="#a855f7" stroke-width="5" opacity=".55"/>
+  <path d="M58 92 C150 46 225 112 313 76 C408 38 470 76 582 44" fill="none" stroke="#70d6ff" stroke-width="4" opacity=".45"/>
+  <g filter="url(#softGlow)">
+    
+        <rect x="230" y="170" width="180" height="105" rx="28" fill="rgba(255,255,255,.15)" stroke="#d8f3ff" stroke-width="7"/>
+        <rect x="258" y="205" width="36" height="22" rx="6" fill="rgba(112,214,255,.55)"/>
+        <rect x="302" y="205" width="36" height="22" rx="6" fill="rgba(112,214,255,.55)"/>
+        <rect x="346" y="205" width="36" height="22" rx="6" fill="rgba(112,214,255,.55)"/>
+        <path d="M320 170 C320 112 410 112 410 162" fill="none" stroke="#ffd166" stroke-width="8" stroke-linecap="round"/>
+        <path d="M320 275 C320 335 225 335 225 292" fill="none" stroke="#a855f7" stroke-width="8" stroke-linecap="round"/>
+        
+  </g>
+  <text x="320" y="374" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="900" letter-spacing="5" fill="#d8f3ff">USB</text>
+  <text x="320" y="398" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="13" font-weight="700" letter-spacing="2" fill="#ffd166" opacity=".9">ORIGINAL IMAGE</text>
+</svg>
