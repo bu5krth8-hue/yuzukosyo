@@ -88,5 +88,23 @@ window.YUZUKOSYO_PUBLIC_MEIGEN = [
     "date": "未設定",
     "memo": "ダイソン発電機とダイソンロッカーに吸われました",
     "visible": true
+  },
+  {
+    "id": "local-1780194482335",
+    "text": "ここぞという時にミスるストライク、、、、(DBD)",
+    "speaker": "とある住人さん",
+    "place": "配信中",
+    "date": "2026年5月31日",
+    "memo": "",
+    "visible": true
+  },
+  {
+    "id": "local-1780194310319-j4y49q",
+    "text": "窓枠飛びたかっただけなのに　発電機とロッカーに吸われる(DBD)",
+    "speaker": "とある住人さん",
+    "place": "未設定",
+    "date": "未設定",
+    "memo": "ダイソン発電機とダイソンロッカーに吸われました",
+    "visible": true
   }
 ];
