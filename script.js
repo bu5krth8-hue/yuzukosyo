@@ -339,7 +339,7 @@ function scheduleTwitchStatusPolling() {
 
 scheduleTwitchStatusPolling();
 
-setInterval(rotateMascots, 7000);
+setInterval(rotateMascots, 10000);
 
 // 配信履歴：同じ日に複数ゲームを入れられます。
 // 例：{ date: "2026年5月25日", games: ["VALORANT", "雑談"] }
@@ -559,7 +559,6 @@ function setDailyMeigen() {
   `;
 }
 
-
 const omikujiItems = [
   {
     fortune: "大吉",
@@ -690,7 +689,6 @@ function showOmikujiResult(item) {
   if (chat) chat.textContent = item.chat;
 }
 
-
 const SITE_SHARE_URL = "https://yuzukosyo.pages.dev/";
 
 function wrapCanvasText(ctx, text, x, y, maxWidth, lineHeight, maxLines = 99) {
@@ -757,7 +755,7 @@ async function shareOrDownloadImage(blob, filename, text, title) {
       return;
     }
   } catch (error) {
-    // 共有がキャンセル・失敗した場合は下の保存方式に切り替える
+
   }
 
   downloadBlobFile(blob, filename);
@@ -776,7 +774,6 @@ function pickWeightedOmikujiIndex() {
 
   return Math.max(0, omikujiItems.length - 1);
 }
-
 
 function createOmikujiShareCanvas(item) {
   const scale = 2;
@@ -982,7 +979,7 @@ function setupDailyOmikuji() {
           index
         }));
       } catch (error) {
-        // localStorageが使えない環境でも表示は続ける
+
       }
     }
 
@@ -1008,9 +1005,6 @@ function setupDailyOmikuji() {
   });
 }
 
-
-
-/* ===== v48: visit stamp card, unlock progress and hidden secrets ===== */
 const VISIT_STAMP_STORAGE_KEY = "yuzukosyoVisitStampsV1";
 const VISIT_STAMP_HISTORY_MONTHS = 24;
 const SECRET_ROOM_UNLOCK_DAYS = 20;
@@ -1082,7 +1076,7 @@ function saveVisitStampDates(dates) {
   try {
     localStorage.setItem(VISIT_STAMP_STORAGE_KEY, JSON.stringify(pruneVisitStampDatesToRetention(dates)));
   } catch (error) {
-    // localStorageが使えない環境では表示だけ続ける
+
   }
 }
 
@@ -1368,7 +1362,6 @@ function setupVisitStampCard() {
   }
 }
 
-
 function countVisitsInMonth(monthDate, stampedSet) {
   const year = monthDate.getFullYear();
   const month = monthDate.getMonth();
@@ -1413,9 +1406,6 @@ function drawRoundedRect(ctx, x, y, width, height, radius) {
   ctx.quadraticCurveTo(x, y, x + r, y);
   ctx.closePath();
 }
-
-
-
 
 function drawTanukiVisitStamp(ctx, cx, cy, size = 48) {
   const r = size / 2;
@@ -1843,8 +1833,6 @@ setupVisitStampCard();
 setupStampHistoryPage();
 setupSecretInteractions();
 
-
-/* ===== v25: animation upgrade pack ===== */
 function setupCursorParticles() {
   const cursorLight = document.getElementById("cursorLight");
   const particleLayer = document.getElementById("particleLayer");
@@ -1859,34 +1847,24 @@ function setupCursorParticles() {
   document.body.classList.add("has-pointer");
 
   let lastParticleAt = 0;
-  let mouseX = window.innerWidth / 2;
-  let mouseY = window.innerHeight / 2;
-
-  const moveLight = () => {
-    if (cursorLight) {
-      cursorLight.style.transform = `translate(${mouseX - 110}px, ${mouseY - 110}px)`;
-    }
-    requestAnimationFrame(moveLight);
-  };
-  requestAnimationFrame(moveLight);
-
   window.addEventListener("mousemove", (event) => {
-    mouseX = event.clientX;
-    mouseY = event.clientY;
+    if (cursorLight) {
+      cursorLight.style.transform = `translate(${event.clientX - 110}px, ${event.clientY - 110}px)`;
+    }
 
     const now = Date.now();
-    if (!particleLayer || now - lastParticleAt < 54) return;
+    if (!particleLayer || now - lastParticleAt < 180) return;
     lastParticleAt = now;
 
     const particle = document.createElement("span");
     particle.className = "cursor-particle";
     particle.style.left = `${event.clientX}px`;
     particle.style.top = `${event.clientY}px`;
-    particle.style.setProperty("--px", `${Math.round((Math.random() - 0.5) * 48)}px`);
-    particle.style.setProperty("--py", `${Math.round((Math.random() - 0.8) * 54)}px`);
+    particle.style.setProperty("--px", `${Math.round((Math.random() - 0.5) * 34)}px`);
+    particle.style.setProperty("--py", `${Math.round((Math.random() - 0.8) * 38)}px`);
 
     particleLayer.appendChild(particle);
-    window.setTimeout(() => particle.remove(), 900);
+    window.setTimeout(() => particle.remove(), 700);
   }, { passive: true });
 }
 
@@ -1895,7 +1873,7 @@ function setupAmbientParticles() {
   const prefersReducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   if (!particleLayer || prefersReducedMotion) return;
 
-  const count = window.innerWidth < 520 ? 18 : 34;
+  const count = window.innerWidth < 520 ? 8 : 14;
   const fragment = document.createDocumentFragment();
 
   for (let i = 0; i < count; i += 1) {
@@ -1905,8 +1883,8 @@ function setupAmbientParticles() {
     particle.style.setProperty("--y", `${Math.round(Math.random() * 100)}vh`);
     particle.style.setProperty("--s", `${Math.round(2 + Math.random() * 4)}px`);
     particle.style.setProperty("--dx", `${Math.round((Math.random() - 0.5) * 90)}px`);
-    particle.style.setProperty("--dy", `${Math.round(28 + Math.random() * 84)}px`);
-    particle.style.setProperty("--d", `${Math.round(8 + Math.random() * 11)}s`);
+    particle.style.setProperty("--dy", `${Math.round(20 + Math.random() * 58)}px`);
+    particle.style.setProperty("--d", `${Math.round(14 + Math.random() * 12)}s`);
     particle.style.setProperty("--delay", `${Math.round(Math.random() * -14)}s`);
     fragment.appendChild(particle);
   }
@@ -1963,15 +1941,6 @@ setupAnimationPack();
 
 setupCursorParticles();
 
-
-
-
-
-
-
-
-
-
 function setupUpdateHistoryMore() {
   const card = document.querySelector(".update-history-card");
   const button = document.getElementById("updateMoreBtn");
@@ -2002,7 +1971,6 @@ function setupUpdateHistoryMore() {
 
 setupUpdateHistoryMore();
 
-
 function setupStableShortcutJumps() {
   const nav = document.querySelector(".topbar-actions");
   if (!nav) return;
@@ -2026,16 +1994,12 @@ function setupStableShortcutJumps() {
     if (shortcutLayoutPrepared) return;
     shortcutLayoutPrepared = true;
 
-    // 初回だけズレる主因は、下部セクションの content-visibility と
-    // 初期描画中の高さ計算がショートカット押下時にまだ確定していないこと。
-    // 右上ショートカットを使う瞬間だけ先にレイアウトを確定させる。
     document.body.classList.add("anchor-jump-prep");
 
     document.querySelectorAll(jumpPrepareTargets).forEach((element) => {
       element.getBoundingClientRect();
     });
 
-    // 強制的に再計算を走らせてからスクロール位置を取る。
     document.documentElement.getBoundingClientRect();
     document.body.offsetHeight;
   }
@@ -2072,8 +2036,6 @@ function setupStableShortcutJumps() {
     const top = getTargetTop(hash);
     if (top === null) return;
 
-    // ショートカットは「確実に飛ぶ」ことを優先し、smooth補正は使わない。
-    // smooth中に高さ再計算が入ると、初回だけズレる原因になる。
     window.scrollTo({
       top,
       behavior: "auto"

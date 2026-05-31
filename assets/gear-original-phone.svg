@@ -1,35 +1,37 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 420" role="img" aria-labelledby="title desc">
-  <title id="title">スマホスタンドのオリジナルイメージ画像</title>
-  <desc id="desc">柚胡椒の秘密基地用に作成した、商品公式画像ではないカテゴリイメージです。</desc>
-  <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#2b1152"/>
-      <stop offset=".52" stop-color="#10051f"/>
-      <stop offset="1" stop-color="#041a2e"/>
-    </linearGradient>
-    <radialGradient id="glow" cx=".52" cy=".40" r=".72">
-      <stop offset="0" stop-color="#70d6ff" stop-opacity=".34"/>
-      <stop offset=".38" stop-color="#a855f7" stop-opacity=".20"/>
-      <stop offset="1" stop-color="#000000" stop-opacity="0"/>
-    </radialGradient>
-    <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur stdDeviation="7" result="blur"/>
-      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-    </filter>
-  </defs>
-  <rect width="640" height="420" rx="40" fill="url(#bg)"/>
-  <rect x="20" y="20" width="600" height="380" rx="32" fill="url(#glow)"/>
-  <path d="M58 328 C160 260 240 396 346 322 C430 264 484 302 582 250" fill="none" stroke="#a855f7" stroke-width="5" opacity=".55"/>
-  <path d="M58 92 C150 46 225 112 313 76 C408 38 470 76 582 44" fill="none" stroke="#70d6ff" stroke-width="4" opacity=".45"/>
-  <g filter="url(#softGlow)">
-    
-        <rect x="270" y="92" width="100" height="210" rx="24" fill="rgba(255,255,255,.15)" stroke="#d8f3ff" stroke-width="7"/>
-        <rect x="286" y="122" width="68" height="136" rx="12" fill="rgba(7,3,16,.58)" stroke="rgba(112,214,255,.5)" stroke-width="3"/>
-        <circle cx="320" cy="278" r="7" fill="#ffd166"/>
-        <path d="M250 330 H390" stroke="#70d6ff" stroke-width="10" stroke-linecap="round"/>
-        <path d="M292 302 L260 330 M348 302 L380 330" stroke="#70d6ff" stroke-width="8" stroke-linecap="round"/>
-        
-  </g>
-  <text x="320" y="374" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="900" letter-spacing="5" fill="#d8f3ff">PHONE</text>
-  <text x="320" y="398" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="13" font-weight="700" letter-spacing="2" fill="#ffd166" opacity=".9">ORIGINAL IMAGE</text>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg aria-labelledby="title desc" role="img" viewBox="0 0 640 420" xmlns="http://www.w3.org/2000/svg">
+<title>スマホスタンドのオリジナルイメージ画像</title>
+<desc>柚胡椒の秘密基地用に作成した、商品公式画像ではないカテゴリイメージです。</desc>
+<defs>
+<linearGradient id="c" y2="1">
+<stop stop-color="#2b1152" offset="0"/>
+<stop stop-color="#10051f" offset=".52"/>
+<stop stop-color="#041a2e" offset="1"/>
+</linearGradient>
+<radialGradient id="b" cx=".52" cy=".4" r=".72">
+<stop stop-color="#70d6ff" stop-opacity=".34" offset="0"/>
+<stop stop-color="#a855f7" stop-opacity=".2" offset=".38"/>
+<stop stop-opacity="0" offset="1"/>
+</radialGradient>
+<filter id="a" x="-20%" y="-20%" width="140%" height="140%">
+<feGaussianBlur result="blur" stdDeviation="7"/>
+<feMerge>
+<feMergeNode in="blur"/>
+<feMergeNode in="SourceGraphic"/>
+</feMerge>
+</filter>
+</defs>
+<rect width="640" height="420" rx="40" fill="url(#c)"/>
+<rect x="20" y="20" width="600" height="380" rx="32" fill="url(#b)"/>
+<path d="m58 328c102-68 182 68 288-6 84-58 138-20 236-72" fill="none" opacity=".55" stroke="#a855f7" stroke-width="5"/>
+<path d="m58 92c92-46 167 20 255-16 95-38 157 0 269-32" fill="none" opacity=".45" stroke="#70d6ff" stroke-width="4"/>
+<g filter="url(#a)">
+<rect x="270" y="92" width="100" height="210" rx="24" fill="rgba(255,255,255,.15)" stroke="#d8f3ff" stroke-width="7"/>
+<rect x="286" y="122" width="68" height="136" rx="12" fill="rgba(7,3,16,.58)" stroke="rgba(112,214,255,.5)" stroke-width="3"/>
+<circle cx="320" cy="278" r="7" fill="#ffd166"/>
+<path d="m250 330h140" stroke="#70d6ff" stroke-linecap="round" stroke-width="10"/>
+<path d="m292 302-32 28m88-28 32 28" stroke="#70d6ff" stroke-linecap="round" stroke-width="8"/>
+</g>
+<text x="320" y="374" fill="#d8f3ff" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="900" letter-spacing="5" text-anchor="middle">PHONE</text>
+<text x="320" y="398" fill="#ffd166" font-family="Arial, Helvetica, sans-serif" font-size="13" font-weight="700" letter-spacing="2" opacity=".9" text-anchor="middle">ORIGINAL IMAGE</text>
 </svg>

@@ -153,7 +153,6 @@ function renderMeigenList() {
   }
 }
 
-
 function meigenBase64UrlEncode(value) {
   const bytes = new TextEncoder().encode(String(value || ""));
   let binary = "";

@@ -1,39 +1,43 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 420" role="img" aria-labelledby="title desc">
-  <title id="title">ゲーミングチェアーのオリジナルイメージ画像</title>
-  <desc id="desc">柚胡椒の秘密基地用に作成した、商品公式画像ではないカテゴリイメージです。</desc>
-  <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#2b1152"/>
-      <stop offset=".52" stop-color="#10051f"/>
-      <stop offset="1" stop-color="#041a2e"/>
-    </linearGradient>
-    <radialGradient id="glow" cx=".52" cy=".40" r=".72">
-      <stop offset="0" stop-color="#70d6ff" stop-opacity=".34"/>
-      <stop offset=".38" stop-color="#a855f7" stop-opacity=".20"/>
-      <stop offset="1" stop-color="#000000" stop-opacity="0"/>
-    </radialGradient>
-    <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur stdDeviation="7" result="blur"/>
-      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-    </filter>
-  </defs>
-  <rect width="640" height="420" rx="40" fill="url(#bg)"/>
-  <rect x="20" y="20" width="600" height="380" rx="32" fill="url(#glow)"/>
-  <path d="M58 328 C160 260 240 396 346 322 C430 264 484 302 582 250" fill="none" stroke="#a855f7" stroke-width="5" opacity=".55"/>
-  <path d="M58 92 C150 46 225 112 313 76 C408 38 470 76 582 44" fill="none" stroke="#70d6ff" stroke-width="4" opacity=".45"/>
-  <g filter="url(#softGlow)">
-    <path d="M235 112 H405 C430 112 448 132 443 157 L420 277 C416 299 399 314 377 314 H263 C241 314 224 299 220 277 L197 157 C192 132 210 112 235 112 Z" fill="rgba(112,214,255,.14)" stroke="#70d6ff" stroke-width="7"/>
-    <path d="M250 134 H390 C404 134 414 146 411 160 L394 248 C391 263 378 274 363 274 H277 C262 274 249 263 246 248 L229 160 C226 146 236 134 250 134 Z" fill="rgba(7,3,16,.48)" stroke="rgba(216,243,255,.50)" stroke-width="4"/>
-    <path d="M248 290 H392 C408 290 421 303 421 319 V334 H219 V319 C219 303 232 290 248 290 Z" fill="rgba(255,255,255,.13)" stroke="#d8f3ff" stroke-width="7"/>
-    <path d="M205 183 L160 239" stroke="#ffd166" stroke-width="8" stroke-linecap="round"/>
-    <path d="M435 183 L480 239" stroke="#ffd166" stroke-width="8" stroke-linecap="round"/>
-    <path d="M320 334 V356" stroke="#ffd166" stroke-width="8" stroke-linecap="round"/>
-    <path d="M274 356 H366" stroke="#ffd166" stroke-width="8" stroke-linecap="round"/>
-    <circle cx="248" cy="368" r="9" fill="#a855f7" stroke="#d8f3ff" stroke-width="3"/>
-    <circle cx="392" cy="368" r="9" fill="#a855f7" stroke="#d8f3ff" stroke-width="3"/>
-    <path d="M276 158 C294 174 346 174 364 158" fill="none" stroke="#a855f7" stroke-width="6" stroke-linecap="round" opacity=".80"/>
-    <path d="M282 215 H358" stroke="#70d6ff" stroke-width="5" stroke-linecap="round" opacity=".75"/>
-  </g>
-  <text x="320" y="374" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="900" letter-spacing="5" fill="#d8f3ff">CHAIR</text>
-  <text x="320" y="398" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="13" font-weight="700" letter-spacing="2" fill="#ffd166" opacity=".9">ORIGINAL IMAGE</text>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg aria-labelledby="title desc" role="img" viewBox="0 0 640 420" xmlns="http://www.w3.org/2000/svg">
+<title>ゲーミングチェアーのオリジナルイメージ画像</title>
+<desc>柚胡椒の秘密基地用に作成した、商品公式画像ではないカテゴリイメージです。</desc>
+<defs>
+<linearGradient id="c" y2="1">
+<stop stop-color="#2b1152" offset="0"/>
+<stop stop-color="#10051f" offset=".52"/>
+<stop stop-color="#041a2e" offset="1"/>
+</linearGradient>
+<radialGradient id="b" cx=".52" cy=".4" r=".72">
+<stop stop-color="#70d6ff" stop-opacity=".34" offset="0"/>
+<stop stop-color="#a855f7" stop-opacity=".2" offset=".38"/>
+<stop stop-opacity="0" offset="1"/>
+</radialGradient>
+<filter id="a" x="-20%" y="-20%" width="140%" height="140%">
+<feGaussianBlur result="blur" stdDeviation="7"/>
+<feMerge>
+<feMergeNode in="blur"/>
+<feMergeNode in="SourceGraphic"/>
+</feMerge>
+</filter>
+</defs>
+<rect width="640" height="420" rx="40" fill="url(#c)"/>
+<rect x="20" y="20" width="600" height="380" rx="32" fill="url(#b)"/>
+<path d="m58 328c102-68 182 68 288-6 84-58 138-20 236-72" fill="none" opacity=".55" stroke="#a855f7" stroke-width="5"/>
+<path d="m58 92c92-46 167 20 255-16 95-38 157 0 269-32" fill="none" opacity=".45" stroke="#70d6ff" stroke-width="4"/>
+<g filter="url(#a)">
+<path d="m235 112h170c25 0 43 20 38 45l-23 120c-4 22-21 37-43 37h-114c-22 0-39-15-43-37l-23-120c-5-25 13-45 38-45z" fill="rgba(112,214,255,.14)" stroke="#70d6ff" stroke-width="7"/>
+<path d="m250 134h140c14 0 24 12 21 26l-17 88c-3 15-16 26-31 26h-86c-15 0-28-11-31-26l-17-88c-3-14 7-26 21-26z" fill="rgba(7,3,16,.48)" stroke="rgba(216,243,255,.50)" stroke-width="4"/>
+<path d="m248 290h144c16 0 29 13 29 29v15h-202v-15c0-16 13-29 29-29z" fill="rgba(255,255,255,.13)" stroke="#d8f3ff" stroke-width="7"/>
+<path d="m205 183-45 56" stroke="#ffd166" stroke-linecap="round" stroke-width="8"/>
+<path d="m435 183 45 56" stroke="#ffd166" stroke-linecap="round" stroke-width="8"/>
+<path d="m320 334v22" stroke="#ffd166" stroke-linecap="round" stroke-width="8"/>
+<path d="m274 356h92" stroke="#ffd166" stroke-linecap="round" stroke-width="8"/>
+<circle cx="248" cy="368" r="9" fill="#a855f7" stroke="#d8f3ff" stroke-width="3"/>
+<circle cx="392" cy="368" r="9" fill="#a855f7" stroke="#d8f3ff" stroke-width="3"/>
+<path d="m276 158c18 16 70 16 88 0" fill="none" opacity=".8" stroke="#a855f7" stroke-linecap="round" stroke-width="6"/>
+<path d="m282 215h76" opacity=".75" stroke="#70d6ff" stroke-linecap="round" stroke-width="5"/>
+</g>
+<text x="320" y="374" fill="#d8f3ff" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="900" letter-spacing="5" text-anchor="middle">CHAIR</text>
+<text x="320" y="398" fill="#ffd166" font-family="Arial, Helvetica, sans-serif" font-size="13" font-weight="700" letter-spacing="2" opacity=".9" text-anchor="middle">ORIGINAL IMAGE</text>
 </svg>
