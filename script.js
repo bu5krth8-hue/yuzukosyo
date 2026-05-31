@@ -250,6 +250,29 @@ function formatScheduleDate(value) {
 
 }
 
+
+function queueLowPriorityTask(callback, timeout = 1800) {
+  if (typeof callback !== "function") return;
+
+  if ("requestIdleCallback" in window) {
+    window.requestIdleCallback(callback, { timeout });
+    return;
+  }
+
+  window.setTimeout(callback, Math.min(timeout, 1200));
+}
+
+function runAfterWindowLoad(callback, delay = 0) {
+  const start = () => window.setTimeout(callback, delay);
+
+  if (document.readyState === "complete") {
+    start();
+    return;
+  }
+
+  window.addEventListener("load", start, { once: true });
+}
+
 function escapeHtml(value) {
 
   return String(value)
@@ -329,17 +352,44 @@ function startTwitchStatusPolling() {
 function scheduleTwitchStatusPolling() {
   const start = () => startTwitchStatusPolling();
 
-  if ("requestIdleCallback" in window) {
-    window.requestIdleCallback(start, { timeout: 1600 });
-    return;
-  }
-
-  window.setTimeout(start, 900);
+  runAfterWindowLoad(() => {
+    queueLowPriorityTask(start, 2600);
+  }, 700);
 }
 
 scheduleTwitchStatusPolling();
 
-setInterval(rotateMascots, 10000);
+function scheduleMascotRotation() {
+  let timerId = null;
+  const start = () => {
+    if (timerId) return;
+    timerId = setInterval(rotateMascots, 14000);
+  };
+
+  const area = document.querySelector(".mascot-area");
+  const prefersReducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  if (prefersReducedMotion) return;
+
+  if (!area || !("IntersectionObserver" in window)) {
+    runAfterWindowLoad(() => queueLowPriorityTask(start, 3500), 900);
+    return;
+  }
+
+  const observer = new IntersectionObserver((entries) => {
+    if (!entries.some((entry) => entry.isIntersecting)) return;
+    start();
+    observer.disconnect();
+  }, {
+    rootMargin: "180px 0px",
+    threshold: 0.01
+  });
+
+  observer.observe(area);
+  runAfterWindowLoad(() => window.setTimeout(start, 9000), 900);
+}
+
+scheduleMascotRotation();
 
 // 配信履歴：同じ日に複数ゲームを入れられます。
 // 例：{ date: "2026年5月25日", games: ["VALORANT", "雑談"] }
@@ -1873,7 +1923,7 @@ function setupAmbientParticles() {
   const prefersReducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   if (!particleLayer || prefersReducedMotion) return;
 
-  const count = window.innerWidth < 520 ? 8 : 14;
+  const count = window.innerWidth < 520 ? 4 : 10;
   const fragment = document.createDocumentFragment();
 
   for (let i = 0; i < count; i += 1) {
@@ -1933,13 +1983,20 @@ function setupScrollReveal() {
 }
 
 function setupAnimationPack() {
-  setupAmbientParticles();
   setupScrollReveal();
 }
 
-setupAnimationPack();
+function scheduleVisualEffects() {
+  runAfterWindowLoad(() => {
+    queueLowPriorityTask(() => {
+      setupAmbientParticles();
+      setupCursorParticles();
+    }, 2800);
+  }, 500);
+}
 
-setupCursorParticles();
+setupAnimationPack();
+scheduleVisualEffects();
 
 function setupUpdateHistoryMore() {
   const card = document.querySelector(".update-history-card");
