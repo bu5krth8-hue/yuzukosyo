@@ -34,4 +34,7 @@
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
+  <url>
+    <loc>https://yuzukosyo.pages.dev/first-visit.html</loc>
+  </url>
 </urlset>
