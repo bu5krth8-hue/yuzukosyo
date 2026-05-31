@@ -5269,3 +5269,21 @@ body.anchor-jump-prep .gear-market-section{
     font-size:11px;
   }
 }
+
+
+/* v108: PC版の過去出席表が透明のまま残るケースを防止 */
+.stamp-history-months-section,
+.stamp-history-months-section .stamp-history-list-card,
+.stamp-history-months-section .stamp-history-month-card{
+  content-visibility:visible !important;
+  contain-intrinsic-size:none !important;
+}
+
+.stamp-history-months-section .reveal-on-scroll,
+.stamp-history-months-section.reveal-on-scroll,
+.stamp-history-months-section .stamp-history-list-card.reveal-on-scroll,
+.stamp-history-months-section .stamp-history-month-card.reveal-on-scroll{
+  opacity:1 !important;
+  transform:none !important;
+  filter:none !important;
+}

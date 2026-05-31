@@ -1713,7 +1713,16 @@ function setupStampHistoryPage() {
   if (totalEl) totalEl.textContent = String(total);
   if (streakEl) streakEl.textContent = String(streak);
 
-  monthsRoot.innerHTML = months.map((monthDate) => buildStampHistoryMonth(monthDate, stampedSet, todayKey)).join("");
+  try {
+    monthsRoot.innerHTML = months.map((monthDate) => buildStampHistoryMonth(monthDate, stampedSet, todayKey)).join("");
+  } catch (error) {
+    monthsRoot.innerHTML = months.map((monthDate) => {
+      const year = monthDate.getFullYear();
+      const monthNumber = monthDate.getMonth() + 1;
+      const count = countVisitsInMonth(monthDate, stampedSet);
+      return `<article class="stamp-history-month-card"><div class="stamp-history-month-actions"><div><strong>${year}年${monthNumber}月</strong><span>${count}日 来場</span></div></div>${buildStampMonth(monthDate, stampedSet, todayKey, false, { showYear: true })}</article>`;
+    }).join("");
+  }
 
   monthsRoot.addEventListener("click", (event) => {
     const target = event.target instanceof Element ? event.target.closest("[data-save-stamp-month]") : null;
