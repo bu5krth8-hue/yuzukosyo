@@ -115,13 +115,13 @@
         <div class="stamp-head">
           <p class="section-kicker">VISIT STAMP</p>
           <h2>📮 来場スタンプカード</h2>
-          <p class="stamp-lead">この端末で1日1回、来場した日に自動で「済」スタンプが付きます。直近2ヶ月分を確認できます。</p>
+          <p class="stamp-lead">この端末で1日1回、来場した日に自動で「済」スタンプが付きます。トップでは今月分を表示し、過去24ヶ月分は別ページで確認できます。</p>
         </div>
 
         <div class="stamp-status-row">
           <div class="stamp-status-pill" id="stampTodayStatus">今日の来場スタンプ：確認中</div>
           <div class="stamp-status-pill stamp-status-strong">連続来場 <strong id="stampStreakCount">0</strong> 日</div>
-          <div class="stamp-status-pill">2ヶ月内 <strong id="stampTwoMonthCount">0</strong> 日</div>
+          <div class="stamp-status-pill">24ヶ月内 <strong id="stampTwoMonthCount">0</strong> 日</div>
         </div>
 
         <div class="stamp-replay-row" aria-label="来場スタンプ演出の再表示">
@@ -136,7 +136,7 @@
           </button>
         </div>
 
-        <div class="stamp-months" id="stampMonths" aria-label="直近2ヶ月のスタンプカード"></div>
+        <div class="stamp-months stamp-current-month-only" id="stampMonths" aria-label="今月のスタンプカード"></div><div class="stamp-history-link-row"><a class="mini-btn stamp-history-link" href="stamp-history.html">過去の出席表を見る →</a><p>過去24ヶ月分の出席表と、月ごとの画像保存はこちら。</p></div>
 
         <div class="secret-unlock-card" id="secretUnlockCard">
           <strong id="secretUnlockTitle">隠しページの解放状況を確認中…</strong>
@@ -186,7 +186,7 @@
         </div>
         <div class="update-history-viewport" id="updateHistoryViewport" aria-label="更新履歴一覧">
 
-          <ol class="update-history-list"><li><time datetime="2026-05-31">2026/05/31</time><div><strong>初見案内ページへの導線変更</strong><p>「はじめて来た人へ」のスイッチを、プロフィール部屋や秘密基地の住人と同じように専用ページへ移動する形式に変更しました。</p></div></li>
+          <ol class="update-history-list"><li><time datetime="2026-05-31">2026/05/31</time><div><strong>過去出席表ページの追加</strong><p>トップページの出席表を今月分の表示に整理し、過去24ヶ月分を確認できる専用ページと月ごとの画像保存ボタンを追加しました。</p></div></li><li><time datetime="2026-05-31">2026/05/31</time><div><strong>初見案内スイッチの文字位置調整</strong><p>「はじめて来た人への案内を見る」スイッチ内の文字が中央に見えるよう調整しました。</p></div></li><li><time datetime="2026-05-31">2026/05/31</time><div><strong>初見案内ページへの導線変更</strong><p>「はじめて来た人へ」のスイッチを、プロフィール部屋や秘密基地の住人と同じように専用ページへ移動する形式に変更しました。</p></div></li>
         <li><time datetime="2026-05-31">2026/05/31</time><div><strong>オフライン表示の余白調整</strong><p>サイト紹介カードとオフライン表示がくっついて見えないよう、間隔を少し広げました。</p></div></li>
         <li><time datetime="2026-05-31">2026/05/31</time><div><strong>格言・迷言導線の整理</strong><p>下部に分かれていた格言と迷言集の導線を、トップページの表示カード内にまとめました。</p></div></li>
         <li><time datetime="2026-05-31">2026/05/31</time><div><strong>初見案内のスイッチ化</strong><p>「はじめて来た人へ」をスイッチ形式にし、押すと詳しい案内へ移動できるようにしました。</p></div></li>

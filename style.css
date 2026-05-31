@@ -5122,3 +5122,41 @@ body.anchor-jump-prep .gear-market-section{
 /* v93: サイト紹介カードとOFFLINE表示の間隔を微調整 */
 .hero .live-badge{margin-top:14px;}
 
+
+
+/* v96: はじめて来た人への案内スイッチの文字位置を中央寄せ */
+.beginner-big-switch > span:nth-child(2){
+  flex:1;
+  text-align:center;
+}
+.beginner-big-switch > span:nth-child(2) strong,
+.beginner-big-switch > span:nth-child(2) small{
+  display:block;
+  text-align:center;
+}
+
+
+/* v97: 過去24ヶ月の出席表ページ */
+.stamp-current-month-only{grid-template-columns:minmax(0,1fr);max-width:620px;margin:0 auto;}
+.stamp-history-link-row{display:grid;justify-items:center;gap:8px;margin:18px auto 0;text-align:center;}
+.stamp-history-link-row p{margin:0;color:rgba(237,225,255,.78);font-weight:850;line-height:1.7;}
+.stamp-history-page .stamp-status-row{justify-content:center;}
+.stamp-history-info-section{margin-top:22px;}
+.stamp-history-info-card p{line-height:1.85;font-weight:850;color:rgba(245,234,255,.88);}
+.stamp-history-info-card strong{color:#fff;text-shadow:0 0 10px rgba(216,180,254,.36);}
+.stamp-history-note{font-size:13px;color:rgba(237,225,255,.72)!important;}
+.stamp-history-list-card{overflow:hidden;}
+.stamp-history-list-head{text-align:center;margin-bottom:20px;}
+.stamp-history-list-head p:not(.section-kicker){margin:0 auto;color:rgba(237,225,255,.82);font-weight:850;line-height:1.75;}
+.stamp-history-month-list{display:grid;gap:18px;}
+.stamp-history-month-card{border:1px solid rgba(216,180,254,.28);border-radius:24px;padding:16px;background:linear-gradient(135deg,rgba(15,23,42,.46),rgba(26,8,42,.54));box-shadow:0 0 22px rgba(168,85,247,.10),inset 0 0 18px rgba(255,255,255,.025);}
+.stamp-history-month-actions{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:14px;padding:12px 14px;border:1px solid rgba(125,211,252,.22);border-radius:18px;background:rgba(7,3,14,.36);}
+.stamp-history-month-actions div{display:flex;flex-direction:column;gap:4px;}
+.stamp-history-month-actions strong{font-size:18px;color:#fff;text-shadow:0 0 12px rgba(168,85,247,.38);}
+.stamp-history-month-actions span{color:rgba(237,225,255,.76);font-weight:900;font-size:13px;}
+.stamp-history-save-btn{flex:0 0 auto;border-radius:16px;}
+.stamp-history-month-card .stamp-month-card{box-shadow:none;background:rgba(7,3,14,.24);}
+@media(max-width:720px){
+  .stamp-history-month-actions{align-items:stretch;flex-direction:column;text-align:center;}
+  .stamp-history-save-btn{width:100%;}
+}

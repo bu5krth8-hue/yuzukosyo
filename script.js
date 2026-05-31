@@ -785,6 +785,7 @@ function setupDailyOmikuji() {
 
 /* ===== v48: visit stamp card, unlock progress and hidden secrets ===== */
 const VISIT_STAMP_STORAGE_KEY = "yuzukosyoVisitStampsV1";
+const VISIT_STAMP_HISTORY_MONTHS = 24;
 const SECRET_ROOM_UNLOCK_DAYS = 20;
 const SECRET_REWARD_TIERS = [20, 40, 60, 80, 100];
 
@@ -812,11 +813,39 @@ function addMonths(date, offset) {
   return new Date(date.getFullYear(), date.getMonth() + offset, 1);
 }
 
+function getVisitStampRetentionStartDate(today = new Date()) {
+  const currentMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+  return addMonths(currentMonth, -(VISIT_STAMP_HISTORY_MONTHS - 1));
+}
+
+function getVisitStampRetentionRange(today = new Date()) {
+  const startDate = getVisitStampRetentionStartDate(today);
+  const endDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  const nextExpiryDate = addMonths(new Date(today.getFullYear(), today.getMonth(), 1), 1);
+  return { startDate, endDate, nextExpiryDate };
+}
+
+function pruneVisitStampDatesToRetention(dates, today = new Date()) {
+  const { startDate, endDate } = getVisitStampRetentionRange(today);
+  const startKey = formatDateKeyFromDate(startDate);
+  const endKey = formatDateKeyFromDate(endDate);
+  return Array.from(new Set(dates.filter((dateKey) => dateKey >= startKey && dateKey <= endKey))).sort();
+}
+
+function formatYearMonthJa(date) {
+  return `${date.getFullYear()}年${date.getMonth() + 1}月`;
+}
+
+function formatDateJa(date) {
+  return `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`;
+}
+
 function loadVisitStampDates() {
   try {
     const raw = JSON.parse(localStorage.getItem(VISIT_STAMP_STORAGE_KEY) || "[]");
     if (!Array.isArray(raw)) return [];
-    return Array.from(new Set(raw.filter((item) => /^\d{4}-\d{2}-\d{2}$/.test(String(item))))).sort();
+    const validDates = Array.from(new Set(raw.filter((item) => /^\d{4}-\d{2}-\d{2}$/.test(String(item))))).sort();
+    return pruneVisitStampDatesToRetention(validDates);
   } catch (error) {
     return [];
   }
@@ -824,7 +853,7 @@ function loadVisitStampDates() {
 
 function saveVisitStampDates(dates) {
   try {
-    localStorage.setItem(VISIT_STAMP_STORAGE_KEY, JSON.stringify(Array.from(new Set(dates)).sort()));
+    localStorage.setItem(VISIT_STAMP_STORAGE_KEY, JSON.stringify(pruneVisitStampDatesToRetention(dates)));
   } catch (error) {
     // localStorageが使えない環境では表示だけ続ける
   }
@@ -875,10 +904,21 @@ function countVisitsInTwoMonths(dates, today) {
   return dates.filter((dateKey) => dateKey >= startKey && dateKey <= endKey).length;
 }
 
+function countVisitsInRetentionMonths(dates, today) {
+  const startKey = formatDateKeyFromDate(getVisitStampRetentionStartDate(today));
+  const endKey = formatDateKeyFromDate(today);
+  return dates.filter((dateKey) => dateKey >= startKey && dateKey <= endKey).length;
+}
+
+function getStampHistoryMonths(today = new Date()) {
+  const currentMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+  return Array.from({ length: VISIT_STAMP_HISTORY_MONTHS }, (_, index) => addMonths(currentMonth, -index));
+}
+
 function buildStampMonth(monthDate,stampedSet,todayKey,freshlyStampedToday=false,options={}){
 const year=monthDate.getFullYear();
 const month=monthDate.getMonth();
-const title=`${month+1}月の出席表`;
+const title=options.showYear ? `${year}年${month+1}月の出席表` : `${month+1}月の出席表`;
 const accessibleTitle=`${year}年${month+1}月`;
 const firstDay=new Date(year,month,1).getDay();
 const daysInMonth=new Date(year,month+1,0).getDate();
@@ -1041,8 +1081,8 @@ function setupVisitStampCard() {
 
   const stampedSet = new Set(dates);
   const streak = getConsecutiveVisitStreak(stampedSet, todayKey);
-  const twoMonthVisits = countVisitsInTwoMonths(dates, today);
-  const { previousMonth, currentMonth } = getTwoMonthRangeKeys(today);
+  const retentionVisits = countVisitsInRetentionMonths(dates, today);
+  const { currentMonth } = getTwoMonthRangeKeys(today);
 
   if (todayStatus) {
     todayStatus.textContent = hadTodayStamp ? "今日の来場スタンプ：済" : "今日の来場スタンプ：済（今日分を押しました）";
@@ -1053,12 +1093,9 @@ function setupVisitStampCard() {
     streakCount.classList.toggle("is-long-streak", String(streak).length >= 4);
     streakCount.setAttribute("aria-label", `連続来場${streak}日`);
   }
-  if (twoMonthCount) twoMonthCount.textContent = String(twoMonthVisits);
+  if (twoMonthCount) twoMonthCount.textContent = String(retentionVisits);
 
-  months.innerHTML = [
-    buildStampMonth(previousMonth, stampedSet, todayKey, !hadTodayStamp, { collapsible: true }),
-    buildStampMonth(currentMonth, stampedSet, todayKey, !hadTodayStamp)
-  ].join("");
+  months.innerHTML = buildStampMonth(currentMonth, stampedSet, todayKey, !hadTodayStamp);
 
   if (replayButton) {
     replayButton.onclick = () => {
@@ -1097,6 +1134,213 @@ function setupVisitStampCard() {
       secretRoomLink.hidden = true;
     }
   }
+}
+
+
+function countVisitsInMonth(monthDate, stampedSet) {
+  const year = monthDate.getFullYear();
+  const month = monthDate.getMonth();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  let count = 0;
+  for (let day = 1; day <= daysInMonth; day += 1) {
+    if (stampedSet.has(formatDateKeyFromDate(new Date(year, month, day)))) count += 1;
+  }
+  return count;
+}
+
+function buildStampHistoryMonth(monthDate, stampedSet, todayKey) {
+  const year = monthDate.getFullYear();
+  const monthNumber = monthDate.getMonth() + 1;
+  const count = countVisitsInMonth(monthDate, stampedSet);
+  const monthKey = `${year}-${String(monthNumber).padStart(2, "0")}`;
+  return `
+<article class="stamp-history-month-card" data-stamp-history-month="${monthKey}">
+  <div class="stamp-history-month-actions">
+    <div>
+      <strong>${year}年${monthNumber}月</strong>
+      <span>${count}日 来場</span>
+    </div>
+    <button class="mini-btn stamp-history-save-btn" type="button" data-save-stamp-month="${monthKey}">この月を画像保存 →</button>
+  </div>
+  ${buildStampMonth(monthDate, stampedSet, todayKey, false, { showYear: true })}
+</article>
+`;
+}
+
+function drawRoundedRect(ctx, x, y, width, height, radius) {
+  const r = Math.min(radius, width / 2, height / 2);
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + width - r, y);
+  ctx.quadraticCurveTo(x + width, y, x + width, y + r);
+  ctx.lineTo(x + width, y + height - r);
+  ctx.quadraticCurveTo(x + width, y + height, x + width - r, y + height);
+  ctx.lineTo(x + r, y + height);
+  ctx.quadraticCurveTo(x, y + height, x, y + height - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+
+function downloadStampMonthImage(monthDate, stampedSet, todayKey) {
+  const year = monthDate.getFullYear();
+  const month = monthDate.getMonth();
+  const monthNumber = month + 1;
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const firstDay = new Date(year, month, 1).getDay();
+  const todayDate = parseDateKeyToLocalDate(todayKey);
+  const todayTime = todayDate ? todayDate.getTime() : Date.now();
+
+  const scale = 2;
+  const width = 980;
+  const height = 900;
+  const canvas = document.createElement("canvas");
+  canvas.width = width * scale;
+  canvas.height = height * scale;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return;
+
+  ctx.scale(scale, scale);
+
+  const bg = ctx.createLinearGradient(0, 0, width, height);
+  bg.addColorStop(0, "#12051f");
+  bg.addColorStop(0.55, "#170620");
+  bg.addColorStop(1, "#030006");
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, width, height);
+
+  ctx.fillStyle = "rgba(168, 85, 247, 0.28)";
+  ctx.beginPath();
+  ctx.arc(120, 90, 160, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "rgba(112, 214, 255, 0.16)";
+  ctx.beginPath();
+  ctx.arc(850, 160, 190, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.strokeStyle = "rgba(216,180,254,.55)";
+  ctx.lineWidth = 3;
+  drawRoundedRect(ctx, 44, 44, width - 88, height - 88, 34);
+  ctx.stroke();
+
+  ctx.textAlign = "center";
+  ctx.fillStyle = "#f7ecff";
+  ctx.font = "900 42px -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Noto Sans JP', sans-serif";
+  ctx.shadowColor = "rgba(168,85,247,.85)";
+  ctx.shadowBlur = 18;
+  ctx.fillText(`📮 ${year}年${monthNumber}月の出席表`, width / 2, 112);
+  ctx.shadowBlur = 0;
+
+  ctx.font = "800 24px -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Noto Sans JP', sans-serif";
+  ctx.fillStyle = "rgba(237,225,255,.86)";
+  ctx.fillText(`来場 ${countVisitsInMonth(monthDate, stampedSet)} 日 / 保存期間：過去24ヶ月`, width / 2, 154);
+
+  const weekdays = ["日", "月", "火", "水", "木", "金", "土"];
+  const gridX = 100;
+  const gridY = 210;
+  const gap = 14;
+  const cell = 100;
+
+  ctx.font = "900 20px -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Noto Sans JP', sans-serif";
+  weekdays.forEach((day, index) => {
+    ctx.fillStyle = index === 0 ? "#fecdd3" : index === 6 ? "#bae6fd" : "rgba(233,213,255,.80)";
+    ctx.fillText(day, gridX + index * (cell + gap) + cell / 2, gridY);
+  });
+
+  for (let day = 1; day <= daysInMonth; day += 1) {
+    const date = new Date(year, month, day);
+    const dateKey = formatDateKeyFromDate(date);
+    const cellIndex = firstDay + day - 1;
+    const col = cellIndex % 7;
+    const row = Math.floor(cellIndex / 7);
+    const x = gridX + col * (cell + gap);
+    const y = gridY + 30 + row * (cell + gap);
+    const isStamped = stampedSet.has(dateKey);
+    const isToday = dateKey === todayKey;
+    const isFuture = date.getTime() > todayTime;
+
+    ctx.fillStyle = isStamped ? "rgba(34,211,238,.28)" : "rgba(7,3,14,.72)";
+    ctx.strokeStyle = isToday ? "rgba(250,204,21,.95)" : (isStamped ? "rgba(125,211,252,.88)" : "rgba(216,180,254,.28)");
+    ctx.lineWidth = isToday ? 4 : 2;
+    drawRoundedRect(ctx, x, y, cell, cell, 18);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.fillStyle = isFuture ? "rgba(237,225,255,.30)" : "#fff";
+    ctx.font = "900 24px -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Noto Sans JP', sans-serif";
+    ctx.fillText(String(day), x + cell / 2, y + 34);
+
+    if (isStamped) {
+      ctx.font = "900 28px -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Noto Sans JP', sans-serif";
+      ctx.fillStyle = "#dffaff";
+      ctx.shadowColor = "rgba(125,211,252,.85)";
+      ctx.shadowBlur = 10;
+      ctx.fillText("済", x + cell / 2, y + 72);
+      ctx.shadowBlur = 0;
+    }
+  }
+
+  ctx.font = "800 18px -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Noto Sans JP', sans-serif";
+  ctx.fillStyle = "rgba(237,225,255,.70)";
+  ctx.fillText("柚胡椒の秘密基地 / 来場スタンプカード", width / 2, height - 72);
+
+  canvas.toBlob((blob) => {
+    if (!blob) return;
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `yuzukosyo-stamp-${year}-${String(monthNumber).padStart(2, "0")}.png`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.setTimeout(() => URL.revokeObjectURL(url), 1200);
+  }, "image/png");
+}
+
+function setupStampHistoryPage() {
+  const root = document.getElementById("stampHistoryPage");
+  const monthsRoot = document.getElementById("stampHistoryMonths");
+  if (!root || !monthsRoot) return;
+
+  const today = new Date();
+  const todayKey = getTodayKey();
+  const dates = loadVisitStampDates();
+  if (!dates.includes(todayKey)) {
+    dates.push(todayKey);
+    saveVisitStampDates(dates);
+  }
+
+  const stampedSet = new Set(loadVisitStampDates());
+  const range = getVisitStampRetentionRange(today);
+  const months = getStampHistoryMonths(today);
+  const total = countVisitsInRetentionMonths(Array.from(stampedSet), today);
+  const streak = getConsecutiveVisitStreak(stampedSet, todayKey);
+
+  const rangeText = document.getElementById("stampHistoryRangeText");
+  const expiryText = document.getElementById("stampHistoryExpiryText");
+  const totalEl = document.getElementById("stampHistoryTotal");
+  const streakEl = document.getElementById("stampHistoryStreak");
+
+  if (rangeText) {
+    rangeText.textContent = `現在の保存対象：${formatYearMonthJa(range.startDate)}〜${formatYearMonthJa(today)}の24ヶ月分。`;
+  }
+  if (expiryText) {
+    expiryText.textContent = `次に保存期間が切れるのは ${formatYearMonthJa(range.startDate)} 分です。${formatDateJa(range.nextExpiryDate)} 以降は表示・画像保存の対象外になります。`;
+  }
+  if (totalEl) totalEl.textContent = String(total);
+  if (streakEl) streakEl.textContent = String(streak);
+
+  monthsRoot.innerHTML = months.map((monthDate) => buildStampHistoryMonth(monthDate, stampedSet, todayKey)).join("");
+
+  monthsRoot.addEventListener("click", (event) => {
+    const target = event.target instanceof Element ? event.target.closest("[data-save-stamp-month]") : null;
+    if (!target) return;
+    const monthKey = target.getAttribute("data-save-stamp-month");
+    const match = /^(\d{4})-(\d{2})$/.exec(monthKey || "");
+    if (!match) return;
+    const monthDate = new Date(Number(match[1]), Number(match[2]) - 1, 1);
+    downloadStampMonthImage(monthDate, stampedSet, todayKey);
+  });
 }
 
 let secretToastTimer = null;
@@ -1203,6 +1447,7 @@ setDailyQuote();
 setDailyMeigen();
 setupDailyOmikuji();
 setupVisitStampCard();
+setupStampHistoryPage();
 setupSecretInteractions();
 
 
