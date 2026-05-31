@@ -875,38 +875,56 @@ function countVisitsInTwoMonths(dates, today) {
   return dates.filter((dateKey) => dateKey >= startKey && dateKey <= endKey).length;
 }
 
-function buildStampMonth(monthDate, stampedSet, todayKey, freshlyStampedToday = false) {
-  const year = monthDate.getFullYear();
-  const month = monthDate.getMonth();
-  const title = `${month + 1}月の出席表`;
-  const accessibleTitle = `${year}年${month + 1}月`;
-  const firstDay = new Date(year, month, 1).getDay();
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const today = parseDateKeyToLocalDate(todayKey);
-  const todayTime = today ? today.getTime() : Date.now();
-  const weekdays = ["日", "月", "火", "水", "木", "金", "土"];
-
-  const blanks = Array.from({ length: firstDay }, () => '<div class="stamp-day is-empty" aria-hidden="true"></div>').join("");
-  const days = Array.from({ length: daysInMonth }, (_, index) => {
-    const day = index + 1;
-    const date = new Date(year, month, day);
-    const dateKey = formatDateKeyFromDate(date);
-    const classes = ["stamp-day"];
-    if (stampedSet.has(dateKey)) classes.push("is-stamped");
-    if (dateKey === todayKey) classes.push("is-today");
-    if (freshlyStampedToday && dateKey === todayKey && stampedSet.has(dateKey)) classes.push("is-new-stamp");
-    if (date.getTime() > todayTime) classes.push("is-future");
-    const label = stampedSet.has(dateKey) ? `${accessibleTitle}${day}日 来場済み` : `${accessibleTitle}${day}日`;
-    return `<div class="${classes.join(" ")}" aria-label="${escapeHtml(label)}"><span>${day}</span></div>`;
-  }).join("");
-
-  return `
-    <section class="stamp-month-card" aria-label="${escapeHtml(accessibleTitle)}の来場スタンプ">
-      <h3 class="stamp-month-title">${escapeHtml(title)}</h3>
-      <div class="stamp-weekdays" aria-hidden="true">${weekdays.map((day) => `<div class="stamp-weekday">${day}</div>`).join("")}</div>
-      <div class="stamp-grid">${blanks}${days}</div>
-    </section>
-  `;
+function buildStampMonth(monthDate,stampedSet,todayKey,freshlyStampedToday=false,options={}){
+const year=monthDate.getFullYear();
+const month=monthDate.getMonth();
+const title=`${month+1}月の出席表`;
+const accessibleTitle=`${year}年${month+1}月`;
+const firstDay=new Date(year,month,1).getDay();
+const daysInMonth=new Date(year,month+1,0).getDate();
+const today=parseDateKeyToLocalDate(todayKey);
+const todayTime=today ? today.getTime():Date.now();
+const weekdays=["日","月","火","水","木","金","土"];
+const blanks=Array.from({length:firstDay},()=>'<div class="stamp-day is-empty" aria-hidden="true"></div>').join("");
+const days=Array.from({length:daysInMonth},(_,index)=>{
+const day=index+1;
+const date=new Date(year,month,day);
+const dateKey=formatDateKeyFromDate(date);
+const classes=["stamp-day"];
+if(stampedSet.has(dateKey))classes.push("is-stamped");
+if(dateKey===todayKey)classes.push("is-today");
+if(freshlyStampedToday && dateKey===todayKey && stampedSet.has(dateKey))classes.push("is-new-stamp");
+if(date.getTime()>todayTime)classes.push("is-future");
+const label=stampedSet.has(dateKey)? `${accessibleTitle}${day}日 来場済み`:`${accessibleTitle}${day}日`;
+return `<div class="${classes.join(" ")}" aria-label="${escapeHtml(label)}"><span>${day}</span></div>`;
+}).join("");
+const monthBody=`
+<div class="stamp-weekdays" aria-hidden="true">${weekdays.map((day)=>`<div class="stamp-weekday">${day}</div>`).join("")}</div>
+<div class="stamp-grid">${blanks}${days}</div>
+`;
+if(options.collapsible){
+const count=Array.from({length:daysInMonth},(_,index)=>{
+const dateKey=formatDateKeyFromDate(new Date(year,month,index+1));
+return stampedSet.has(dateKey)?1:0;
+}).reduce((total,value)=>total+value,0);
+return `
+<details class="stamp-month-card stamp-month-accordion" aria-label="${escapeHtml(accessibleTitle)}の来場スタンプ">
+<summary class="stamp-month-summary">
+<span class="stamp-month-summary-main"><span class="stamp-month-summary-icon" aria-hidden="true">📅</span><span>${escapeHtml(title)}</span></span>
+<span class="stamp-month-summary-sub">${count}日 来場</span>
+</summary>
+<div class="stamp-month-accordion-body">
+${monthBody}
+</div>
+</details>
+`;
+}
+return `
+<section class="stamp-month-card" aria-label="${escapeHtml(accessibleTitle)}の来場スタンプ">
+<h3 class="stamp-month-title">${escapeHtml(title)}</h3>
+${monthBody}
+</section>
+`;
 }
 
 function triggerVisitStampAnimation(root, streak) {
@@ -1038,7 +1056,7 @@ function setupVisitStampCard() {
   if (twoMonthCount) twoMonthCount.textContent = String(twoMonthVisits);
 
   months.innerHTML = [
-    buildStampMonth(previousMonth, stampedSet, todayKey, !hadTodayStamp),
+    buildStampMonth(previousMonth, stampedSet, todayKey, !hadTodayStamp, { collapsible: true }),
     buildStampMonth(currentMonth, stampedSet, todayKey, !hadTodayStamp)
   ].join("");
 

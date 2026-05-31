@@ -161,40 +161,7 @@
       </div>
     </section>
 
-    <section class="cards beginner-section" aria-label="はじめて来た人へ">
-      <article class="card beginner-card">
-        <div class="beginner-head">
-          <p class="section-kicker">FIRST VISIT</p>
-          <h2>🌙 はじめて来た人へ</h2>
-          <p class="beginner-lead">柚胡椒の秘密基地は、ゲーム配信をゆるく楽しむ場所です。</p>
-        </div>
-        <div class="beginner-grid" aria-label="初見さん向け案内">
-          <div class="beginner-point">
-            <span>💬</span>
-            <strong>初見コメント歓迎</strong>
-            <p>あいさつだけでもOK。気軽にコメントしてね。</p>
-          </div>
-          <div class="beginner-point">
-            <span>👀</span>
-            <strong>ROM専もOK</strong>
-            <p>見るだけでも大丈夫。のんびり楽しんでね。</p>
-          </div>
-          <div class="beginner-point">
-            <span>🎮</span>
-            <strong>ゲーム配信中心</strong>
-            <p>Twitchでゲーム、雑談、参加型などを配信中。</p>
-          </div>
-          <div class="beginner-point">
-            <span>🔔</span>
-            <strong>予定は各SNSで案内</strong>
-            <p>X・Discord・Twitchで配信予定をお知らせします。</p>
-          </div>
-        </div>
-        <p class="beginner-note">まずはTwitchをのぞいて、気になったらDiscordやXもチェックしてね。</p>
-      </article>
-    </section>
-
-    <section class="cards schedule-wide-section">
+    <section class="cards beginner-section beginner-switch-section" aria-label="はじめて来た人へ"><article class="card beginner-card beginner-switch-card"><div class="beginner-head"><p class="section-kicker">FIRST VISIT</p><h2>🌙 はじめて来た人へ</h2><p class="beginner-lead">初見コメント、ROM、参加の雰囲気をまとめています。</p></div><a class="beginner-big-switch" href="#beginnerGuideDetails" aria-label="はじめて来た人への詳しい説明へ移動"><span class="beginner-big-switch-icon">🌙</span><span><strong>はじめて来た人への案内を見る</strong><small>押すと、初見コメント・ROM OK・配信の楽しみ方へ移動します。</small></span><span class="beginner-big-switch-arrow">↓</span></a></article></section><section class="cards beginner-detail-section" id="beginnerGuideDetails" aria-label="はじめて来た人への詳しい案内"><article class="card beginner-card beginner-detail-card"><div class="beginner-head"><p class="section-kicker">FIRST VISIT GUIDE</p><h2>🌙 はじめて来た人へ</h2><p class="beginner-lead">柚胡椒の秘密基地は、ゲーム配信をゆるく楽しむ場所です。</p></div><div class="beginner-grid" aria-label="初見さん向け案内"><div class="beginner-point"><span>💬</span><strong>初見コメント歓迎</strong><p>あいさつだけでもOK。気軽にコメントしてね。</p></div><div class="beginner-point"><span>👀</span><strong>ROM専もOK</strong><p>見るだけでも大丈夫。のんびり楽しんでね。</p></div><div class="beginner-point"><span>🎮</span><strong>ゲーム配信中心</strong><p>Twitchでゲーム、雑談、参加型などを配信中。</p></div><div class="beginner-point"><span>🔔</span><strong>予定は各SNSで案内</strong><p>X・Discord・Twitchで配信予定をお知らせします。</p></div></div><p class="beginner-note">まずはTwitchをのぞいて、気になったらDiscordやXもチェックしてね。</p><div class="beginner-home-row"><a class="mini-btn" href="#top" aria-label="ホームへ戻る">⬆ ホームに戻る</a></div></article></section><section class="cards schedule-wide-section">
 
       <article class="card schedule-wide-card" id="schedule">
         <h2>📅 配信予定</h2>
@@ -210,83 +177,7 @@
 
 
 
-    <section class="cards extra-cards single-card-row">
-      <article class="card daily-word-card quote-link-card">
-        <a class="daily-word-link" href="quotes.html" aria-label="今日の格言の部屋へ移動">
-          <h2>📜 今日の格言</h2>
-          <p class="daily-word-note">1日に1回、短い格言が表示されます。押すと今日の格言の部屋に移動するよ。</p>
-          <div class="daily-word-box">
-            <p id="dailyWordText">今日の格言を準備中…</p>
-          </div>
-          <p class="daily-word-jump">今日の格言の部屋を見る →</p>
-        </a>
-      </article>
-
-      <article class="card daily-word-card quote-link-card daily-meigen-link-card">
-        <a class="daily-word-link" href="meigen.html" aria-label="柚胡椒の迷言集へ移動">
-          <h2>🗯️ 柚胡椒の迷言集</h2>
-          <p class="daily-word-note">1日に1回、公開中の迷言からランダム表示されます。押すと迷言集の部屋に移動するよ。</p>
-          <div class="daily-word-box">
-            <p id="dailyMeigenText">今日の迷言を準備中…</p>
-          </div>
-          <p class="daily-word-jump">柚胡椒の迷言集を見る →</p>
-        </a>
-      </article>
-
-      <article class="card daily-word-card omikuji-card" id="omikuji">
-        <div class="daily-word-link omikuji-inner">
-          <h2>🔮 今日の柚胡椒みくじ</h2>
-          <p class="daily-word-note">1端末につき1日1回、今日の運勢とひとことコメントが出ます。引いた後は明日まで押せないよ。</p>
-          <div class="daily-word-box omikuji-box" id="omikujiBox" aria-live="polite">
-            <div class="omikuji-ready" id="omikujiReady">
-              <img src="assets/tanuchan-wink.webp" alt="たぬちゃん" class="omikuji-mascot" loading="lazy" decoding="async" width="416" height="520">
-              <p>今日のみくじを準備中…</p>
-            </div>
-            <div class="omikuji-result" id="omikujiResult" hidden>
-              <p class="omikuji-label">今日の運勢</p>
-              <p class="omikuji-fortune" id="omikujiFortune">-</p>
-              <p class="omikuji-comment" id="omikujiComment">-</p>
-              <dl class="omikuji-detail">
-                <div><dt>配信運</dt><dd id="omikujiStream">-</dd></div>
-                <div><dt>ゲーム運</dt><dd id="omikujiGame">-</dd></div>
-                <div><dt>コメント運</dt><dd id="omikujiChat">-</dd></div>
-              </dl>
-            </div>
-          </div>
-          <button class="omikuji-button" id="omikujiButton" type="button">今日のみくじを引く</button>
-        </div>
-      </article>
-    </section>
-
-
-    <section class="cards page-links-section room-link-grid">
-      <article class="card room-card">
-        <h2>👤 プロフィール部屋</h2>
-        <p>柚胡椒の配信スタイル、好きなゲーム、活動場所、秘密基地のことをまとめた部屋。</p>
-        <a class="mini-btn" href="profile.html">プロフィールを見る →</a>
-      </article>
-
-      <article class="card room-card">
-        <h2>👻 秘密基地の住人</h2>
-        <p>サイトに出てくる幽霊ちゃんと、たぬちゃんの紹介部屋。</p>
-        <a class="mini-btn" href="mascots.html">住人を見る →</a>
-      </article>
-
-      <article class="card room-card">
-        <h2>📜 今日の格言の部屋</h2>
-        <p>トップページに出る今日の格言をまとめた部屋。気分転換にふらっと見てね。</p>
-        <a class="mini-btn" href="quotes.html">格言を見る →</a>
-      </article>
-
-      <article class="card room-card">
-        <h2>🗯️ 柚胡椒の迷言集</h2>
-        <p>配信やコメント欄で生まれた迷言をまとめる、秘密基地の主コンテンツだよ。</p>
-        <a class="mini-btn" href="meigen.html">迷言集を見る →</a>
-        <a class="mini-btn" href="meigen-submit.html">迷言案を送る →</a>
-      </article>
-    </section>
-
-    <section class="cards update-history-section" id="updates" aria-label="更新履歴">
+    <section class="cards extra-cards single-card-row"><article class="card daily-word-card quote-link-card"><a class="daily-word-link" href="quotes.html" aria-label="今日の格言の部屋へ移動"><h2>📜 今日の格言</h2><p class="daily-word-note">1日に1回、短い格言が表示されます。押すと今日の格言の部屋に移動するよ。</p><div class="daily-word-box"><p id="dailyWordText">今日の格言を準備中…</p></div><p class="daily-word-jump">今日の格言の部屋を見る →</p></a></article><article class="card daily-word-card quote-link-card daily-meigen-link-card"><div class="daily-word-link daily-meigen-link-inner" aria-label="柚胡椒の迷言集"><h2>🗯️ 柚胡椒の迷言集</h2><p class="daily-word-note">1日に1回、公開中の迷言からランダム表示されます。ここから迷言集の部屋と投稿フォームへ移動できるよ。</p><div class="daily-word-box"><p id="dailyMeigenText">今日の迷言を準備中…</p></div><div class="daily-word-actions"><a class="daily-word-jump daily-word-action-btn" href="meigen.html">柚胡椒の迷言集を見る →</a><a class="daily-word-jump daily-word-action-btn" href="meigen-submit.html">迷言案を送る →</a></div></div></article><article class="card daily-word-card omikuji-card" id="omikuji"><div class="daily-word-link omikuji-inner"><h2>🔮 今日の柚胡椒みくじ</h2><p class="daily-word-note">1端末につき1日1回、今日の運勢とひとことコメントが出ます。引いた後は明日まで押せないよ。</p><div class="daily-word-box omikuji-box" id="omikujiBox" aria-live="polite"><div class="omikuji-ready" id="omikujiReady"><img src="assets/tanuchan-wink.webp" alt="たぬちゃん" class="omikuji-mascot" loading="lazy" decoding="async" width="416" height="520"><p>今日のみくじを準備中…</p></div><div class="omikuji-result" id="omikujiResult" hidden><p class="omikuji-label">今日の運勢</p><p class="omikuji-fortune" id="omikujiFortune">-</p><p class="omikuji-comment" id="omikujiComment">-</p><dl class="omikuji-detail"><div><dt>配信運</dt><dd id="omikujiStream">-</dd></div><div><dt>ゲーム運</dt><dd id="omikujiGame">-</dd></div><div><dt>コメント運</dt><dd id="omikujiChat">-</dd></div></dl></div></div><button class="omikuji-button" id="omikujiButton" type="button">今日のみくじを引く</button></div></article></section><section class="cards page-links-section room-link-grid"><article class="card room-card"><h2>👤 プロフィール部屋</h2><p>柚胡椒の配信スタイル、好きなゲーム、活動場所、秘密基地のことをまとめた部屋。</p><a class="mini-btn" href="profile.html">プロフィールを見る →</a></article><article class="card room-card"><h2>👻 秘密基地の住人</h2><p>サイトに出てくる幽霊ちゃんと、たぬちゃんの紹介部屋。</p><a class="mini-btn" href="mascots.html">住人を見る →</a></article></section><section class="cards update-history-section" id="updates" aria-label="更新履歴">
       <article class="card update-history-card">
         <div class="update-history-head">
           <p class="section-kicker">UPDATE LOG</p>
@@ -296,6 +187,10 @@
         <div class="update-history-viewport" id="updateHistoryViewport" aria-label="更新履歴一覧">
 
           <ol class="update-history-list">
+        <li><time datetime="2026-05-31">2026/05/31</time><div><strong>オフライン表示の余白調整</strong><p>サイト紹介カードとオフライン表示がくっついて見えないよう、間隔を少し広げました。</p></div></li>
+        <li><time datetime="2026-05-31">2026/05/31</time><div><strong>格言・迷言導線の整理</strong><p>下部に分かれていた格言と迷言集の導線を、トップページの表示カード内にまとめました。</p></div></li>
+        <li><time datetime="2026-05-31">2026/05/31</time><div><strong>初見案内のスイッチ化</strong><p>「はじめて来た人へ」をスイッチ形式にし、押すと詳しい案内へ移動できるようにしました。</p></div></li>
+        <li><time datetime="2026-05-31">2026/05/31</time><div><strong>前月出席表の折りたたみ表示</strong><p>当月の出席表は表示したまま、前月の出席表をボタンで展開できる表示に変更しました。</p></div></li>
           <li>
             <time datetime="2026-05-29">2026/05/29</time>
             <div>
@@ -937,7 +832,7 @@
     <span id="secretToastText">見つけてくれてありがとう。</span>
   </div>
   <script src="meigen-data.js?v=88" defer></script>
-  <script src="script.js?v=85" defer></script>
-  <script src="stats-counter.js?v=72" defer></script>
+  <script src="script.js?v=88" defer></script>
+  <script src="stats-counter.js?v=88" defer></script>
 </body>
 </html>
