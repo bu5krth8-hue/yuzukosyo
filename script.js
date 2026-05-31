@@ -1416,6 +1416,7 @@ function drawRoundedRect(ctx, x, y, width, height, radius) {
 
 
 
+
 function drawTanukiVisitStamp(ctx, cx, cy, size = 48) {
   const r = size / 2;
   ctx.save();
@@ -1497,7 +1498,34 @@ function drawTanukiVisitStamp(ctx, cx, cy, size = 48) {
   ctx.restore();
 }
 
-function createStampMonthCanvas(monthDate, stampedSet, todayKey) {
+function loadImageAsset(src) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.decoding = "async";
+    img.onload = () => resolve(img);
+    img.onerror = () => resolve(null);
+    img.src = src;
+  });
+}
+
+let stampShareTanukiAssetPromise = null;
+function getStampShareTanukiAsset() {
+  if (!stampShareTanukiAssetPromise) {
+    stampShareTanukiAssetPromise = loadImageAsset("assets/tanuchan-stamp-head.webp");
+  }
+  return stampShareTanukiAssetPromise;
+}
+
+function drawStampShareCellBase(ctx, x, y, size, strokeStyle, fillStyle, lineWidth) {
+  ctx.fillStyle = fillStyle;
+  ctx.strokeStyle = strokeStyle;
+  ctx.lineWidth = lineWidth;
+  drawRoundedRect(ctx, x, y, size, size, 18);
+  ctx.fill();
+  ctx.stroke();
+}
+
+async function createStampMonthCanvas(monthDate, stampedSet, todayKey) {
   const year = monthDate.getFullYear();
   const month = monthDate.getMonth();
   const monthNumber = month + 1;
@@ -1505,10 +1533,11 @@ function createStampMonthCanvas(monthDate, stampedSet, todayKey) {
   const firstDay = new Date(year, month, 1).getDay();
   const todayDate = parseDateKeyToLocalDate(todayKey);
   const todayTime = todayDate ? todayDate.getTime() : Date.now();
+  const tanukiImage = await getStampShareTanukiAsset();
 
   const scale = 2;
   const width = 980;
-  const height = 900;
+  const height = 1080;
   const canvas = document.createElement("canvas");
   canvas.width = width * scale;
   canvas.height = height * scale;
@@ -1524,43 +1553,51 @@ function createStampMonthCanvas(monthDate, stampedSet, todayKey) {
   ctx.fillStyle = bg;
   ctx.fillRect(0, 0, width, height);
 
-  ctx.fillStyle = "rgba(168, 85, 247, 0.28)";
+  ctx.fillStyle = "rgba(168, 85, 247, 0.10)";
   ctx.beginPath();
-  ctx.arc(120, 90, 160, 0, Math.PI * 2);
+  ctx.arc(160, 140, 150, 0, Math.PI * 2);
   ctx.fill();
-  ctx.fillStyle = "rgba(112, 214, 255, 0.16)";
+  ctx.fillStyle = "rgba(112, 214, 255, 0.08)";
   ctx.beginPath();
-  ctx.arc(850, 160, 190, 0, Math.PI * 2);
+  ctx.arc(820, 130, 170, 0, Math.PI * 2);
   ctx.fill();
 
-  ctx.strokeStyle = "rgba(216,180,254,.55)";
-  ctx.lineWidth = 3;
-  drawRoundedRect(ctx, 44, 44, width - 88, height - 88, 34);
+  const cardX = 68;
+  const cardY = 42;
+  const cardW = width - 136;
+  const cardH = 872;
+
+  ctx.fillStyle = "rgba(10, 3, 19, 0.72)";
+  ctx.strokeStyle = "rgba(125,211,252,.42)";
+  ctx.lineWidth = 2.6;
+  drawRoundedRect(ctx, cardX, cardY, cardW, cardH, 34);
+  ctx.fill();
   ctx.stroke();
 
   ctx.textAlign = "center";
-  ctx.fillStyle = "#f7ecff";
-  ctx.font = "900 42px -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Noto Sans JP', sans-serif";
+  ctx.fillStyle = "#ffffff";
+  ctx.font = "900 48px -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Noto Sans JP', sans-serif";
   ctx.shadowColor = "rgba(168,85,247,.85)";
-  ctx.shadowBlur = 18;
-  ctx.fillText(`📮 ${year}年${monthNumber}月の出席表`, width / 2, 112);
+  ctx.shadowBlur = 22;
+  ctx.fillText(`${monthNumber}月の出席表`, width / 2, 118);
   ctx.shadowBlur = 0;
 
-  const visitCount = countVisitsInMonth(monthDate, stampedSet);
-  ctx.font = "800 24px -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Noto Sans JP', sans-serif";
-  ctx.fillStyle = "rgba(237,225,255,.86)";
-  ctx.fillText(`来場 ${visitCount} 日 / 保存期間：過去24ヶ月`, width / 2, 154);
+  ctx.font = "800 17px -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Noto Sans JP', sans-serif";
+  ctx.fillStyle = "rgba(237,225,255,.62)";
+  ctx.fillText(`${year}年 / 来場 ${countVisitsInMonth(monthDate, stampedSet)}日`, width / 2, 148);
 
   const weekdays = ["日", "月", "火", "水", "木", "金", "土"];
-  const gridX = 100;
-  const gridY = 210;
-  const gap = 14;
-  const cell = 100;
+  const cell = 92;
+  const gap = 12;
+  const gridWidth = cell * 7 + gap * 6;
+  const gridX = Math.round((width - gridWidth) / 2);
+  const weekY = 222;
+  const firstRowY = 256;
 
-  ctx.font = "900 20px -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Noto Sans JP', sans-serif";
+  ctx.font = "900 21px -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Noto Sans JP', sans-serif";
   weekdays.forEach((day, index) => {
-    ctx.fillStyle = index === 0 ? "#fecdd3" : index === 6 ? "#bae6fd" : "rgba(233,213,255,.80)";
-    ctx.fillText(day, gridX + index * (cell + gap) + cell / 2, gridY);
+    ctx.fillStyle = index === 0 ? "rgba(244,214,255,.88)" : index === 6 ? "rgba(201,233,255,.92)" : "rgba(233,213,255,.82)";
+    ctx.fillText(day, gridX + index * (cell + gap) + cell / 2, weekY);
   });
 
   for (let day = 1; day <= daysInMonth; day += 1) {
@@ -1570,39 +1607,58 @@ function createStampMonthCanvas(monthDate, stampedSet, todayKey) {
     const col = cellIndex % 7;
     const row = Math.floor(cellIndex / 7);
     const x = gridX + col * (cell + gap);
-    const y = gridY + 30 + row * (cell + gap);
+    const y = firstRowY + row * (cell + gap);
     const isStamped = stampedSet.has(dateKey);
     const isToday = dateKey === todayKey;
     const isFuture = date.getTime() > todayTime;
 
-    ctx.fillStyle = isStamped ? "rgba(34,211,238,.28)" : "rgba(7,3,14,.72)";
-    ctx.strokeStyle = isToday ? "rgba(250,204,21,.95)" : (isStamped ? "rgba(125,211,252,.88)" : "rgba(216,180,254,.28)");
-    ctx.lineWidth = isToday ? 4 : 2;
-    drawRoundedRect(ctx, x, y, cell, cell, 18);
-    ctx.fill();
-    ctx.stroke();
+    let fillStyle = "rgba(7,3,14,.72)";
+    let strokeStyle = "rgba(216,180,254,.24)";
+    let lineWidth = 2;
+    if (isStamped) {
+      fillStyle = "rgba(85, 146, 196, 0.28)";
+      strokeStyle = "rgba(125,211,252,.88)";
+    }
+    if (isToday) {
+      lineWidth = 4.5;
+      strokeStyle = "rgba(250,204,21,.96)";
+    }
 
-    ctx.fillStyle = isFuture ? "rgba(237,225,255,.30)" : "#fff";
-    ctx.font = "900 24px -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Noto Sans JP', sans-serif";
-    ctx.fillText(String(day), x + cell / 2, y + 34);
+    drawStampShareCellBase(ctx, x, y, cell, strokeStyle, fillStyle, lineWidth);
+
+    ctx.fillStyle = isFuture ? "rgba(237,225,255,.32)" : "#ffffff";
+    ctx.font = "900 22px -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Noto Sans JP', sans-serif";
+    ctx.fillText(String(day), x + cell / 2, y + 30);
 
     if (isStamped) {
-      drawTanukiVisitStamp(ctx, x + cell / 2, y + 66, 46);
+      if (tanukiImage) {
+        const imgSize = 54;
+        const imgX = x + (cell - imgSize) / 2;
+        const imgY = y + 28;
+        ctx.save();
+        ctx.shadowColor = isToday ? "rgba(250,204,21,.42)" : "rgba(125,211,252,.32)";
+        ctx.shadowBlur = isToday ? 16 : 12;
+        ctx.drawImage(tanukiImage, imgX, imgY, imgSize, imgSize);
+        ctx.restore();
+      } else {
+        drawTanukiVisitStamp(ctx, x + cell / 2, y + 58, 42);
+      }
     }
   }
 
+  ctx.textAlign = "center";
+  ctx.fillStyle = "rgba(237,225,255,.68)";
   ctx.font = "800 18px -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Noto Sans JP', sans-serif";
-  ctx.fillStyle = "rgba(237,225,255,.70)";
-  ctx.fillText("柚胡椒の秘密基地 / 来場スタンプカード", width / 2, height - 102);
+  ctx.fillText("柚胡椒の秘密基地 / 来場スタンプカード", width / 2, cardY + cardH + 56);
   ctx.fillStyle = "#d8b4fe";
   ctx.font = "900 20px -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Noto Sans JP', sans-serif";
-  ctx.fillText(SITE_SHARE_URL, width / 2, height - 72);
+  ctx.fillText(SITE_SHARE_URL, width / 2, cardY + cardH + 92);
 
   return canvas;
 }
 
-function downloadStampMonthImage(monthDate, stampedSet, todayKey) {
-  const canvas = createStampMonthCanvas(monthDate, stampedSet, todayKey);
+async function downloadStampMonthImage(monthDate, stampedSet, todayKey) {
+  const canvas = await createStampMonthCanvas(monthDate, stampedSet, todayKey);
   if (!canvas) return;
   canvas.toBlob((blob) => {
     const year = monthDate.getFullYear();
@@ -1612,7 +1668,7 @@ function downloadStampMonthImage(monthDate, stampedSet, todayKey) {
 }
 
 async function shareStampMonthImage(monthDate, stampedSet, todayKey) {
-  const canvas = createStampMonthCanvas(monthDate, stampedSet, todayKey);
+  const canvas = await createStampMonthCanvas(monthDate, stampedSet, todayKey);
   const blob = canvas ? await canvasToPngBlob(canvas) : null;
   const monthLabel = `${monthDate.getFullYear()}年${monthDate.getMonth() + 1}月`;
   const visitCount = countVisitsInMonth(monthDate, stampedSet);
