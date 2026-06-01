@@ -1,11 +1,11 @@
 const YUZU_DAILY_THEMES = [
-  { key: "sunday", dayName: "日曜", themeName: "桜ピンク・休憩所感", note: "やわらかい桜色で、ゆるく落ち着く休憩所みたいなテーマ。" },
+  { key: "sunday", dayName: "日曜", themeName: "桜ローズ・休憩所感", note: "桜ピンク、ローズ、淡い白光を強め、文字は淡いピンク白で読みやすくしたテーマ。" },
   { key: "monday", dayName: "月曜", themeName: "紫ネオン・通常の秘密基地", note: "秘密基地の基本カラー。紫ネオンを中心にした通常テーマ。" },
-  { key: "tuesday", dayName: "火曜", themeName: "深紅・怪しい魔界感", note: "赤いネオンで、少し危ない夜の秘密基地感を強めたテーマ。" },
-  { key: "wednesday", dayName: "水曜", themeName: "氷青・幽霊冷気感", note: "青白い冷気のような光で、幽霊ちゃんの空気を強めたテーマ。" },
-  { key: "thursday", dayName: "木曜", themeName: "森緑・たぬちゃんの森", note: "森っぽい緑の光で、たぬちゃんののんびり感を強めたテーマ。" },
-  { key: "friday", dayName: "金曜", themeName: "黄金・週末お祭り感", note: "金色と橙のネオンで、週末前の明るさを強めたテーマ。" },
-  { key: "saturday", dayName: "土曜", themeName: "電脳ブルー・深夜配信感", note: "青い電脳ネオンで、深夜配信っぽい空気を強めたテーマ。" }
+  { key: "tuesday", dayName: "火曜", themeName: "魔界レッド・深紅マゼンタ", note: "深紅、マゼンタ、灼熱オレンジを強め、文字は明るい白桃色で読みやすくしたテーマ。" },
+  { key: "wednesday", dayName: "水曜", themeName: "氷結シアン・白銀冷気", note: "氷青、白銀、冷たいブルーを強め、文字は青白く読みやすくしたテーマ。" },
+  { key: "thursday", dayName: "木曜", themeName: "森緑ライム・たぬ森", note: "森緑、ライム、深い緑の光を強め、文字は淡い緑白で読みやすくしたテーマ。" },
+  { key: "friday", dayName: "金曜", themeName: "黄金オレンジ・お祭り", note: "黄金、オレンジ、炎色の光を強め、文字は淡い金白で読みやすくしたテーマ。" },
+  { key: "saturday", dayName: "土曜", themeName: "電脳ブルー・深夜配信", note: "電脳ブルー、シアン、紫の光を強め、文字は青白く読みやすくしたテーマ。" }
 ];
 
 const YUZU_THEME_OVERRIDE_KEY = "yuzuThemeOverride";
