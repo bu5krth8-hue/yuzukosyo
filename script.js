@@ -812,6 +812,37 @@ async function shareOrDownloadImage(blob, filename, text, title) {
   openXShareText(`${text}\n\n画像を保存したので、投稿画面で添付してね。`);
 }
 
+async function shareImageOnly(blob, filename, text, title) {
+  if (!blob) return false;
+  const file = new File([blob], filename, { type: "image/png" });
+  const shareText = `${text}\n\n#柚胡椒の秘密基地\n${SITE_SHARE_URL}`;
+
+  try {
+    if (navigator.share) {
+      if (!navigator.canShare || navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          title: title || "柚胡椒の秘密基地",
+          text: shareText,
+          files: [file]
+        });
+        return true;
+      }
+
+      await navigator.share({
+        title: title || "柚胡椒の秘密基地",
+        text: shareText,
+        url: SITE_SHARE_URL
+      });
+      return true;
+    }
+  } catch (error) {
+    return false;
+  }
+
+  window.alert("このブラウザでは共有画面を開けません。下の保存ボタンから画像を保存して投稿してください。");
+  return false;
+}
+
 function pickWeightedOmikujiIndex() {
   const totalWeight = omikujiItems.reduce((sum, item) => sum + (Number(item.weight) > 0 ? Number(item.weight) : 10), 0);
   let random = Math.random() * totalWeight;
@@ -946,12 +977,21 @@ function getTodayOmikujiItem() {
 
 function updateOmikujiShareButtonState() {
   const shareButton = document.getElementById("omikujiShareButton");
-  if (!shareButton) return;
+  const saveButton = document.getElementById("omikujiSaveButton");
   const item = getTodayOmikujiItem();
   const disabled = !item;
-  shareButton.disabled = disabled;
-  shareButton.setAttribute("aria-disabled", disabled ? "true" : "false");
-  shareButton.textContent = disabled ? "みくじ後にSNS投稿できます" : "みくじ画像をSNSに投稿 →";
+
+  if (shareButton) {
+    shareButton.disabled = disabled;
+    shareButton.setAttribute("aria-disabled", disabled ? "true" : "false");
+    shareButton.textContent = disabled ? "みくじ後にSNS投稿できます" : "みくじ画像をSNSに投稿 →";
+  }
+
+  if (saveButton) {
+    saveButton.disabled = disabled;
+    saveButton.setAttribute("aria-disabled", disabled ? "true" : "false");
+    saveButton.textContent = disabled ? "みくじ後に画像保存できます" : "みくじ画像を保存 →";
+  }
 }
 
 function setupOmikujiShareButton() {
@@ -966,12 +1006,28 @@ function setupOmikujiShareButton() {
     }
     const canvas = createOmikujiShareCanvas(item);
     const blob = canvas ? await canvasToPngBlob(canvas) : null;
-    await shareOrDownloadImage(
+    await shareImageOnly(
       blob,
       `yuzukosyo-omikuji-${getTodayKey()}.png`,
       `今日の柚胡椒みくじを引いたよ！\n運勢：${item.fortune}\n配信運：${item.stream}\nゲーム運：${item.game}\nコメント運：${item.chat}`,
       "今日の柚胡椒みくじ"
     );
+  });
+}
+
+function setupOmikujiSaveButton() {
+  const saveButton = document.getElementById("omikujiSaveButton");
+  if (!saveButton) return;
+  updateOmikujiShareButtonState();
+  saveButton.addEventListener("click", async () => {
+    const item = getTodayOmikujiItem();
+    if (!item) {
+      updateOmikujiShareButtonState();
+      return;
+    }
+    const canvas = createOmikujiShareCanvas(item);
+    const blob = canvas ? await canvasToPngBlob(canvas) : null;
+    downloadBlobFile(blob, `yuzukosyo-omikuji-${getTodayKey()}.png`);
   });
 }
 
@@ -1332,6 +1388,7 @@ function setupVisitStampCard() {
   const months = document.getElementById("stampMonths");
   const replayButton = document.getElementById("stampReplayButton");
   const stampShareButton = document.getElementById("stampShareButton");
+  const stampSaveButton = document.getElementById("stampSaveButton");
   const unlockCard = document.getElementById("secretUnlockCard");
   const unlockTitle = document.getElementById("secretUnlockTitle");
   const unlockText = document.getElementById("secretUnlockText");
@@ -1378,6 +1435,10 @@ function setupVisitStampCard() {
 
   if (stampShareButton) {
     stampShareButton.onclick = () => shareStampMonthImage(currentMonth, stampedSet, todayKey);
+  }
+
+  if (stampSaveButton) {
+    stampSaveButton.onclick = () => downloadStampMonthImage(currentMonth, stampedSet, todayKey);
   }
 
   if (!hadTodayStamp) {
@@ -1712,7 +1773,7 @@ async function shareStampMonthImage(monthDate, stampedSet, todayKey) {
   const blob = canvas ? await canvasToPngBlob(canvas) : null;
   const monthLabel = `${monthDate.getFullYear()}年${monthDate.getMonth() + 1}月`;
   const visitCount = countVisitsInMonth(monthDate, stampedSet);
-  await shareOrDownloadImage(
+  await shareImageOnly(
     blob,
     `yuzukosyo-stamp-${monthDate.getFullYear()}-${String(monthDate.getMonth() + 1).padStart(2, "0")}.png`,
     `${monthLabel}の来場スタンプカード！\n今月の来場：${visitCount}日`,
@@ -1872,6 +1933,7 @@ setDailyQuote();
 setDailyMeigen();
 setupDailyOmikuji();
 setupOmikujiShareButton();
+setupOmikujiSaveButton();
 setupVisitStampCard();
 setupStampHistoryPage();
 setupSecretInteractions();
