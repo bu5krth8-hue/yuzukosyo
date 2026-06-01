@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script>document.documentElement.setAttribute('data-yuzu-theme',['sunday','monday','tuesday','wednesday','thursday','friday','saturday'][new Date().getDay()]||'monday');</script>
+  <link rel="stylesheet" href="style.css?v=126" />
+  <title>サイトのテーマカラー一覧表｜柚胡椒の秘密基地</title>
+  <meta name="description" content="柚胡椒の秘密基地で曜日ごとに切り替わる日替わりテーマカラーの一覧ページです。" />
+  <link rel="canonical" href="https://yuzukosyo.pages.dev/theme-colors.html" />
+  <meta name="robots" content="index, follow" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="柚胡椒の秘密基地" />
+  <meta property="og:title" content="サイトのテーマカラー一覧表｜柚胡椒の秘密基地" />
+  <meta property="og:description" content="曜日ごとに変わる秘密基地のテーマカラーをまとめたページです。" />
+  <meta property="og:url" content="https://yuzukosyo.pages.dev/theme-colors.html" />
+  <meta name="twitter:card" content="summary" />
+</head>
+<body>
+  <div class="cursor-light" id="cursorLight"></div>
+  <div class="bg-glow glow-a"></div>
+  <div class="bg-glow glow-b"></div>
+  <div class="stars" aria-hidden="true"></div>
+  <div class="shooting-stars" aria-hidden="true"><span></span><span></span><span></span></div>
+  <div class="particle-layer" id="particleLayer" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <a class="schedule-btn" href="index.html">← 秘密基地に戻る</a>
+  </header>
+
+  <main class="page sub-page">
+    <section class="hero sub-hero">
+      <p class="eyebrow">- DAILY THEME COLORS -</p>
+      <h1 class="sub-page-title">🎨 サイトのテーマカラー一覧表</h1>
+      <p class="catchcopy">曜日ごとに、秘密基地の色と雰囲気が少し変わります。</p>
+    </section>
+
+    <section class="cards theme-color-section">
+      <article class="card theme-today-card">
+        <p class="section-kicker">TODAY</p>
+        <h2>今日の秘密基地カラー</h2>
+        <p class="theme-today-label" id="todayThemeLabel">今日のテーマを確認中…</p>
+        <p class="theme-today-copy" id="todayThemeCopy">曜日に合わせて、サイトの差し色だけが日替わりで切り替わります。</p>
+      </article>
+    </section>
+
+    <section class="cards theme-color-section">
+      <article class="card theme-color-table-card">
+        <h2>📅 曜日ごとのテーマ</h2>
+        <p>内容やレイアウトはそのままに、曜日ごとにネオンの差し色と背景の空気だけを切り替えます。</p>
+
+        <div class="theme-color-list" aria-label="曜日ごとのテーマカラー一覧">
+          <div class="theme-color-row" data-theme-day="monday" style="--swatch-a:#a855f7;--swatch-b:#70d6ff">
+            <div class="theme-color-day">月曜</div>
+            <div class="theme-color-name"><strong>紫ネオン・通常の秘密基地</strong><span>いつもの秘密基地カラー。</span><span class="theme-today-badge">今日</span></div>
+            <div class="theme-color-swatch"><span class="theme-color-dot"></span><span>紫 × 水色</span></div>
+          </div>
+
+          <div class="theme-color-row" data-theme-day="tuesday" style="--swatch-a:#fb7185;--swatch-b:#e879f9">
+            <div class="theme-color-day">火曜</div>
+            <div class="theme-color-name"><strong>赤紫・少し怪しい雰囲気</strong><span>少し怪しい夜の秘密基地感。</span><span class="theme-today-badge">今日</span></div>
+            <div class="theme-color-swatch"><span class="theme-color-dot"></span><span>赤紫 × 紫</span></div>
+          </div>
+
+          <div class="theme-color-row" data-theme-day="wednesday" style="--swatch-a:#7dd3fc;--swatch-b:#a78bfa">
+            <div class="theme-color-day">水曜</div>
+            <div class="theme-color-name"><strong>青紫・幽霊感強め</strong><span>幽霊ちゃんのふわっとした空気。</span><span class="theme-today-badge">今日</span></div>
+            <div class="theme-color-swatch"><span class="theme-color-dot"></span><span>青紫 × 水色</span></div>
+          </div>
+
+          <div class="theme-color-row" data-theme-day="thursday" style="--swatch-a:#86efac;--swatch-b:#a78bfa">
+            <div class="theme-color-day">木曜</div>
+            <div class="theme-color-name"><strong>緑紫・たぬちゃん感</strong><span>たぬちゃんののんびり感を少し追加。</span><span class="theme-today-badge">今日</span></div>
+            <div class="theme-color-swatch"><span class="theme-color-dot"></span><span>緑 × 紫</span></div>
+          </div>
+
+          <div class="theme-color-row" data-theme-day="friday" style="--swatch-a:#facc15;--swatch-b:#c084fc">
+            <div class="theme-color-day">金曜</div>
+            <div class="theme-color-name"><strong>金紫・週末感</strong><span>週末前の少し明るいネオン。</span><span class="theme-today-badge">今日</span></div>
+            <div class="theme-color-swatch"><span class="theme-color-dot"></span><span>金 × 紫</span></div>
+          </div>
+
+          <div class="theme-color-row" data-theme-day="saturday" style="--swatch-a:#60a5fa;--swatch-b:#7c3aed">
+            <div class="theme-color-day">土曜</div>
+            <div class="theme-color-name"><strong>濃い紺紫・深夜配信感</strong><span>深夜配信っぽい落ち着いた空気。</span><span class="theme-today-badge">今日</span></div>
+            <div class="theme-color-swatch"><span class="theme-color-dot"></span><span>紺紫 × 青</span></div>
+          </div>
+
+          <div class="theme-color-row" data-theme-day="sunday" style="--swatch-a:#f0abfc;--swatch-b:#c084fc">
+            <div class="theme-color-day">日曜</div>
+            <div class="theme-color-name"><strong>やわらか紫・休憩所感</strong><span>休憩所みたいにゆるく落ち着く色。</span><span class="theme-today-badge">今日</span></div>
+            <div class="theme-color-swatch"><span class="theme-color-dot"></span><span>淡紫 × 桃紫</span></div>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section class="cards theme-color-section">
+      <article class="card theme-note-card">
+        <h2>📝 メモ</h2>
+        <p>テーマは端末に保存する設定ではなく、曜日で自動的に切り替わります。画像は差し替えず、色味だけを変えるので、サイトの重さや画質はほぼ変わりません。</p>
+      </article>
+    </section>
+  </main>
+
+  <footer>
+    <p>© 2026 柚胡椒の秘密基地 All Rights Reserved.</p>
+  </footer>
+
+  <script src="script.js?v=125" defer></script>
+</body>
+</html>

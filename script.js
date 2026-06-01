@@ -1,3 +1,41 @@
+const YUZU_DAILY_THEMES = [
+  { key: "sunday", dayName: "日曜", themeName: "やわらか紫・休憩所感", note: "休憩所みたいに、やさしい紫でゆるく落ち着く雰囲気。" },
+  { key: "monday", dayName: "月曜", themeName: "紫ネオン・通常の秘密基地", note: "秘密基地の基本カラー。紫ネオンを中心にした通常テーマ。" },
+  { key: "tuesday", dayName: "火曜", themeName: "赤紫・少し怪しい雰囲気", note: "赤紫の差し色で、少しだけ怪しい夜の秘密基地感。" },
+  { key: "wednesday", dayName: "水曜", themeName: "青紫・幽霊感強め", note: "青紫の光で、幽霊ちゃんのふわっとした空気を強めたテーマ。" },
+  { key: "thursday", dayName: "木曜", themeName: "緑紫・たぬちゃん感", note: "緑寄りの差し色で、たぬちゃんののんびり感を足したテーマ。" },
+  { key: "friday", dayName: "金曜", themeName: "金紫・週末感", note: "金色のネオンを少し混ぜた、週末前の明るいテーマ。" },
+  { key: "saturday", dayName: "土曜", themeName: "濃い紺紫・深夜配信感", note: "深い紺紫で、深夜配信っぽい落ち着いたテーマ。" }
+];
+
+(function applyYuzuDailyTheme() {
+  const today = new Date().getDay();
+  const theme = YUZU_DAILY_THEMES[today] || YUZU_DAILY_THEMES[1];
+  document.documentElement.setAttribute("data-yuzu-theme", theme.key);
+
+  const updateThemePage = () => {
+    document.querySelectorAll("[data-theme-day]").forEach((row) => {
+      row.classList.toggle("is-today", row.dataset.themeDay === theme.key);
+    });
+
+    const todayLabel = document.getElementById("todayThemeLabel");
+    if (todayLabel) {
+      todayLabel.textContent = `今日のテーマ：${theme.dayName}｜${theme.themeName}`;
+    }
+
+    const todayCopy = document.getElementById("todayThemeCopy");
+    if (todayCopy) {
+      todayCopy.textContent = theme.note;
+    }
+  };
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", updateThemePage, { once: true });
+  } else {
+    updateThemePage();
+  }
+})();
+
 const TWITCH_FUNCTION_URL = "/api/twitch";
 
 async function checkLiveStatus() {
