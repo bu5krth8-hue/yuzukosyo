@@ -1473,6 +1473,35 @@ function setupVisitStampCard() {
   }
 }
 
+let visitStampLastRefreshKey = "";
+
+function refreshVisitStampViewsForCurrentDay(options = {}) {
+  const hasVisitStampCard = Boolean(document.getElementById("visitStamp"));
+  const hasStampHistoryPage = Boolean(document.getElementById("stampHistoryPage"));
+  if (!hasVisitStampCard && !hasStampHistoryPage) return;
+
+  const todayKey = getTodayKey();
+  if (!options.force && visitStampLastRefreshKey === todayKey) return;
+  visitStampLastRefreshKey = todayKey;
+
+  setupVisitStampCard();
+  setupStampHistoryPage();
+}
+
+function setupVisitStampResumeChecks() {
+  if (window.__yuzukosyoVisitStampResumeChecksReady) return;
+  window.__yuzukosyoVisitStampResumeChecksReady = true;
+
+  const refresh = () => {
+    if (document.visibilityState && document.visibilityState !== "visible") return;
+    window.setTimeout(() => refreshVisitStampViewsForCurrentDay(), 0);
+  };
+
+  document.addEventListener("visibilitychange", refresh, { passive: true });
+  window.addEventListener("pageshow", refresh, { passive: true });
+  window.addEventListener("focus", refresh, { passive: true });
+}
+
 function countVisitsInMonth(monthDate, stampedSet) {
   const year = monthDate.getFullYear();
   const month = monthDate.getMonth();
@@ -1934,8 +1963,8 @@ setDailyMeigen();
 setupDailyOmikuji();
 setupOmikujiShareButton();
 setupOmikujiSaveButton();
-setupVisitStampCard();
-setupStampHistoryPage();
+refreshVisitStampViewsForCurrentDay({ force: true });
+setupVisitStampResumeChecks();
 setupSecretInteractions();
 
 function setupCursorParticles() {
