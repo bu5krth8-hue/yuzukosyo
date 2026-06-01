@@ -11,3 +11,5 @@
 /* v118: top logo animation disabled for lighter home rendering */.logo-image-wrap,.logo-image-wrap::before{animation:none!important;will-change:auto!important}.logo-image-wrap:hover{transform:none!important}
 /* v122: mobile top English fit */
 @media(max-width:760px){body#top .hero .eyebrow{display:block;width:100%;max-width:100%;white-space:nowrap;font-size:clamp(10px,3vw,13px);letter-spacing:clamp(1.8px,.72vw,3.2px);line-height:1.45;margin:34px auto 8px}}@media(max-width:360px){body#top .hero .eyebrow{font-size:10px;letter-spacing:1.4px}}
+/* v123: mobile top English spacing */
+@media(max-width:760px){body#top .hero .eyebrow{margin:56px auto 9px}}
