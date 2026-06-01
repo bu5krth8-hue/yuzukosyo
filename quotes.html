@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <script>document.documentElement.setAttribute('data-yuzu-theme',['sunday','monday','tuesday','wednesday','thursday','friday','saturday'][new Date().getDay()]||'monday');</script>
-  <link rel="stylesheet" href="style.css?v=132" />
+  <script>(function(){var days=['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];var theme=days[new Date().getDay()]||'monday';try{var raw=localStorage.getItem('yuzuThemeOverride');if(raw){var saved=JSON.parse(raw);if(saved&&saved.themeKey&&saved.expiresAt&&Date.now()<Number(saved.expiresAt)){theme=saved.themeKey}else{localStorage.removeItem('yuzuThemeOverride')}}}catch(e){}document.documentElement.setAttribute('data-yuzu-theme',theme);})();</script>
+  <link rel="stylesheet" href="style.css?v=134" />
   <title>今日の格言の部屋｜柚胡椒の秘密基地</title>
   <meta name="description" content="柚胡椒の秘密基地の今日の格言ページ。トップページに表示される短い格言をまとめています。" />
   <link rel="canonical" href="https://yuzukosyo.pages.dev/quotes.html" />
@@ -74,6 +74,6 @@
     <p>© 2026 柚胡椒の秘密基地 All Rights Reserved.</p>
   </footer>
 
-  <script src="script.js?v=125" defer></script>
+  <script src="script.js?v=135" defer></script>
 </body>
 </html>

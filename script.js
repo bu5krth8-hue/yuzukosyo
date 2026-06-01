@@ -1,38 +1,143 @@
 const YUZU_DAILY_THEMES = [
-  { key: "sunday", dayName: "日曜", themeName: "やわらか紫・休憩所感", note: "休憩所みたいに、やさしい紫でゆるく落ち着く雰囲気。" },
+  { key: "sunday", dayName: "日曜", themeName: "桜ピンク・休憩所感", note: "やわらかい桜色で、ゆるく落ち着く休憩所みたいなテーマ。" },
   { key: "monday", dayName: "月曜", themeName: "紫ネオン・通常の秘密基地", note: "秘密基地の基本カラー。紫ネオンを中心にした通常テーマ。" },
-  { key: "tuesday", dayName: "火曜", themeName: "赤紫・少し怪しい雰囲気", note: "赤紫の差し色で、少しだけ怪しい夜の秘密基地感。" },
-  { key: "wednesday", dayName: "水曜", themeName: "青紫・幽霊感強め", note: "青紫の光で、幽霊ちゃんのふわっとした空気を強めたテーマ。" },
-  { key: "thursday", dayName: "木曜", themeName: "緑紫・たぬちゃん感", note: "緑寄りの差し色で、たぬちゃんののんびり感を足したテーマ。" },
-  { key: "friday", dayName: "金曜", themeName: "金紫・週末感", note: "金色のネオンを少し混ぜた、週末前の明るいテーマ。" },
-  { key: "saturday", dayName: "土曜", themeName: "濃い紺紫・深夜配信感", note: "深い紺紫で、深夜配信っぽい落ち着いたテーマ。" }
+  { key: "tuesday", dayName: "火曜", themeName: "深紅・怪しい魔界感", note: "赤いネオンで、少し危ない夜の秘密基地感を強めたテーマ。" },
+  { key: "wednesday", dayName: "水曜", themeName: "氷青・幽霊冷気感", note: "青白い冷気のような光で、幽霊ちゃんの空気を強めたテーマ。" },
+  { key: "thursday", dayName: "木曜", themeName: "森緑・たぬちゃんの森", note: "森っぽい緑の光で、たぬちゃんののんびり感を強めたテーマ。" },
+  { key: "friday", dayName: "金曜", themeName: "黄金・週末お祭り感", note: "金色と橙のネオンで、週末前の明るさを強めたテーマ。" },
+  { key: "saturday", dayName: "土曜", themeName: "電脳ブルー・深夜配信感", note: "青い電脳ネオンで、深夜配信っぽい空気を強めたテーマ。" }
 ];
 
-(function applyYuzuDailyTheme() {
-  const today = new Date().getDay();
-  const theme = YUZU_DAILY_THEMES[today] || YUZU_DAILY_THEMES[1];
-  document.documentElement.setAttribute("data-yuzu-theme", theme.key);
+const YUZU_THEME_OVERRIDE_KEY = "yuzuThemeOverride";
+
+function getYuzuThemeByKey(key) {
+  return YUZU_DAILY_THEMES.find((theme) => theme.key === key) || null;
+}
+
+function getYuzuTodayTheme() {
+  return YUZU_DAILY_THEMES[new Date().getDay()] || YUZU_DAILY_THEMES[1];
+}
+
+function getNextLocalMidnightTime() {
+  const next = new Date();
+  next.setHours(24, 0, 0, 0);
+  return next.getTime();
+}
+
+function getSavedYuzuThemeOverride() {
+  try {
+    const raw = localStorage.getItem(YUZU_THEME_OVERRIDE_KEY);
+    if (!raw) return null;
+
+    const saved = JSON.parse(raw);
+    const theme = saved && getYuzuThemeByKey(saved.themeKey);
+    const expiresAt = Number(saved && saved.expiresAt);
+
+    if (!theme || !expiresAt || Date.now() >= expiresAt) {
+      localStorage.removeItem(YUZU_THEME_OVERRIDE_KEY);
+      return null;
+    }
+
+    return { theme, expiresAt };
+  } catch (error) {
+    localStorage.removeItem(YUZU_THEME_OVERRIDE_KEY);
+    return null;
+  }
+}
+
+function getYuzuActiveThemeState() {
+  const todayTheme = getYuzuTodayTheme();
+  const override = getSavedYuzuThemeOverride();
+  return {
+    todayTheme,
+    activeTheme: override ? override.theme : todayTheme,
+    override
+  };
+}
+
+function applyYuzuTheme() {
+  const state = getYuzuActiveThemeState();
+  document.documentElement.setAttribute("data-yuzu-theme", state.activeTheme.key);
+  return state;
+}
+
+function setYuzuThemeOverride(themeKey) {
+  const theme = getYuzuThemeByKey(themeKey);
+  if (!theme) return null;
+
+  const expiresAt = getNextLocalMidnightTime();
+  localStorage.setItem(YUZU_THEME_OVERRIDE_KEY, JSON.stringify({ themeKey: theme.key, expiresAt }));
+  return applyYuzuTheme();
+}
+
+function formatYuzuThemeExpiry(expiresAt) {
+  const date = new Date(expiresAt);
+  return `${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
+}
+
+(function setupYuzuTheme() {
+  let midnightTimerId = null;
 
   const updateThemePage = () => {
+    const state = applyYuzuTheme();
+    const { todayTheme, activeTheme, override } = state;
+
     document.querySelectorAll("[data-theme-day]").forEach((row) => {
-      row.classList.toggle("is-today", row.dataset.themeDay === theme.key);
+      row.classList.toggle("is-today", row.dataset.themeDay === todayTheme.key);
+      row.classList.toggle("is-active", row.dataset.themeDay === activeTheme.key);
+    });
+
+    document.querySelectorAll("[data-theme-pick]").forEach((button) => {
+      const isActive = button.dataset.themePick === activeTheme.key;
+      button.classList.toggle("is-active", isActive);
+      button.setAttribute("aria-pressed", isActive ? "true" : "false");
     });
 
     const todayLabel = document.getElementById("todayThemeLabel");
     if (todayLabel) {
-      todayLabel.textContent = `今日のテーマ：${theme.dayName}｜${theme.themeName}`;
+      todayLabel.textContent = override
+        ? `現在のテーマ：${activeTheme.dayName}｜${activeTheme.themeName}（0:00まで固定中）`
+        : `今日のテーマ：${todayTheme.dayName}｜${todayTheme.themeName}`;
     }
 
     const todayCopy = document.getElementById("todayThemeCopy");
     if (todayCopy) {
-      todayCopy.textContent = theme.note;
+      todayCopy.textContent = override
+        ? `${activeTheme.note} 次の0:00になると曜日テーマへ戻ります。`
+        : activeTheme.note;
     }
+
+    const overrideStatus = document.getElementById("themeOverrideStatus");
+    if (overrideStatus) {
+      overrideStatus.textContent = override
+        ? `${activeTheme.dayName}テーマを${formatYuzuThemeExpiry(override.expiresAt)}まで固定中です。`
+        : "通常の曜日テーマで表示中です。好きな曜日テーマを押すと、次の0:00まで固定できます。";
+    }
+
+    if (midnightTimerId) window.clearTimeout(midnightTimerId);
+    const msUntilMidnight = Math.max(1000, getNextLocalMidnightTime() - Date.now() + 1200);
+    midnightTimerId = window.setTimeout(updateThemePage, Math.min(msUntilMidnight, 2147483000));
+  };
+
+  const bootThemeUi = () => {
+    updateThemePage();
+
+    document.querySelectorAll("[data-theme-pick]").forEach((button) => {
+      button.addEventListener("click", () => {
+        setYuzuThemeOverride(button.dataset.themePick);
+        updateThemePage();
+      });
+    });
+
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden) updateThemePage();
+    });
   };
 
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", updateThemePage, { once: true });
+    document.addEventListener("DOMContentLoaded", bootThemeUi, { once: true });
   } else {
-    updateThemePage();
+    bootThemeUi();
   }
 })();
 
@@ -2154,7 +2259,7 @@ function setupStableShortcutJumps() {
   const nav = document.querySelector(".topbar-actions");
   if (!nav) return;
 
-  const anchorMap = new Set(["#top", "#visitStamp", "#schedule", "#omikuji", "#updates", "#stream-gear"]);
+  const anchorMap = new Set(["#top", "#visitStamp", "#schedule", "#omikuji", "#themeColors", "#updates", "#stream-gear"]);
   const jumpPrepareTargets = [
     ".visit-stamp-section",
     ".mascot-area",
@@ -2163,6 +2268,7 @@ function setupStableShortcutJumps() {
     ".schedule-wide-card",
     ".extra-cards",
     ".page-links-section",
+    ".theme-link-section",
     ".update-history-section",
     ".gear-market-section"
   ].join(",");
@@ -2190,7 +2296,7 @@ function setupStableShortcutJumps() {
     const navHeight = actions ? Math.ceil(actions.getBoundingClientRect().height) : 0;
     const width = window.innerWidth || document.documentElement.clientWidth || 0;
 
-    if (hash === "#stream-gear" || hash === "#updates" || hash === "#visitStamp") {
+    if (hash === "#stream-gear" || hash === "#updates" || hash === "#visitStamp" || hash === "#themeColors") {
       if (width <= 520) return Math.max(168, navHeight + 12);
       if (width <= 900) return Math.max(188, navHeight + 16);
       return 210;
@@ -2244,6 +2350,7 @@ function setupStableShortcutJumps() {
     if (!anchorMap.has(hash)) return;
 
     event.preventDefault();
+
     performStableJump(hash, true);
   });
 
@@ -2255,3 +2362,40 @@ function setupStableShortcutJumps() {
 }
 
 setupStableShortcutJumps();
+
+function setupMobileShortcutMenu() {
+  const actions = document.querySelector(".topbar-actions");
+  const toggle = document.querySelector(".mobile-shortcut-toggle");
+  if (!actions || !toggle) return;
+
+  function closeMenu() {
+    actions.classList.remove("is-open");
+    toggle.setAttribute("aria-expanded", "false");
+  }
+
+  function openMenu() {
+    actions.classList.add("is-open");
+    toggle.setAttribute("aria-expanded", "true");
+  }
+
+  toggle.addEventListener("click", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (actions.classList.contains("is-open")) {
+      closeMenu();
+    } else {
+      openMenu();
+    }
+  });
+
+  document.addEventListener("click", (event) => {
+    if (!actions.classList.contains("is-open")) return;
+    const target = event.target instanceof Element ? event.target : null;
+    if (target && actions.contains(target)) return;
+    closeMenu();
+  });
+
+}
+
+setupMobileShortcutMenu();

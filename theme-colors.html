@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <script>document.documentElement.setAttribute('data-yuzu-theme',['sunday','monday','tuesday','wednesday','thursday','friday','saturday'][new Date().getDay()]||'monday');</script>
-  <link rel="stylesheet" href="style.css?v=132" />
+  <script>(function(){var days=['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];var theme=days[new Date().getDay()]||'monday';try{var raw=localStorage.getItem('yuzuThemeOverride');if(raw){var saved=JSON.parse(raw);if(saved&&saved.themeKey&&saved.expiresAt&&Date.now()<Number(saved.expiresAt)){theme=saved.themeKey}else{localStorage.removeItem('yuzuThemeOverride')}}}catch(e){}document.documentElement.setAttribute('data-yuzu-theme',theme);})();</script>
+  <link rel="stylesheet" href="style.css?v=134" />
   <title>サイトのテーマカラー一覧表｜柚胡椒の秘密基地</title>
   <meta name="description" content="柚胡椒の秘密基地で曜日ごとに切り替わる日替わりテーマカラーの一覧ページです。" />
   <link rel="canonical" href="https://yuzukosyo.pages.dev/theme-colors.html" />
@@ -35,6 +35,24 @@
       <p class="catchcopy">曜日ごとに、秘密基地の色と雰囲気が少し変わります。</p>
     </section>
 
+    <section class="cards theme-color-section theme-control-section">
+      <article class="card theme-control-card">
+        <p class="section-kicker">CHANGE</p>
+        <h2>🎛️ テーマカラー変更</h2>
+        <p class="theme-control-copy">好きな曜日テーマを押すと、次の0:00切り替えまで選んだ色のまま表示されます。</p>
+        <div class="theme-control-grid" aria-label="テーマカラー変更ボタン">
+          <button type="button" class="theme-pick-btn" data-theme-pick="monday"><strong>月曜</strong><span>通常</span></button>
+          <button type="button" class="theme-pick-btn" data-theme-pick="tuesday"><strong>火曜</strong><span>深紅</span></button>
+          <button type="button" class="theme-pick-btn" data-theme-pick="wednesday"><strong>水曜</strong><span>氷青</span></button>
+          <button type="button" class="theme-pick-btn" data-theme-pick="thursday"><strong>木曜</strong><span>森緑</span></button>
+          <button type="button" class="theme-pick-btn" data-theme-pick="friday"><strong>金曜</strong><span>黄金</span></button>
+          <button type="button" class="theme-pick-btn" data-theme-pick="saturday"><strong>土曜</strong><span>電脳青</span></button>
+          <button type="button" class="theme-pick-btn" data-theme-pick="sunday"><strong>日曜</strong><span>桜</span></button>
+        </div>
+        <p class="theme-override-status" id="themeOverrideStatus">現在のテーマを確認中…</p>
+      </article>
+    </section>
+
     <section class="cards theme-color-section">
       <article class="card theme-today-card">
         <p class="section-kicker">TODAY</p>
@@ -56,40 +74,40 @@
             <div class="theme-color-swatch"><span class="theme-color-dot"></span><span>紫 × 水色</span></div>
           </div>
 
-          <div class="theme-color-row" data-theme-day="tuesday" style="--swatch-a:#fb7185;--swatch-b:#e879f9">
+          <div class="theme-color-row" data-theme-day="tuesday" style="--swatch-a:#ef4444;--swatch-b:#f97316">
             <div class="theme-color-day">火曜</div>
-            <div class="theme-color-name"><strong>赤紫・少し怪しい雰囲気</strong><span>少し怪しい夜の秘密基地感。</span><span class="theme-today-badge">今日</span></div>
-            <div class="theme-color-swatch"><span class="theme-color-dot"></span><span>赤紫 × 紫</span></div>
+            <div class="theme-color-name"><strong>深紅・怪しい魔界感</strong><span>赤いネオンで少し危ない夜の秘密基地。</span><span class="theme-today-badge">今日</span></div>
+            <div class="theme-color-swatch"><span class="theme-color-dot"></span><span>深紅 × 橙</span></div>
           </div>
 
-          <div class="theme-color-row" data-theme-day="wednesday" style="--swatch-a:#7dd3fc;--swatch-b:#a78bfa">
+          <div class="theme-color-row" data-theme-day="wednesday" style="--swatch-a:#38bdf8;--swatch-b:#e0f2fe">
             <div class="theme-color-day">水曜</div>
-            <div class="theme-color-name"><strong>青紫・幽霊感強め</strong><span>幽霊ちゃんのふわっとした空気。</span><span class="theme-today-badge">今日</span></div>
-            <div class="theme-color-swatch"><span class="theme-color-dot"></span><span>青紫 × 水色</span></div>
+            <div class="theme-color-name"><strong>氷青・幽霊冷気感</strong><span>冷たい青白い光で幽霊感を強めた色。</span><span class="theme-today-badge">今日</span></div>
+            <div class="theme-color-swatch"><span class="theme-color-dot"></span><span>氷青 × 白</span></div>
           </div>
 
-          <div class="theme-color-row" data-theme-day="thursday" style="--swatch-a:#86efac;--swatch-b:#a78bfa">
+          <div class="theme-color-row" data-theme-day="thursday" style="--swatch-a:#22c55e;--swatch-b:#84cc16">
             <div class="theme-color-day">木曜</div>
-            <div class="theme-color-name"><strong>緑紫・たぬちゃん感</strong><span>たぬちゃんののんびり感を少し追加。</span><span class="theme-today-badge">今日</span></div>
-            <div class="theme-color-swatch"><span class="theme-color-dot"></span><span>緑 × 紫</span></div>
+            <div class="theme-color-name"><strong>森緑・たぬちゃんの森</strong><span>森っぽい緑でたぬちゃん感を強めた色。</span><span class="theme-today-badge">今日</span></div>
+            <div class="theme-color-swatch"><span class="theme-color-dot"></span><span>森緑 × 黄緑</span></div>
           </div>
 
-          <div class="theme-color-row" data-theme-day="friday" style="--swatch-a:#facc15;--swatch-b:#c084fc">
+          <div class="theme-color-row" data-theme-day="friday" style="--swatch-a:#facc15;--swatch-b:#f97316">
             <div class="theme-color-day">金曜</div>
-            <div class="theme-color-name"><strong>金紫・週末感</strong><span>週末前の少し明るいネオン。</span><span class="theme-today-badge">今日</span></div>
-            <div class="theme-color-swatch"><span class="theme-color-dot"></span><span>金 × 紫</span></div>
+            <div class="theme-color-name"><strong>黄金・週末お祭り感</strong><span>金色と橙で週末前の明るさを強めた色。</span><span class="theme-today-badge">今日</span></div>
+            <div class="theme-color-swatch"><span class="theme-color-dot"></span><span>金 × 橙</span></div>
           </div>
 
-          <div class="theme-color-row" data-theme-day="saturday" style="--swatch-a:#60a5fa;--swatch-b:#7c3aed">
+          <div class="theme-color-row" data-theme-day="saturday" style="--swatch-a:#2563eb;--swatch-b:#06b6d4">
             <div class="theme-color-day">土曜</div>
-            <div class="theme-color-name"><strong>濃い紺紫・深夜配信感</strong><span>深夜配信っぽい落ち着いた空気。</span><span class="theme-today-badge">今日</span></div>
-            <div class="theme-color-swatch"><span class="theme-color-dot"></span><span>紺紫 × 青</span></div>
+            <div class="theme-color-name"><strong>電脳ブルー・深夜配信感</strong><span>青い電脳ネオンで深夜配信感を強めた色。</span><span class="theme-today-badge">今日</span></div>
+            <div class="theme-color-swatch"><span class="theme-color-dot"></span><span>電脳青 × 水色</span></div>
           </div>
 
-          <div class="theme-color-row" data-theme-day="sunday" style="--swatch-a:#f0abfc;--swatch-b:#c084fc">
+          <div class="theme-color-row" data-theme-day="sunday" style="--swatch-a:#f472b6;--swatch-b:#f9a8d4">
             <div class="theme-color-day">日曜</div>
-            <div class="theme-color-name"><strong>やわらか紫・休憩所感</strong><span>休憩所みたいにゆるく落ち着く色。</span><span class="theme-today-badge">今日</span></div>
-            <div class="theme-color-swatch"><span class="theme-color-dot"></span><span>淡紫 × 桃紫</span></div>
+            <div class="theme-color-name"><strong>桜ピンク・休憩所感</strong><span>やわらかい桜色でゆるく落ち着く色。</span><span class="theme-today-badge">今日</span></div>
+            <div class="theme-color-swatch"><span class="theme-color-dot"></span><span>桜 × 桃</span></div>
           </div>
         </div>
       </article>
@@ -98,7 +116,7 @@
     <section class="cards theme-color-section">
       <article class="card theme-note-card">
         <h2>📝 メモ</h2>
-        <p>テーマは端末に保存する設定ではなく、曜日で自動的に切り替わります。画像は差し替えず、色味だけを変えるので、サイトの重さや画質はほぼ変わりません。</p>
+        <p>通常は曜日で自動的に切り替わります。テーマカラー変更ボタンで選んだ場合は、次の0:00までそのテーマがこのブラウザに保存されます。画像は差し替えず、色味だけを変えるので、サイトの重さや画質はほぼ変わりません。</p>
       </article>
     </section>
   </main>
@@ -107,6 +125,6 @@
     <p>© 2026 柚胡椒の秘密基地 All Rights Reserved.</p>
   </footer>
 
-  <script src="script.js?v=125" defer></script>
+  <script src="script.js?v=135" defer></script>
 </body>
 </html>
