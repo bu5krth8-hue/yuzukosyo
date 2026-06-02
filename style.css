@@ -819,3 +819,32 @@ html[data-yuzu-theme]:not([data-yuzu-theme="monday"]) .theme-color-dot{
 
 .novel-link-note{margin-top:12px!important;color:rgba(255,246,255,.82)!important;font-size:.95em;line-height:1.8;text-shadow:0 2px 8px rgba(0,0,0,.62)}
 .novel-body-label{text-align:center;margin:22px auto 24px;color:#fff;font-weight:1000;letter-spacing:.08em;text-shadow:0 0 14px rgba(216,180,254,.62),0 0 28px rgba(168,85,247,.35)}
+
+
+/* v153: novel bookshelf / expandable reading layout */
+.novel-page .cards,.novel-page .card,.novel-bookshelf-section,.novel-bookshelf-card,.novel-accordion,.novel-episode-content{content-visibility:visible!important;contain-intrinsic-size:auto!important;visibility:visible!important;opacity:1!important;filter:none!important}
+.novel-bookshelf-section{grid-template-columns:minmax(0,920px);justify-content:center}
+.novel-bookshelf-card{padding:34px clamp(22px,4vw,52px)}
+.novel-bookshelf-card h2{text-align:center;font-size:clamp(24px,4vw,36px);line-height:1.45;margin-bottom:16px}
+.novel-guide-text{max-width:760px;margin:0 auto 12px;color:rgba(248,240,255,.9);font-weight:850;line-height:1.9;text-align:center;text-shadow:0 2px 10px rgba(0,0,0,.56)}
+.novel-accordion-list{display:grid;gap:16px;margin:28px auto 0;max-width:780px}
+.novel-accordion{display:block;border:1px solid rgba(216,180,254,.38);border-radius:22px;background:linear-gradient(180deg,rgba(32,9,55,.82),rgba(9,2,18,.92));box-shadow:0 0 28px rgba(168,85,247,.24),inset 0 0 20px rgba(255,255,255,.035);overflow:hidden}
+.novel-accordion[open]{box-shadow:0 0 38px rgba(168,85,247,.36),inset 0 0 24px rgba(255,255,255,.045)}
+.novel-accordion>summary{list-style:none}
+.novel-accordion>summary::-webkit-details-marker{display:none}
+.novel-accordion-button{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:12px;width:100%;padding:18px 20px;cursor:pointer;color:#fff;background:linear-gradient(135deg,rgba(168,85,247,.72),rgba(236,72,153,.54));font-weight:1000;text-shadow:0 2px 8px rgba(0,0,0,.65),0 0 16px rgba(255,255,255,.14);transition:transform .18s ease,box-shadow .18s ease,background .18s ease}
+.novel-accordion-button:hover,.novel-accordion-button:focus-visible{outline:none;box-shadow:inset 0 0 28px rgba(255,255,255,.08)}
+.novel-button-kicker{display:inline-flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.42);border-radius:999px;padding:6px 10px;background:rgba(0,0,0,.26);font-size:13px;white-space:nowrap}
+.novel-button-title{font-size:clamp(17px,2.4vw,23px);line-height:1.45;word-break:keep-all;overflow-wrap:anywhere;text-align:left}
+.novel-button-mark{width:34px;height:34px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.35);font-size:22px;line-height:1;transition:transform .18s ease}
+.novel-accordion[open]>.novel-accordion-button .novel-button-mark{transform:rotate(45deg)}
+.novel-series-content{padding:20px clamp(16px,3vw,28px) 26px;display:grid;gap:16px}
+.novel-series-note{margin:0;color:rgba(248,240,255,.9);font-weight:850;line-height:1.85;text-align:center}
+.novel-episode-panel{border-radius:18px;background:linear-gradient(180deg,rgba(10,2,20,.74),rgba(4,0,10,.92));border-color:rgba(216,180,254,.30)}
+.novel-episode-button{background:linear-gradient(135deg,rgba(20,8,32,.92),rgba(168,85,247,.44));padding:15px 18px}
+.novel-episode-content{padding:26px clamp(16px,3vw,34px) 30px;border-top:1px solid rgba(216,180,254,.24)}
+.novel-catchcopy{max-width:780px;margin-left:auto!important;margin-right:auto!important}
+html[data-yuzu-theme]:not([data-yuzu-theme="monday"]) .novel-bookshelf-card,html[data-yuzu-theme]:not([data-yuzu-theme="monday"]) .novel-accordion{border-color:color-mix(in srgb,var(--theme-accent) 72%,rgba(255,255,255,.18))!important;background:linear-gradient(180deg,color-mix(in srgb,var(--theme-accent) 28%,rgba(5,0,10,.92)),color-mix(in srgb,var(--theme-accent2) 12%,rgba(2,0,8,.97)))!important;box-shadow:0 0 40px var(--theme-soft),inset 0 0 26px rgba(255,255,255,.05)!important}
+html[data-yuzu-theme]:not([data-yuzu-theme="monday"]) .novel-accordion-button{background:linear-gradient(135deg,color-mix(in srgb,var(--theme-accent) 76%,rgba(0,0,0,.18)),color-mix(in srgb,var(--theme-accent2) 68%,rgba(0,0,0,.16)))!important;color:var(--theme-readable)!important}
+html[data-yuzu-theme]:not([data-yuzu-theme="monday"]) .novel-guide-text,html[data-yuzu-theme]:not([data-yuzu-theme="monday"]) .novel-series-note{color:var(--theme-readable)!important;text-shadow:0 2px 8px rgba(0,0,0,.72),0 0 12px rgba(255,255,255,.12)}
+@media(max-width:760px){.novel-bookshelf-card{padding:26px 20px}.novel-guide-text{text-align:left;font-size:15px}.novel-accordion-button{grid-template-columns:1fr auto;gap:10px;padding:16px}.novel-button-kicker{grid-column:1 / -1;width:max-content}.novel-button-title{font-size:17px}.novel-series-content{padding:18px 14px 22px}.novel-series-note{text-align:left}.novel-episode-content{padding:24px 14px 28px}.novel-home-row .mini-btn{width:100%}}
