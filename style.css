@@ -800,6 +800,7 @@ html[data-yuzu-theme]:not([data-yuzu-theme="monday"]) .theme-color-dot{
 }
 
 /* v149: スマホ版左上メニュー位置を再微調整 */
+/* v150: SNS案内文を再調整 */
 @media(max-width:760px){
   body#top .topbar{
     top:34px!important;
