@@ -785,3 +785,16 @@ html[data-yuzu-theme]:not([data-yuzu-theme="monday"]) .theme-color-dot{
     top:27px!important;
   }
 }
+
+
+/* v147: スマホ版左上メニュー位置をスクリーンショット基準へ調整、トップキャッチコピー削除 */
+@media(max-width:760px){
+  body#top .topbar{
+    top:30px!important;
+  }
+}
+@media(max-width:360px){
+  body#top .topbar{
+    top:29px!important;
+  }
+}
