@@ -2361,6 +2361,15 @@ function setupStableShortcutJumps() {
     event.preventDefault();
 
     performStableJump(hash, true);
+
+    const mobileToggle = document.querySelector(".mobile-shortcut-toggle");
+    const isMobile = (window.innerWidth || document.documentElement.clientWidth || 0) <= 760;
+    if (isMobile && nav.classList.contains("is-open")) {
+      window.requestAnimationFrame(() => {
+        nav.classList.remove("is-open");
+        if (mobileToggle) mobileToggle.setAttribute("aria-expanded", "false");
+      });
+    }
   });
 
   if (window.location.hash && anchorMap.has(window.location.hash)) {

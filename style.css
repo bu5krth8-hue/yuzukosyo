@@ -875,3 +875,6 @@ html[data-yuzu-theme]:not([data-yuzu-theme="monday"]) body::before{
     scroll-margin-top:76px!important;
   }
 }
+
+/* v158: novel episode illustrations optimized */
+.novel-illustration{max-width:720px;margin:22px auto 30px}.novel-illustration img{display:block;width:100%;height:auto;border-radius:22px;border:1px solid rgba(216,180,254,.34);box-shadow:0 0 34px rgba(168,85,247,.22),0 18px 36px rgba(0,0,0,.34)}html[data-yuzu-theme]:not([data-yuzu-theme="monday"]) .novel-illustration img{border-color:color-mix(in srgb,var(--theme-accent) 72%,rgba(255,255,255,.18));box-shadow:0 0 38px var(--theme-soft),0 18px 36px rgba(0,0,0,.38)}@media(max-width:760px){.novel-illustration{margin:18px auto 24px}.novel-illustration img{border-radius:18px}}
