@@ -760,3 +760,16 @@ html[data-yuzu-theme]:not([data-yuzu-theme="monday"]) .theme-color-dot{
     top:19px!important;
   }
 }
+
+
+/* v145: スマホ版左上メニュー位置をさらに微調整 */
+@media(max-width:760px){
+  body#top .topbar{
+    top:24px!important;
+  }
+}
+@media(max-width:360px){
+  body#top .topbar{
+    top:23px!important;
+  }
+}
