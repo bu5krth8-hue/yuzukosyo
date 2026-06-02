@@ -2259,7 +2259,7 @@ function setupStableShortcutJumps() {
   const nav = document.querySelector(".topbar-actions");
   if (!nav) return;
 
-  const anchorMap = new Set(["#top", "#visitStamp", "#schedule", "#omikuji", "#themeColors", "#updates", "#stream-gear"]);
+  const anchorMap = new Set(["#top", "#visitStamp", "#schedule", "#omikuji", "#themeColors", "#novel", "#updates", "#stream-gear"]);
   const jumpPrepareTargets = [
     ".visit-stamp-section",
     ".mascot-area",
@@ -2269,6 +2269,7 @@ function setupStableShortcutJumps() {
     ".extra-cards",
     ".page-links-section",
     ".theme-link-section",
+    ".novel-link-section",
     ".update-history-section",
     ".gear-market-section"
   ].join(",");
@@ -2296,7 +2297,7 @@ function setupStableShortcutJumps() {
     const navHeight = actions ? Math.ceil(actions.getBoundingClientRect().height) : 0;
     const width = window.innerWidth || document.documentElement.clientWidth || 0;
 
-    if (hash === "#stream-gear" || hash === "#updates" || hash === "#visitStamp" || hash === "#themeColors") {
+    if (hash === "#stream-gear" || hash === "#updates" || hash === "#visitStamp" || hash === "#themeColors" || hash === "#novel") {
       if (width <= 520) return Math.max(168, navHeight + 12);
       if (width <= 900) return Math.max(188, navHeight + 16);
       return 210;
