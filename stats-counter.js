@@ -12,12 +12,12 @@
     }
 
     if (noteEl) {
-      noteEl.textContent = note || "秘密基地に来てくれた人数を自動カウント中。";
+      noteEl.textContent = "";
     }
   }
 
   async function runCounter() {
-    writeCount(0, "来場者数を確認中…");
+    writeCount(0, "");
 
     try {
       const response = await fetch(`${API_URL}?v=${Date.now()}`, {
@@ -31,13 +31,13 @@
       const data = await response.json();
 
       if (data && data.configured === true && Number.isFinite(Number(data.total))) {
-        writeCount(Number(data.total), "秘密基地に来てくれた人数を自動カウント中。");
+        writeCount(Number(data.total), "");
         return;
       }
 
-      writeCount(0, data && data.message ? data.message : "来場者数を取得できませんでした。");
+      writeCount(0, "");
     } catch (error) {
-      writeCount(0, "来場者数の取得に失敗しました。");
+      writeCount(0, "");
     }
   }
 
