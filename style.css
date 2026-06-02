@@ -773,3 +773,15 @@ html[data-yuzu-theme]:not([data-yuzu-theme="monday"]) .theme-color-dot{
     top:23px!important;
   }
 }
+
+/* v146: スマホ版左上メニュー位置をさらに少しだけ下げる */
+@media(max-width:760px){
+  body#top .topbar{
+    top:28px!important;
+  }
+}
+@media(max-width:360px){
+  body#top .topbar{
+    top:27px!important;
+  }
+}
