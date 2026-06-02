@@ -868,3 +868,10 @@ html[data-yuzu-theme]:not([data-yuzu-theme="monday"]) body::before{
     linear-gradient(90deg,color-mix(in srgb,var(--theme-accent2) 5%,transparent) 1px,transparent 1px)!important;
   background-size:46px 46px!important;
 }
+
+/* v156: スマホ版ショートカットの移動位置を調整 */
+@media(max-width:760px){
+  #visitStamp,#schedule,#omikuji,#themeColors,#novel,#updates,#stream-gear{
+    scroll-margin-top:76px!important;
+  }
+}

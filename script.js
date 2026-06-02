@@ -2293,17 +2293,25 @@ function setupStableShortcutJumps() {
   function getShortcutOffset(hash) {
     if (hash === "#top") return 0;
 
-    const actions = document.querySelector(".topbar-actions");
-    const navHeight = actions ? Math.ceil(actions.getBoundingClientRect().height) : 0;
     const width = window.innerWidth || document.documentElement.clientWidth || 0;
 
+    if (width <= 760) {
+      const toggle = document.querySelector(".mobile-shortcut-toggle");
+      const topbar = document.querySelector(".topbar");
+      const toggleHeight = toggle ? Math.ceil(toggle.getBoundingClientRect().height) : 42;
+      const topbarTop = topbar ? Math.max(0, Math.round(topbar.getBoundingClientRect().top)) : 16;
+
+      return Math.max(76, topbarTop + toggleHeight + 18);
+    }
+
+    const actions = document.querySelector(".topbar-actions");
+    const navHeight = actions ? Math.ceil(actions.getBoundingClientRect().height) : 0;
+
     if (hash === "#stream-gear" || hash === "#updates" || hash === "#visitStamp" || hash === "#themeColors" || hash === "#novel") {
-      if (width <= 520) return Math.max(168, navHeight + 12);
       if (width <= 900) return Math.max(188, navHeight + 16);
       return 210;
     }
 
-    if (width <= 520) return Math.max(112, navHeight + 10);
     if (width <= 900) return Math.max(132, navHeight + 14);
     return 170;
   }
