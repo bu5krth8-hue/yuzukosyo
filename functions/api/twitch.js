@@ -140,7 +140,7 @@ export async function onRequest(context) {
     const live = liveData.data && liveData.data[0];
 
     let scheduleConfigured = true;
-    let scheduleMessage = "Twitchの配信予定を取得しました";
+    let scheduleMessage = "配信予定を取得しました";
     let schedule = [];
 
     try {

@@ -177,7 +177,7 @@ function updateScheduleArea(data) {
   const scheduleNote = document.getElementById("scheduleNote");
   if (!scheduleStatus || !scheduleList || !scheduleNote) return;
   if (!data.scheduleConfigured) {
-    scheduleStatus.innerText = "Twitch予定を取得できませんでした";
+    scheduleStatus.innerText = "配信予定を取得できませんでした";
     scheduleList.innerHTML = `
       <li>
         <span class="schedule-title">予定取得の準備中</span>
@@ -208,7 +208,7 @@ function updateScheduleArea(data) {
       "Twitchの配信スケジュールに予定を入れると、ここへ自動反映されます。";
     return;
   }
-  scheduleStatus.innerText = "Twitchの配信予定";
+  scheduleStatus.innerText = "配信予定";
   scheduleList.innerHTML = segments.map((item) => {
     const startText = formatScheduleDate(item.startTime);
     const title = item.title || "配信予定";
@@ -269,7 +269,7 @@ function showScheduleError() {
   }
   if (scheduleNote)
     scheduleNote.innerText =
-      "Twitch予定が取れない場合はX・Discordを確認してね。";
+      "配信予定が取れない場合はX・Discordを確認してね。";
 }
 function formatScheduleDate(value) {
   if (!value) return "日時未定";
@@ -1493,7 +1493,7 @@ function processVisitStampBackupFromLocation() {
   const addedOmikujiCount = mergedOmikujiEntries.filter((entry) => !currentOmikujiDateSet.has(entry.date)).length;
   const message = [
     "復元リンクが見つかりました。",
-    `スタンプ：${backupDates.length}日分 / 新しく戻せる分 ${addedStampCount}日分`,
+    `来場スタンプ：${backupDates.length}日分 / 新しく戻せる分 ${addedStampCount}日分`,
     `柚胡椒くじ履歴：${backupOmikujiEntries.length}件 / 新しく戻せる分 ${addedOmikujiCount}件`,
     "今のデータと合体して復元しますか？"
   ].join("\n");
@@ -1501,7 +1501,7 @@ function processVisitStampBackupFromLocation() {
   if (mergedDates.length) saveVisitStampDates(mergedDates);
   if (mergedOmikujiEntries.length) saveOmikujiHistory(mergedOmikujiEntries);
   clearVisitStampBackupFromUrl();
-  window.alert(`復元しました。\nスタンプ：${mergedDates.length}日分\n柚胡椒くじ履歴：${mergedOmikujiEntries.length}件`);
+  window.alert(`復元しました。\n来場スタンプ：${mergedDates.length}日分\n柚胡椒くじ履歴：${mergedOmikujiEntries.length}件`);
   return true;
 }
 
@@ -2164,7 +2164,7 @@ function showSecretToast(title, text, rare = false) {
 }
 function setupSecretInteractions() {
   const tanuLines = [
-    "今日も来てくれてありがとうぽん。スタンプ押しておいたよ。",
+    "今日も来てくれてありがとうぽん。来場スタンプ押しておいたよ。",
     "無理せず、のんびり秘密基地で休んでってね。",
     "迷言が増えると、基地も少しにぎやかになるぽん。",
     "水分補給してからゲームすると吉。"
