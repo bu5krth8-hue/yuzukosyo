@@ -35,3 +35,19 @@ body#top .omikuji-history-switch{margin-top:12px!important;margin-bottom:0!impor
   .update-history-list{gap:14px!important}
   .update-history-list li{padding:20px 22px!important}
 }
+
+
+/* v188: profile room layout cleanup */
+@media (min-width:761px){
+  .profile-room-grid{gap:18px 20px!important;align-items:start;margin-top:18px}
+  .profile-room-grid .profile-card{min-height:auto;padding:22px 22px 20px}
+  .profile-room-grid .profile-card h2{margin-bottom:14px}
+  .profile-room-grid .profile-card p{line-height:1.78;margin-bottom:10px}
+  .profile-room-grid .room-list{margin-bottom:0}
+  .profile-room-grid .profile-about-card,.profile-room-grid .profile-base-card{align-self:start}
+  .profile-room-grid .profile-genre-card{grid-column:1/-1;min-height:auto;text-align:center;padding:20px 22px}
+  .profile-room-grid .profile-genre-card .tag-cloud{justify-content:center}
+}
+@media (max-width:760px){
+  .profile-room-grid{gap:18px}
+}
