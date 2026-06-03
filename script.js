@@ -393,7 +393,6 @@ function formatScheduleDate(value) {
 
 }
 
-
 function queueLowPriorityTask(callback, timeout = 1800) {
   if (typeof callback !== "function") return;
 
