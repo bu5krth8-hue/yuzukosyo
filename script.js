@@ -986,7 +986,6 @@ function renderOmikujiHistoryList(entries) {
   entries.forEach((entry, index) => {
     const details = document.createElement("details");
     details.className = "omikuji-history-item";
-    if (index === 0) details.open = true;
     const summary = document.createElement("summary");
     const dateSpan = document.createElement("span");
     dateSpan.className = "omikuji-history-date";
@@ -1108,7 +1107,7 @@ function createOmikujiShareCanvas(item) {
   ctx.shadowBlur = 18;
   ctx.fillStyle = "#f7ecff";
   ctx.font = "900 34px -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Noto Sans JP', sans-serif";
-  ctx.fillText("🔮 今日の柚胡椒みくじ", width / 2, 118);
+  ctx.fillText("🔮 今日の柚胡椒くじ", width / 2, 118);
   ctx.shadowBlur = 0;
   ctx.font = "800 20px -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Noto Sans JP', sans-serif";
   ctx.fillStyle = "rgba(237,225,255,.76)";
@@ -1182,12 +1181,12 @@ function updateOmikujiShareButtonState() {
   if (shareButton) {
     shareButton.disabled = disabled;
     shareButton.setAttribute("aria-disabled", disabled ? "true" : "false");
-    shareButton.textContent = disabled ? "みくじ後にSNS投稿できます" : "みくじ画像をSNSに投稿 →";
+    shareButton.textContent = disabled ? "柚胡椒くじ後にSNS投稿できます" : "柚胡椒くじ画像をSNSに投稿 →";
   }
   if (saveButton) {
     saveButton.disabled = disabled;
     saveButton.setAttribute("aria-disabled", disabled ? "true" : "false");
-    saveButton.textContent = disabled ? "みくじ後に画像保存できます" : "みくじ画像を保存 →";
+    saveButton.textContent = disabled ? "柚胡椒くじ後に画像保存できます" : "柚胡椒くじ画像を保存 →";
   }
 }
 function setupOmikujiShareButton() {
@@ -1205,8 +1204,8 @@ function setupOmikujiShareButton() {
     await shareImageOnly(
       blob,
       `yuzukosyo-omikuji-${getTodayKey()}.png`,
-      `今日の柚胡椒みくじを引いたよ！\n運勢：${item.fortune}\n配信運：${item.stream}\nゲーム運：${item.game}\nコメント運：${item.chat}`,
-      "今日の柚胡椒みくじ"
+      `今日の柚胡椒くじを引いたよ！\n運勢：${item.fortune}\n配信運：${item.stream}\nゲーム運：${item.game}\nコメント運：${item.chat}`,
+      "今日の柚胡椒くじ"
     );
   });
 }
@@ -1495,14 +1494,14 @@ function processVisitStampBackupFromLocation() {
   const message = [
     "復元リンクが見つかりました。",
     `スタンプ：${backupDates.length}日分 / 新しく戻せる分 ${addedStampCount}日分`,
-    `みくじ履歴：${backupOmikujiEntries.length}件 / 新しく戻せる分 ${addedOmikujiCount}件`,
+    `柚胡椒くじ履歴：${backupOmikujiEntries.length}件 / 新しく戻せる分 ${addedOmikujiCount}件`,
     "今のデータと合体して復元しますか？"
   ].join("\n");
   if (!window.confirm(message)) return false;
   if (mergedDates.length) saveVisitStampDates(mergedDates);
   if (mergedOmikujiEntries.length) saveOmikujiHistory(mergedOmikujiEntries);
   clearVisitStampBackupFromUrl();
-  window.alert(`復元しました。\nスタンプ：${mergedDates.length}日分\nみくじ履歴：${mergedOmikujiEntries.length}件`);
+  window.alert(`復元しました。\nスタンプ：${mergedDates.length}日分\n柚胡椒くじ履歴：${mergedOmikujiEntries.length}件`);
   return true;
 }
 
@@ -2346,7 +2345,7 @@ function setupUpdateHistoryMore() {
   const viewport = document.getElementById("updateHistoryViewport");
   if (!card || !button || !viewport) return;
   const items = viewport.querySelectorAll(".update-history-list li");
-  if (items.length <= 3) {
+  if (items.length <= 2) {
     button.style.display = "none";
     card.classList.add("is-expanded");
     return;
