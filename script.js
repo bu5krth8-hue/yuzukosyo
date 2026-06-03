@@ -497,15 +497,97 @@ function setDailyQuote() {
   `;
 }
 function normalizeMeigenValue(value) {
-  return String(value || "").trim().replace(/\s+/g, " ");
+  return String(value || "").normalize("NFKC").trim().replace(/\s+/g, " ");
+}
+function isUnsetMeigenValue(value) {
+  const normalized = normalizeMeigenValue(value);
+  return !normalized || normalized === "未設定" || normalized === "不明";
+}
+function normalizeMeigenTextForSignature(value) {
+  return normalizeMeigenValue(value)
+    .replace(/[（(]\s*DBD\s*[）)]/gi, "")
+    .replace(/[「」『』“”"]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 function getMeigenSignature(item) {
-  return [
-    normalizeMeigenValue(item?.text),
-    normalizeMeigenValue(item?.speaker || "未設定"),
-    normalizeMeigenValue(item?.place || "未設定"),
-    normalizeMeigenValue(item?.date || "未設定")
-  ].join("|");
+  return normalizeMeigenTextForSignature(item?.text) || normalizeMeigenValue(item?.id);
+}
+function hasMeigenGameTag(value) {
+  return /[（(]\s*DBD\s*[）)]/i.test(String(value || ""));
+}
+function meigenFieldScoreForTop(value, type) {
+  const normalized = normalizeMeigenValue(value);
+  if (!normalized || normalized === "未設定" || normalized === "不明") return 0;
+  if (type === "speaker" && normalized.length <= 1) return 2;
+  if (type === "memo") return 30 + Math.min(normalized.length, 80);
+  if (type === "text") return normalized.length + (hasMeigenGameTag(normalized) ? 80 : 0);
+  return 20 + Math.min(normalized.length, 20);
+}
+function meigenItemScoreForTop(item) {
+  return (
+    meigenFieldScoreForTop(item?.text, "text") +
+    meigenFieldScoreForTop(item?.speaker, "speaker") +
+    meigenFieldScoreForTop(item?.place, "place") +
+    meigenFieldScoreForTop(item?.date, "date") +
+    meigenFieldScoreForTop(item?.memo, "memo") +
+    (item?.visible === false ? 0 : 5)
+  );
+}
+function chooseMeigenTextForTop(currentText, nextText) {
+  const current = normalizeMeigenValue(currentText);
+  const next = normalizeMeigenValue(nextText);
+  if (!current) return next;
+  if (!next) return current;
+  if (hasMeigenGameTag(next) && !hasMeigenGameTag(current)) return next;
+  if (hasMeigenGameTag(current) && !hasMeigenGameTag(next)) return current;
+  return next.length > current.length ? next : current;
+}
+function chooseMeigenFieldForTop(currentValue, nextValue, type) {
+  const current = normalizeMeigenValue(currentValue);
+  const next = normalizeMeigenValue(nextValue);
+  if (type === "memo") {
+    if (!current) return next;
+    if (!next) return current;
+    return next.length > current.length ? next : current;
+  }
+  if (isUnsetMeigenValue(current)) return next || current || "未設定";
+  if (isUnsetMeigenValue(next)) return current;
+  if (type === "speaker" && current.length <= 1 && next.length > current.length) return next;
+  return current;
+}
+function mergeMeigenForTop(currentItem, nextItem) {
+  const current = currentItem || {};
+  const next = nextItem || {};
+  const currentScore = meigenItemScoreForTop(current);
+  const nextScore = meigenItemScoreForTop(next);
+  const base = nextScore > currentScore ? { ...next, ...current } : { ...current, ...next };
+  return {
+    ...base,
+    id: nextScore > currentScore ? (next.id || current.id || "") : (current.id || next.id || ""),
+    text: chooseMeigenTextForTop(current.text, next.text),
+    speaker: chooseMeigenFieldForTop(current.speaker, next.speaker, "speaker") || "未設定",
+    place: chooseMeigenFieldForTop(current.place, next.place, "place") || "未設定",
+    date: chooseMeigenFieldForTop(current.date, next.date, "date") || "未設定",
+    memo: chooseMeigenFieldForTop(current.memo, next.memo, "memo") || "",
+    visible: current.visible !== false || next.visible !== false
+  };
+}
+function deduplicateMeigensForTop(items) {
+  const map = new Map();
+  const order = [];
+  (Array.isArray(items) ? items : []).forEach((item) => {
+    if (!item || item.visible === false || !String(item.text || "").trim()) return;
+    const signature = getMeigenSignature(item);
+    if (!signature) return;
+    if (!map.has(signature)) {
+      map.set(signature, { ...item });
+      order.push(signature);
+      return;
+    }
+    map.set(signature, mergeMeigenForTop(map.get(signature), item));
+  });
+  return order.map((key) => map.get(key));
 }
 function getVisibleMeigensForTop() {
   const publicItems = Array.isArray(window.YUZUKOSYO_PUBLIC_MEIGEN)
@@ -519,14 +601,7 @@ function getVisibleMeigensForTop() {
   } catch (error) {
     localItems = [];
   }
-  const seen = new Set();
-  return [...publicItems, ...localItems].filter((item) => {
-    if (!item || item.visible === false || !String(item.text || "").trim()) return false;
-    const signature = getMeigenSignature(item);
-    if (!signature.trim() || seen.has(signature)) return false;
-    seen.add(signature);
-    return true;
-  });
+  return deduplicateMeigensForTop([...publicItems, ...localItems]);
 }
 function getDailyMeigenForTop(items) {
   const todayKey = getTodayKey();

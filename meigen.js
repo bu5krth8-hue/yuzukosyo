@@ -24,29 +24,109 @@ function meigenGetLocalItems() {
   }
 }
 function meigenSaveLocalItems(items) {
-  localStorage.setItem(MEIGEN_STORAGE_KEY, JSON.stringify(items));
+  localStorage.setItem(MEIGEN_STORAGE_KEY, JSON.stringify(meigenDeduplicateItems(items)));
 }
 function meigenNormalizeItemValue(value) {
-  return String(value || "").trim().replace(/\s+/g, " ");
+  return String(value || "")
+    .normalize("NFKC")
+    .trim()
+    .replace(/\s+/g, " ");
+}
+function meigenIsUnsetValue(value) {
+  const normalized = meigenNormalizeItemValue(value);
+  return !normalized || normalized === "未設定" || normalized === "不明";
+}
+function meigenNormalizeTextForSignature(value) {
+  return meigenNormalizeItemValue(value)
+    .replace(/[（(]\s*DBD\s*[）)]/gi, "")
+    .replace(/[「」『』“”"]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 function meigenItemSignature(item) {
-  return [
-    meigenNormalizeItemValue(item?.text),
-    meigenNormalizeItemValue(item?.speaker || "未設定"),
-    meigenNormalizeItemValue(item?.place || "未設定"),
-    meigenNormalizeItemValue(item?.date || "未設定")
-  ].join("|");
+  const textKey = meigenNormalizeTextForSignature(item?.text);
+  return textKey || meigenNormalizeItemValue(item?.id);
+}
+function meigenHasGameTag(value) {
+  return /[（(]\s*DBD\s*[）)]/i.test(String(value || ""));
+}
+function meigenFieldScore(value, type) {
+  const normalized = meigenNormalizeItemValue(value);
+  if (!normalized || normalized === "未設定" || normalized === "不明") return 0;
+  if (type === "speaker" && normalized.length <= 1) return 2;
+  if (type === "memo") return 30 + Math.min(normalized.length, 80);
+  if (type === "text") return normalized.length + (meigenHasGameTag(normalized) ? 80 : 0);
+  return 20 + Math.min(normalized.length, 20);
+}
+function meigenItemScore(item) {
+  return (
+    meigenFieldScore(item?.text, "text") +
+    meigenFieldScore(item?.speaker, "speaker") +
+    meigenFieldScore(item?.place, "place") +
+    meigenFieldScore(item?.date, "date") +
+    meigenFieldScore(item?.memo, "memo") +
+    (item?.visible === false ? 0 : 5)
+  );
+}
+function meigenChooseText(currentText, nextText) {
+  const current = meigenNormalizeItemValue(currentText);
+  const next = meigenNormalizeItemValue(nextText);
+  if (!current) return next;
+  if (!next) return current;
+  if (meigenHasGameTag(next) && !meigenHasGameTag(current)) return next;
+  if (meigenHasGameTag(current) && !meigenHasGameTag(next)) return current;
+  return next.length > current.length ? next : current;
+}
+function meigenChooseField(currentValue, nextValue, type) {
+  const current = meigenNormalizeItemValue(currentValue);
+  const next = meigenNormalizeItemValue(nextValue);
+  if (type === "memo") {
+    if (!current) return next;
+    if (!next) return current;
+    return next.length > current.length ? next : current;
+  }
+  if (meigenIsUnsetValue(current)) return next || current || "未設定";
+  if (meigenIsUnsetValue(next)) return current;
+  if (type === "speaker" && current.length <= 1 && next.length > current.length) return next;
+  return current;
+}
+function meigenMergeItems(currentItem, nextItem) {
+  const current = currentItem || {};
+  const next = nextItem || {};
+  const currentScore = meigenItemScore(current);
+  const nextScore = meigenItemScore(next);
+  const base = nextScore > currentScore ? { ...next, ...current } : { ...current, ...next };
+  return {
+    ...base,
+    id: nextScore > currentScore ? (next.id || current.id || `local-${Date.now()}`) : (current.id || next.id || `local-${Date.now()}`),
+    text: meigenChooseText(current.text, next.text),
+    speaker: meigenChooseField(current.speaker, next.speaker, "speaker") || "未設定",
+    place: meigenChooseField(current.place, next.place, "place") || "未設定",
+    date: meigenChooseField(current.date, next.date, "date") || "未設定",
+    memo: meigenChooseField(current.memo, next.memo, "memo") || "",
+    visible: current.visible !== false || next.visible !== false
+  };
+}
+function meigenDeduplicateItems(items) {
+  const map = new Map();
+  const order = [];
+  (Array.isArray(items) ? items : []).forEach((item) => {
+    if (!item || !String(item.text || "").trim()) return;
+    const signature = meigenItemSignature(item);
+    if (!signature) return;
+    if (!map.has(signature)) {
+      map.set(signature, { ...item });
+      order.push(signature);
+      return;
+    }
+    map.set(signature, meigenMergeItems(map.get(signature), item));
+  });
+  return order.map((key) => map.get(key));
 }
 function meigenAllItems() {
   const publicItems = Array.isArray(window.YUZUKOSYO_PUBLIC_MEIGEN) ? window.YUZUKOSYO_PUBLIC_MEIGEN : [];
   const localItems = meigenGetLocalItems();
-  const seen = new Set();
-  return [...publicItems, ...localItems].filter((item) => {
-    const signature = meigenItemSignature(item);
-    if (!signature.trim() || seen.has(signature)) return false;
-    seen.add(signature);
-    return true;
-  });
+  return meigenDeduplicateItems([...publicItems, ...localItems]);
 }
 function meigenVisibleItems() {
   return meigenAllItems().filter((item) =>
@@ -506,7 +586,7 @@ function setupMeigenAdmin() {
         if (action === "accept-public" || action === "accept-private") {
           const visible = action === "accept-public";
           const localItems = meigenGetLocalItems();
-          meigenSaveLocalItems([meigenSubmissionToLocalItem(target, visible), ...localItems]);
+          meigenSaveLocalItems(meigenDeduplicateItems([meigenSubmissionToLocalItem(target, visible), ...localItems]));
           await removeSubmission(source, id);
           showSubmissionMessage(visible ? "投稿案を公開状態で管理リストへ追加しました。" : "投稿案を非公開状態で管理リストへ保存しました。");
           renderAdminList();
@@ -523,7 +603,7 @@ function setupMeigenAdmin() {
         showLock();
         return;
       }
-      const visibleItems = meigenVisibleItems();
+      const visibleItems = meigenDeduplicateItems(meigenVisibleItems());
       const exportText = `window.YUZUKOSYO_PUBLIC_MEIGEN = ${JSON.stringify(visibleItems, null, 2)};`;
       exportArea.value = exportText;
       exportArea.focus();
