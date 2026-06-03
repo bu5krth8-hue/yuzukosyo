@@ -2258,7 +2258,7 @@ function setupCursorParticles() {
       cursorLight.style.transform = `translate(${event.clientX - 110}px, ${event.clientY - 110}px)`;
     }
     const now = Date.now();
-    if (!particleLayer || now - lastParticleAt < 180) return;
+    if (!particleLayer || now - lastParticleAt < 260) return;
     lastParticleAt = now;
     const particle = document.createElement("span");
     particle.className = "cursor-particle";
@@ -2267,14 +2267,14 @@ function setupCursorParticles() {
     particle.style.setProperty("--px", `${Math.round((Math.random() - 0.5) * 34)}px`);
     particle.style.setProperty("--py", `${Math.round((Math.random() - 0.8) * 38)}px`);
     particleLayer.appendChild(particle);
-    window.setTimeout(() => particle.remove(), 700);
+    window.setTimeout(() => particle.remove(), 620);
   }, { passive: true });
 }
 function setupAmbientParticles() {
   const particleLayer = document.getElementById("particleLayer");
   const prefersReducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   if (!particleLayer || prefersReducedMotion) return;
-  const count = window.innerWidth < 520 ? 0 : 6;
+  const count = window.innerWidth < 760 ? 0 : 4;
   if (count <= 0) return;
   const fragment = document.createDocumentFragment();
   for (let i = 0; i < count; i += 1) {
@@ -2292,6 +2292,8 @@ function setupAmbientParticles() {
   particleLayer.appendChild(fragment);
 }
 function setupScrollReveal() {
+  const prefersReducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (prefersReducedMotion || window.innerWidth < 760) return;
   const targets = [
     ".hero",
     ".base-counter-card",
