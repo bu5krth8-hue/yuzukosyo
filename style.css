@@ -3,7 +3,7 @@
 @supports (content-visibility:auto){.omikuji-history-item,.stamp-history-month-card{content-visibility:auto;contain-intrinsic-size:1px 320px}.omikuji-history-info-section,.stamp-history-info-section{content-visibility:auto;contain-intrinsic-size:1px 280px}}@media (max-width:760px){.ambient-particle{display:none!important}.omikuji-history-list,.stamp-history-month-list{contain:layout paint}}@media (max-width:760px){.shooting-stars,.particle-layer{display:none!important}.reveal-on-scroll{opacity:1!important;transform:none!important;transition:none!important}}@supports (content-visibility:auto){.beginner-grid .beginner-point,.theme-color-row,.update-history-list li{content-visibility:auto;contain-intrinsic-size:1px 220px;contain:layout paint style}}@media (prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.001ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.001ms!important}}
 @media (min-width:761px){.stamp-share-row{grid-template-columns:repeat(2,minmax(0,360px))!important;justify-content:center!important;justify-items:stretch!important;align-items:center!important;gap:8px 12px!important;margin-top:12px!important}.stamp-share-row .stamp-share-btn,.stamp-share-row .stamp-save-btn{width:100%!important;max-width:none!important;min-height:44px!important;margin:0!important;padding:11px 14px!important}.stamp-share-row p{grid-column:1/-1;margin-top:0!important}.omikuji-share-row{display:grid!important;grid-template-columns:repeat(2,minmax(0,360px));justify-content:center;align-items:center;gap:8px 12px;margin:12px auto 0}.omikuji-share-row .omikuji-share-btn,.omikuji-share-row .omikuji-save-btn{width:100%!important;max-width:none!important;min-height:44px!important;margin:0!important;padding:11px 14px!important}.omikuji-history-switch{margin-top:10px!important}.sns-share-note{margin-top:6px!important}}
 
-/* v185: center standalone navigation switches/buttons */
+/* centered standalone navigation switches/buttons */
 body#top .card > a.mini-btn,
 body#top .stamp-history-link-row .mini-btn,
 body#top .secret-unlock-card .mini-btn,
@@ -21,3 +21,17 @@ body#top .stamp-history-link-row,
 body#top .secret-unlock-card{text-align:center!important;justify-items:center!important}
 body#top .omikuji-history-switch{margin-top:12px!important;margin-bottom:0!important}
 @media (max-width:760px){body#top .card > a.mini-btn,body#top .omikuji-history-switch{width:100%!important;max-width:320px!important}}
+
+/* v187: wording cleanup / PC compact spacing */
+@media (min-width:761px){
+  body#top .cards{gap:18px}
+  body#top .card,.sub-page .card{padding:24px}
+  body#top .wide,body#top .gear-card{margin-top:18px}
+  body#top .stamp-backup-panel{margin-top:12px}
+  body#top .stamp-share-row,body#top .omikuji-share-row{margin-top:10px!important}
+  body#top .sns-share-note{margin-top:4px!important;margin-bottom:0!important}
+  .beginner-grid{gap:16px!important}
+  .beginner-point{padding:22px 18px!important}
+  .update-history-list{gap:14px!important}
+  .update-history-list li{padding:20px 22px!important}
+}
