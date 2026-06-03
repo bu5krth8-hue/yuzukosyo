@@ -355,11 +355,22 @@ function rotateMascots() {
   tanuBubble.innerText =
     tanuFaces[faceIndex].text;
 }
+function hasTwitchStatusTargets() {
+  return Boolean(
+    document.getElementById("liveBadge") ||
+    document.getElementById("scheduleStatus") ||
+    document.getElementById("twitchSwitchText")
+  );
+}
 function startTwitchStatusPolling() {
+  if (!hasTwitchStatusTargets()) return;
   checkLiveStatus();
-  setInterval(checkLiveStatus, 60000);
+  setInterval(() => {
+    if (!document.hidden) checkLiveStatus();
+  }, 60000);
 }
 function scheduleTwitchStatusPolling() {
+  if (!hasTwitchStatusTargets()) return;
   const start = () => startTwitchStatusPolling();
   runAfterWindowLoad(() => {
     queueLowPriorityTask(start, 2600);
@@ -880,6 +891,186 @@ function pickWeightedOmikujiIndex() {
   }
   return Math.max(0, omikujiItems.length - 1);
 }
+const OMIKUJI_HISTORY_STORAGE_KEY = "yuzukosyoOmikujiHistoryV1";
+const OMIKUJI_HISTORY_MAX_ENTRIES = 730;
+function getOmikujiItemByIndex(index) {
+  return Number.isInteger(index) && omikujiItems[index] ? omikujiItems[index] : null;
+}
+function sanitizeOmikujiHistoryEntry(entry) {
+  if (!entry || typeof entry !== "object") return null;
+  const date = String(entry.date || "").trim();
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return null;
+  const parsed = parseDateKeyToLocalDate(date);
+  if (!parsed || formatDateKeyFromDate(parsed) !== date) return null;
+  const index = Number(entry.index);
+  const item = getOmikujiItemByIndex(index);
+  if (!item) return null;
+  return {
+    date,
+    index,
+    fortune: String(entry.fortune || item.fortune || "-"),
+    comment: String(entry.comment || item.comment || "-"),
+    stream: String(entry.stream || item.stream || "-"),
+    game: String(entry.game || item.game || "-"),
+    chat: String(entry.chat || item.chat || "-"),
+    rare: Boolean(entry.rare || item.rare),
+    savedAt: String(entry.savedAt || new Date().toISOString())
+  };
+}
+function mergeOmikujiHistoryEntries(entries) {
+  const map = new Map();
+  (Array.isArray(entries) ? entries : []).forEach((entry) => {
+    const normalized = sanitizeOmikujiHistoryEntry(entry);
+    if (!normalized) return;
+    const current = map.get(normalized.date);
+    if (!current || String(normalized.savedAt || "") >= String(current.savedAt || "")) {
+      map.set(normalized.date, normalized);
+    }
+  });
+  return Array.from(map.values())
+    .sort((a, b) => b.date.localeCompare(a.date))
+    .slice(0, OMIKUJI_HISTORY_MAX_ENTRIES);
+}
+function loadOmikujiHistory() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(OMIKUJI_HISTORY_STORAGE_KEY) || "[]");
+    return mergeOmikujiHistoryEntries(raw);
+  } catch (error) {
+    return [];
+  }
+}
+function saveOmikujiHistory(entries) {
+  try {
+    localStorage.setItem(OMIKUJI_HISTORY_STORAGE_KEY, JSON.stringify(mergeOmikujiHistoryEntries(entries)));
+  } catch (error) {
+  }
+}
+function recordOmikujiHistory(dateKey, index) {
+  const item = getOmikujiItemByIndex(index);
+  if (!item || !/^\d{4}-\d{2}-\d{2}$/.test(String(dateKey || ""))) return;
+  const entry = {
+    date: dateKey,
+    index,
+    fortune: item.fortune,
+    comment: item.comment,
+    stream: item.stream,
+    game: item.game,
+    chat: item.chat,
+    rare: Boolean(item.rare),
+    savedAt: new Date().toISOString()
+  };
+  saveOmikujiHistory([entry, ...loadOmikujiHistory().filter((item) => item.date !== dateKey)]);
+}
+function formatDateKeyWithWeekdayJa(dateKey) {
+  const date = parseDateKeyToLocalDate(dateKey);
+  if (!date) return String(dateKey || "");
+  const weekdays = ["日", "月", "火", "水", "木", "金", "土"];
+  return `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日（${weekdays[date.getDay()]}）`;
+}
+function renderOmikujiHistoryList(entries) {
+  const list = document.getElementById("omikujiHistoryList");
+  const empty = document.getElementById("omikujiHistoryEmpty");
+  const total = document.getElementById("omikujiHistoryTotal");
+  const rareTotal = document.getElementById("omikujiHistoryRareTotal");
+  const latest = document.getElementById("omikujiHistoryLatest");
+  if (total) total.textContent = String(entries.length);
+  if (rareTotal) rareTotal.textContent = String(entries.filter((entry) => entry.rare).length);
+  if (latest) latest.textContent = entries[0] ? formatDateKeyWithWeekdayJa(entries[0].date) : "まだなし";
+  if (!list) return;
+  list.innerHTML = "";
+  if (!entries.length) {
+    if (empty) empty.hidden = false;
+    return;
+  }
+  if (empty) empty.hidden = true;
+  entries.forEach((entry, index) => {
+    const details = document.createElement("details");
+    details.className = "omikuji-history-item";
+    if (index === 0) details.open = true;
+    const summary = document.createElement("summary");
+    const dateSpan = document.createElement("span");
+    dateSpan.className = "omikuji-history-date";
+    dateSpan.textContent = formatDateKeyWithWeekdayJa(entry.date);
+    const fortuneSpan = document.createElement("strong");
+    fortuneSpan.className = entry.rare ? "omikuji-history-fortune is-rare" : "omikuji-history-fortune";
+    fortuneSpan.textContent = entry.fortune;
+    summary.append(dateSpan, fortuneSpan);
+    const body = document.createElement("div");
+    body.className = "omikuji-history-body";
+    const comment = document.createElement("p");
+    comment.className = "omikuji-history-comment";
+    comment.textContent = entry.comment;
+    const dl = document.createElement("dl");
+    dl.className = "omikuji-history-detail";
+    [["配信運", entry.stream], ["ゲーム運", entry.game], ["コメント運", entry.chat]].forEach(([label, value]) => {
+      const row = document.createElement("div");
+      const dt = document.createElement("dt");
+      const dd = document.createElement("dd");
+      dt.textContent = label;
+      dd.textContent = value;
+      row.append(dt, dd);
+      dl.appendChild(row);
+    });
+    body.append(comment, dl);
+    details.append(summary, body);
+    list.appendChild(details);
+  });
+}
+function setupOmikujiHistoryPage() {
+  const list = document.getElementById("omikujiHistoryList");
+  if (!list) return;
+  renderOmikujiHistoryList(loadOmikujiHistory());
+}
+function createOmikujiBackupData(entries) {
+  const months = {};
+  mergeOmikujiHistoryEntries(entries).forEach((entry) => {
+    const match = /^(\d{4}-\d{2})-(\d{2})$/.exec(entry.date);
+    if (!match) return;
+    const monthKey = match[1];
+    const day = String(Number(match[2]));
+    if (!months[monthKey]) months[monthKey] = {};
+    months[monthKey][day] = entry.index;
+  });
+  return {
+    v: 1,
+    months
+  };
+}
+function expandOmikujiBackupData(data) {
+  const source = data && data.omikuji ? data.omikuji : data;
+  if (!source || typeof source !== "object") return [];
+  if (Array.isArray(source.entries)) return mergeOmikujiHistoryEntries(source.entries);
+  const months = source.months && typeof source.months === "object" ? source.months : null;
+  if (!months) return [];
+  const entries = [];
+  Object.keys(months).forEach((monthKey) => {
+    if (!/^\d{4}-\d{2}$/.test(monthKey)) return;
+    const days = months[monthKey];
+    if (!days || typeof days !== "object") return;
+    Object.keys(days).forEach((dayKey) => {
+      const day = Number(dayKey);
+      const index = Number(days[dayKey]);
+      if (!Number.isInteger(day) || day < 1 || day > 31 || !getOmikujiItemByIndex(index)) return;
+      const date = `${monthKey}-${String(day).padStart(2, "0")}`;
+      const parsed = parseDateKeyToLocalDate(date);
+      if (!parsed || formatDateKeyFromDate(parsed) !== date) return;
+      const item = getOmikujiItemByIndex(index);
+      entries.push({
+        date,
+        index,
+        fortune: item.fortune,
+        comment: item.comment,
+        stream: item.stream,
+        game: item.game,
+        chat: item.chat,
+        rare: Boolean(item.rare),
+        savedAt: new Date().toISOString()
+      });
+    });
+  });
+  return mergeOmikujiHistoryEntries(entries);
+}
+
 function createOmikujiShareCanvas(item) {
   const scale = 2;
   const width = 980;
@@ -1052,6 +1243,7 @@ function setupDailyOmikuji() {
     Number.isInteger(saved.index) &&
     omikujiItems[saved.index]
   ) {
+    recordOmikujiHistory(todayKey, saved.index);
     showOmikujiResult(omikujiItems[saved.index]);
     button.textContent = "今日はもう引いたよ";
     button.classList.add("omikuji-button-done");
@@ -1084,6 +1276,7 @@ function setupDailyOmikuji() {
       } catch (error) {
       }
     }
+    recordOmikujiHistory(todayKey, index);
     button.disabled = true;
     button.setAttribute("aria-disabled", "true");
     button.textContent = "占い中…";
@@ -1104,6 +1297,7 @@ function setupDailyOmikuji() {
   });
 }
 const VISIT_STAMP_STORAGE_KEY = "yuzukosyoVisitStampsV1";
+const VISIT_STAMP_BACKUP_PARAM = "stampBackup";
 const VISIT_STAMP_HISTORY_MONTHS = 24;
 const SECRET_ROOM_UNLOCK_DAYS = 20;
 const SECRET_REWARD_TIERS = [20, 40, 60, 80, 100];
@@ -1164,6 +1358,208 @@ function saveVisitStampDates(dates) {
     localStorage.setItem(VISIT_STAMP_STORAGE_KEY, JSON.stringify(pruneVisitStampDatesToRetention(dates)));
   } catch (error) {
   }
+}
+function createVisitStampBackupData(dates) {
+  const months = {};
+  pruneVisitStampDatesToRetention(dates).forEach((dateKey) => {
+    const match = /^(\d{4}-\d{2})-(\d{2})$/.exec(dateKey);
+    if (!match) return;
+    const monthKey = match[1];
+    const day = Number(match[2]);
+    if (!Number.isInteger(day) || day < 1 || day > 31) return;
+    months[monthKey] = (months[monthKey] || 0) + Math.pow(2, day - 1);
+  });
+  return {
+    v: 1,
+    createdAt: new Date().toISOString(),
+    months
+  };
+}
+function expandVisitStampBackupData(data) {
+  if (!data || typeof data !== "object") return [];
+  if (Array.isArray(data.dates)) {
+    return pruneVisitStampDatesToRetention(data.dates.filter((dateKey) => /^\d{4}-\d{2}-\d{2}$/.test(String(dateKey))));
+  }
+  const months = data.months && typeof data.months === "object" ? data.months : null;
+  if (!months) return [];
+  const dates = [];
+  Object.keys(months).forEach((monthKey) => {
+    if (!/^\d{4}-\d{2}$/.test(monthKey)) return;
+    const mask = Number(months[monthKey]);
+    if (!Number.isFinite(mask) || mask <= 0) return;
+    for (let day = 1; day <= 31; day += 1) {
+      const flag = Math.pow(2, day - 1);
+      if (Math.floor(mask / flag) % 2 !== 1) continue;
+      const dateKey = `${monthKey}-${String(day).padStart(2, "0")}`;
+      const parsed = parseDateKeyToLocalDate(dateKey);
+      if (!parsed || formatDateKeyFromDate(parsed) !== dateKey) continue;
+      dates.push(dateKey);
+    }
+  });
+  return pruneVisitStampDatesToRetention(dates);
+}
+function encodeVisitStampBackupPayload(dates, omikujiEntries = loadOmikujiHistory()) {
+  try {
+    const data = createVisitStampBackupData(dates);
+    data.v = 2;
+    data.omikuji = createOmikujiBackupData(omikujiEntries);
+    const json = JSON.stringify(data);
+    return btoa(json).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+  } catch (error) {
+    return "";
+  }
+}
+function decodeVisitStampBackupBundle(payload) {
+  try {
+    const normalized = String(payload || "").trim().replace(/-/g, "+").replace(/_/g, "/");
+    if (!normalized) return { dates: [], omikujiEntries: [] };
+    const padded = normalized + "=".repeat((4 - (normalized.length % 4)) % 4);
+    const data = JSON.parse(atob(padded));
+    return {
+      dates: expandVisitStampBackupData(data),
+      omikujiEntries: expandOmikujiBackupData(data)
+    };
+  } catch (error) {
+    return { dates: [], omikujiEntries: [] };
+  }
+}
+function decodeVisitStampBackupPayload(payload) {
+  return decodeVisitStampBackupBundle(payload).dates;
+}
+function buildVisitStampBackupUrl() {
+  const payload = encodeVisitStampBackupPayload(loadVisitStampDates(), loadOmikujiHistory());
+  if (!payload) return "";
+  const url = new URL(window.location.href);
+  url.searchParams.delete(VISIT_STAMP_BACKUP_PARAM);
+  url.hash = "";
+  return `${url.origin}${url.pathname}${url.search}#${VISIT_STAMP_BACKUP_PARAM}=${encodeURIComponent(payload)}`;
+}
+function getVisitStampBackupPayloadFromLocation() {
+  try {
+    const url = new URL(window.location.href);
+    const queryPayload = url.searchParams.get(VISIT_STAMP_BACKUP_PARAM);
+    if (queryPayload) return queryPayload;
+    const hash = (window.location.hash || "").replace(/^#/, "");
+    if (!hash) return "";
+    if (hash.startsWith(`${VISIT_STAMP_BACKUP_PARAM}=`)) {
+      return decodeURIComponent(hash.slice(VISIT_STAMP_BACKUP_PARAM.length + 1));
+    }
+    const hashParams = new URLSearchParams(hash);
+    return hashParams.get(VISIT_STAMP_BACKUP_PARAM) || "";
+  } catch (error) {
+    return "";
+  }
+}
+function clearVisitStampBackupFromUrl() {
+  try {
+    const url = new URL(window.location.href);
+    url.searchParams.delete(VISIT_STAMP_BACKUP_PARAM);
+    const hash = (url.hash || "").replace(/^#/, "");
+    if (hash.startsWith(`${VISIT_STAMP_BACKUP_PARAM}=`)) {
+      url.hash = "";
+    } else if (hash) {
+      const hashParams = new URLSearchParams(hash);
+      if (hashParams.has(VISIT_STAMP_BACKUP_PARAM)) {
+        hashParams.delete(VISIT_STAMP_BACKUP_PARAM);
+        const nextHash = hashParams.toString();
+        url.hash = nextHash ? `#${nextHash}` : "";
+      }
+    }
+    if (history.replaceState) {
+      history.replaceState(null, document.title, `${url.pathname}${url.search}${url.hash}`);
+    }
+  } catch (error) {
+  }
+}
+let visitStampBackupProcessed = false;
+function processVisitStampBackupFromLocation() {
+  if (visitStampBackupProcessed) return false;
+  const payload = getVisitStampBackupPayloadFromLocation();
+  if (!payload) return false;
+  visitStampBackupProcessed = true;
+  const backupBundle = decodeVisitStampBackupBundle(payload);
+  const backupDates = backupBundle.dates;
+  const backupOmikujiEntries = backupBundle.omikujiEntries;
+  if (!backupDates.length && !backupOmikujiEntries.length) {
+    window.alert("復元リンクを読み取れませんでした。リンクが途中で切れている可能性があります。");
+    clearVisitStampBackupFromUrl();
+    return false;
+  }
+  const currentDates = loadVisitStampDates();
+  const mergedDates = pruneVisitStampDatesToRetention([...currentDates, ...backupDates]);
+  const addedStampCount = Math.max(0, mergedDates.length - currentDates.length);
+  const currentOmikujiEntries = loadOmikujiHistory();
+  const currentOmikujiDateSet = new Set(currentOmikujiEntries.map((entry) => entry.date));
+  const mergedOmikujiEntries = mergeOmikujiHistoryEntries([...currentOmikujiEntries, ...backupOmikujiEntries]);
+  const addedOmikujiCount = mergedOmikujiEntries.filter((entry) => !currentOmikujiDateSet.has(entry.date)).length;
+  const message = [
+    "復元リンクが見つかりました。",
+    `スタンプ：${backupDates.length}日分 / 新しく戻せる分 ${addedStampCount}日分`,
+    `みくじ履歴：${backupOmikujiEntries.length}件 / 新しく戻せる分 ${addedOmikujiCount}件`,
+    "今のデータと合体して復元しますか？"
+  ].join("\n");
+  if (!window.confirm(message)) return false;
+  if (mergedDates.length) saveVisitStampDates(mergedDates);
+  if (mergedOmikujiEntries.length) saveOmikujiHistory(mergedOmikujiEntries);
+  clearVisitStampBackupFromUrl();
+  window.alert(`復元しました。\nスタンプ：${mergedDates.length}日分\nみくじ履歴：${mergedOmikujiEntries.length}件`);
+  return true;
+}
+
+async function copyTextToClipboard(text) {
+  if (navigator.clipboard && window.isSecureContext) {
+    await navigator.clipboard.writeText(text);
+    return true;
+  }
+  const textarea = document.createElement("textarea");
+  textarea.value = text;
+  textarea.setAttribute("readonly", "readonly");
+  textarea.style.position = "fixed";
+  textarea.style.left = "-9999px";
+  textarea.style.top = "0";
+  document.body.appendChild(textarea);
+  textarea.focus();
+  textarea.select();
+  const copied = document.execCommand("copy");
+  textarea.remove();
+  if (!copied) throw new Error("copy failed");
+  return true;
+}
+function setupStampBackupButtons() {
+  const buttons = document.querySelectorAll("[data-stamp-backup-copy]");
+  if (!buttons.length) return;
+  buttons.forEach((button) => {
+    if (button.dataset.stampBackupReady === "1") return;
+    button.dataset.stampBackupReady = "1";
+    button.addEventListener("click", async () => {
+      const panel = button.closest(".stamp-backup-panel");
+      const status = panel ? panel.querySelector(".stamp-backup-status") : null;
+      const originalText = button.textContent;
+      const url = buildVisitStampBackupUrl();
+      if (!url) {
+        if (status) status.textContent = "復元リンクを作れませんでした。ページを再読み込みしてからもう一度試してください。";
+        return;
+      }
+      button.disabled = true;
+      button.textContent = "コピー中…";
+      try {
+        await copyTextToClipboard(url);
+        button.textContent = "コピーしました";
+        if (status) status.textContent = "コピーしたリンクを、iPhoneメモ・LINE・自分宛メールなどブラウザの外に保存してください。スタンプとみくじ履歴を復元できます。";
+        if (typeof showSecretToast === "function") {
+          showSecretToast("復元リンクをコピーしました", "スタンプとみくじ履歴を戻せるリンクです。メモやLINEへ保存してください。", false);
+        }
+      } catch (error) {
+        button.textContent = originalText;
+        if (status) status.textContent = "自動コピーできませんでした。Safari/Chromeの共有や長押しコピーで保存してください。";
+      } finally {
+        window.setTimeout(() => {
+          button.disabled = false;
+          button.textContent = originalText;
+        }, 1800);
+      }
+    });
+  });
 }
 function getConsecutiveVisitStreak(stampedSet, todayKey) {
   const today = parseDateKeyToLocalDate(todayKey);
@@ -1840,7 +2236,10 @@ setDailyMeigen();
 setupDailyOmikuji();
 setupOmikujiShareButton();
 setupOmikujiSaveButton();
+processVisitStampBackupFromLocation();
+setupOmikujiHistoryPage();
 refreshVisitStampViewsForCurrentDay({ force: true });
+setupStampBackupButtons();
 setupVisitStampResumeChecks();
 setupSecretInteractions();
 function setupCursorParticles() {
@@ -1875,7 +2274,8 @@ function setupAmbientParticles() {
   const particleLayer = document.getElementById("particleLayer");
   const prefersReducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   if (!particleLayer || prefersReducedMotion) return;
-  const count = window.innerWidth < 520 ? 4 : 10;
+  const count = window.innerWidth < 520 ? 0 : 6;
+  if (count <= 0) return;
   const fragment = document.createDocumentFragment();
   for (let i = 0; i < count; i += 1) {
     const particle = document.createElement("span");

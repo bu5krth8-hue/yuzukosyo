@@ -1,18 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 420" role="img" aria-label="飲み物">
-  <rect width="640" height="420" rx="28" fill="#f8fafc"/>
-  <rect x="18" y="18" width="604" height="384" rx="24" fill="#ffffff" stroke="#111827" stroke-width="6"/>
-  <rect x="0" y="0" width="640" height="86" fill="#2563eb"/>
-  <text x="320" y="57" text-anchor="middle" font-family="system-ui,-apple-system,BlinkMacSystemFont,'Noto Sans JP',sans-serif" font-size="36" font-weight="900" fill="#ffffff">飲み物</text>
-  <g transform="translate(0,78)">
-
-    <rect x="265" y="72" width="110" height="230" rx="30" fill="#93c5fd" stroke="#111827" stroke-width="8"/>
-    <rect x="287" y="43" width="66" height="46" rx="14" fill="#dbeafe" stroke="#111827" stroke-width="7"/>
-    <rect x="285" y="145" width="70" height="100" rx="18" fill="#b45309"/>
-    <rect x="282" y="114" width="76" height="42" rx="14" fill="#ffffff" stroke="#111827" stroke-width="5"/>
-    <text x="320" y="139" text-anchor="middle" font-family="system-ui,'Noto Sans JP',sans-serif" font-size="18" font-weight="900" fill="#111827">麦茶</text>
-    <text x="320" y="322" text-anchor="middle" font-family="system-ui,'Noto Sans JP',sans-serif" font-size="32" font-weight="900" fill="#111827">ペットボトル飲料</text>
-
-  </g>
-  <rect x="62" y="332" width="516" height="50" rx="18" fill="#111827"/>
-  <text x="320" y="366" text-anchor="middle" font-family="system-ui,-apple-system,BlinkMacSystemFont,'Noto Sans JP',sans-serif" font-size="26" font-weight="900" fill="#ffffff">麦茶・水分補給</text>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 420" role="img" aria-label="飲み物"><rect width="640" height="420" rx="28" fill="#f8fafc"/><rect x="18" y="18" width="604" height="384" rx="24" fill="#ffffff" stroke="#111827" stroke-width="6"/><rect x="0" y="0" width="640" height="86" fill="#2563eb"/><text x="320" y="57" text-anchor="middle" font-family="system-ui,-apple-system,BlinkMacSystemFont,'Noto Sans JP',sans-serif" font-size="36" font-weight="900" fill="#ffffff">飲み物</text><g transform="translate(0,78)"><rect x="265" y="72" width="110" height="230" rx="30" fill="#93c5fd" stroke="#111827" stroke-width="8"/><rect x="287" y="43" width="66" height="46" rx="14" fill="#dbeafe" stroke="#111827" stroke-width="7"/><rect x="285" y="145" width="70" height="100" rx="18" fill="#b45309"/><rect x="282" y="114" width="76" height="42" rx="14" fill="#ffffff" stroke="#111827" stroke-width="5"/><text x="320" y="139" text-anchor="middle" font-family="system-ui,'Noto Sans JP',sans-serif" font-size="18" font-weight="900" fill="#111827">麦茶</text><text x="320" y="322" text-anchor="middle" font-family="system-ui,'Noto Sans JP',sans-serif" font-size="32" font-weight="900" fill="#111827">ペットボトル飲料</text></g><rect x="62" y="332" width="516" height="50" rx="18" fill="#111827"/><text x="320" y="366" text-anchor="middle" font-family="system-ui,-apple-system,BlinkMacSystemFont,'Noto Sans JP',sans-serif" font-size="26" font-weight="900" fill="#ffffff">麦茶・水分補給</text></svg>
