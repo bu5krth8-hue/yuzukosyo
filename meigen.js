@@ -5,7 +5,6 @@ const MEIGEN_OWNER_MAIL = "";
 const MEIGEN_SUBMISSION_STORAGE_KEY = "yuzukosyoMeigenSubmissions";
 const MEIGEN_ADMIN_PAGE = "yuzu-secret-meigen-control-2026.html";
 const MEIGEN_SUBMIT_API = "/api/meigen-submit";
-
 function meigenEscapeHtml(value) {
   return String(value ?? "")
     .replace(/&/g, "&amp;")
@@ -14,7 +13,6 @@ function meigenEscapeHtml(value) {
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
 }
-
 function meigenGetLocalItems() {
   try {
     const raw = localStorage.getItem(MEIGEN_STORAGE_KEY);
@@ -25,15 +23,12 @@ function meigenGetLocalItems() {
     return [];
   }
 }
-
 function meigenSaveLocalItems(items) {
   localStorage.setItem(MEIGEN_STORAGE_KEY, JSON.stringify(items));
 }
-
 function meigenNormalizeItemValue(value) {
   return String(value || "").trim().replace(/\s+/g, " ");
 }
-
 function meigenItemSignature(item) {
   return [
     meigenNormalizeItemValue(item?.text),
@@ -42,12 +37,10 @@ function meigenItemSignature(item) {
     meigenNormalizeItemValue(item?.date || "未設定")
   ].join("|");
 }
-
 function meigenAllItems() {
   const publicItems = Array.isArray(window.YUZUKOSYO_PUBLIC_MEIGEN) ? window.YUZUKOSYO_PUBLIC_MEIGEN : [];
   const localItems = meigenGetLocalItems();
   const seen = new Set();
-
   return [...publicItems, ...localItems].filter((item) => {
     const signature = meigenItemSignature(item);
     if (!signature.trim() || seen.has(signature)) return false;
@@ -55,7 +48,6 @@ function meigenAllItems() {
     return true;
   });
 }
-
 function meigenVisibleItems() {
   return meigenAllItems().filter((item) =>
     item &&
@@ -63,7 +55,6 @@ function meigenVisibleItems() {
     String(item.text || "").trim()
   );
 }
-
 function meigenTodayKey() {
   const now = new Date();
   return [
@@ -72,32 +63,26 @@ function meigenTodayKey() {
     String(now.getDate()).padStart(2, "0")
   ].join("-");
 }
-
 function meigenGetDailyItem(items) {
   const todayKey = meigenTodayKey();
   const storageKey = "yuzukosyoDailyMeigen";
   let saved = null;
-
   try {
     saved = JSON.parse(localStorage.getItem(storageKey) || "null");
   } catch (error) {
     saved = null;
   }
-
   if (saved && saved.date === todayKey) {
     if (saved.id) {
       const savedItem = items.find((item) => item.id === saved.id);
       if (savedItem) return savedItem;
     }
-
     if (Number.isInteger(saved.index) && items[saved.index]) {
       return items[saved.index];
     }
   }
-
   const index = Math.floor(Math.random() * items.length);
   const item = items[index];
-
   try {
     localStorage.setItem(storageKey, JSON.stringify({
       date: todayKey,
@@ -105,12 +90,9 @@ function meigenGetDailyItem(items) {
       id: item.id || ""
     }));
   } catch (error) {
-    // localStorageが使えない環境でも表示は続ける
   }
-
   return item;
 }
-
 function meigenCardTemplate(item) {
   return `
     <div class="quote-item meigen-item" data-meigen-id="${meigenEscapeHtml(item.id)}">
@@ -124,15 +106,12 @@ function meigenCardTemplate(item) {
     </div>
   `;
 }
-
 function renderMeigenList() {
   const list = document.getElementById("meigenArchiveList");
   const count = document.getElementById("meigenCount");
   const random = document.getElementById("meigenRandomText");
   const items = meigenVisibleItems();
-
   if (count) count.textContent = `${items.length}件公開中`;
-
   if (list) {
     if (!items.length) {
       list.innerHTML = `<div class="empty-meigen-box">公開中の迷言はまだありません。追加されたらここに並ぶよ。</div>`;
@@ -140,7 +119,6 @@ function renderMeigenList() {
       list.innerHTML = items.map(meigenCardTemplate).join("");
     }
   }
-
   if (random) {
     if (!items.length) {
       random.textContent = "今日の迷言を準備中…";
@@ -152,14 +130,12 @@ function renderMeigenList() {
     }
   }
 }
-
 function meigenBase64UrlEncode(value) {
   const bytes = new TextEncoder().encode(String(value || ""));
   let binary = "";
   bytes.forEach((byte) => binary += String.fromCharCode(byte));
   return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
 }
-
 function meigenBase64UrlDecode(value) {
   const base64 = String(value || "").replace(/-/g, "+").replace(/_/g, "/");
   const padded = base64 + "=".repeat((4 - base64.length % 4) % 4);
@@ -167,7 +143,6 @@ function meigenBase64UrlDecode(value) {
   const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0));
   return new TextDecoder().decode(bytes);
 }
-
 function meigenGetLocalSubmissions() {
   try {
     const raw = localStorage.getItem(MEIGEN_SUBMISSION_STORAGE_KEY);
@@ -178,11 +153,9 @@ function meigenGetLocalSubmissions() {
     return [];
   }
 }
-
 function meigenSaveLocalSubmissions(items) {
   localStorage.setItem(MEIGEN_SUBMISSION_STORAGE_KEY, JSON.stringify(items));
 }
-
 function meigenSubmissionSignature(item) {
   return [
     meigenNormalizeItemValue(item?.text),
@@ -193,7 +166,6 @@ function meigenSubmissionSignature(item) {
     meigenNormalizeItemValue(item?.memo || "")
   ].join("|");
 }
-
 function meigenNormalizeSubmission(raw) {
   const item = raw && typeof raw === "object" ? raw : {};
   return {
@@ -207,30 +179,24 @@ function meigenNormalizeSubmission(raw) {
     createdAt: String(item.createdAt || new Date().toISOString())
   };
 }
-
 function meigenAddLocalSubmission(raw) {
   const item = meigenNormalizeSubmission(raw);
   if (!item.text) return false;
-
   const localItems = meigenGetLocalSubmissions();
   const signature = meigenSubmissionSignature(item);
   const exists = localItems.some((current) =>
     current.id === item.id || meigenSubmissionSignature(current) === signature
   );
-
   if (!exists) {
     meigenSaveLocalSubmissions([item, ...localItems]);
   }
-
   return true;
 }
-
 function meigenSubmissionToLocalItem(submission, visible) {
   const item = meigenNormalizeSubmission(submission);
   const memoParts = [];
   if (item.sender && item.sender !== "匿名") memoParts.push(`投稿者：${item.sender}`);
   if (item.memo) memoParts.push(item.memo);
-
   return {
     id: `local-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
     text: item.text,
@@ -241,7 +207,6 @@ function meigenSubmissionToLocalItem(submission, visible) {
     visible: visible === true
   };
 }
-
 async function meigenPostRemoteSubmission(item) {
   const response = await fetch(MEIGEN_SUBMIT_API, {
     method: "POST",
@@ -249,30 +214,24 @@ async function meigenPostRemoteSubmission(item) {
     body: JSON.stringify(item),
     cache: "no-store"
   });
-
   const data = await response.json().catch(() => ({}));
   if (!response.ok || data.configured === false) {
     throw new Error(data.message || "投稿案の保存に失敗しました。");
   }
-
   return data;
 }
-
 async function meigenFetchRemoteSubmissions() {
   const response = await fetch(MEIGEN_SUBMIT_API, {
     method: "GET",
     headers: { "X-Meigen-Admin": MEIGEN_ADMIN_PASSWORD },
     cache: "no-store"
   });
-
   const data = await response.json().catch(() => ({}));
   if (!response.ok || data.configured === false) {
     throw new Error(data.message || "投稿案の取得に失敗しました。");
   }
-
   return Array.isArray(data.items) ? data.items.map(meigenNormalizeSubmission) : [];
 }
-
 async function meigenDeleteRemoteSubmission(id) {
   const response = await fetch(MEIGEN_SUBMIT_API, {
     method: "DELETE",
@@ -283,15 +242,12 @@ async function meigenDeleteRemoteSubmission(id) {
     body: JSON.stringify({ id }),
     cache: "no-store"
   });
-
   const data = await response.json().catch(() => ({}));
   if (!response.ok || data.configured === false) {
     throw new Error(data.message || "投稿案の削除に失敗しました。");
   }
-
   return data;
 }
-
 function setupMeigenAdmin() {
   const lock = document.getElementById("meigenAdminLock");
   const panel = document.getElementById("meigenAdminPanel");
@@ -305,13 +261,10 @@ function setupMeigenAdmin() {
   const exportArea = document.getElementById("meigenExportArea");
   const exportBtn = document.getElementById("meigenExportBtn");
   const resetBtn = document.getElementById("meigenResetBtn");
-
   if (!lock || !panel || !form || !list) return;
-
   let adminUnlocked = false;
   let remoteSubmissions = [];
   let remoteReady = false;
-
   const setPanelInteractive = (enabled) => {
     const controls = panel.querySelectorAll("input, textarea, select, button");
     controls.forEach((control) => {
@@ -319,18 +272,14 @@ function setupMeigenAdmin() {
     });
     panel.setAttribute("aria-hidden", enabled ? "false" : "true");
   };
-
   const isAdminUnlocked = () => adminUnlocked === true && sessionStorage.getItem(MEIGEN_ADMIN_PASS_KEY) === "true";
-
   const showSubmissionMessage = (message) => {
     if (submissionMsg) submissionMsg.textContent = message || "";
   };
-
   const consumeIncomingSubmission = () => {
     const params = new URLSearchParams(window.location.search);
     const encoded = params.get("submit");
     const posted = params.get("posted");
-
     if (encoded) {
       try {
         const item = meigenNormalizeSubmission(JSON.parse(meigenBase64UrlDecode(encoded)));
@@ -340,17 +289,14 @@ function setupMeigenAdmin() {
       } catch (error) {
         if (passMsg) passMsg.textContent = "投稿案の読み込みに失敗しました。";
       }
-
       window.history.replaceState({}, document.title, MEIGEN_ADMIN_PAGE);
       return;
     }
-
     if (posted && passMsg) {
       passMsg.textContent = "投稿案を受け付けました。管理者が確認します。";
       window.history.replaceState({}, document.title, MEIGEN_ADMIN_PAGE);
     }
   };
-
   const allSubmissions = () => {
     const merged = [];
     const seen = new Set();
@@ -364,22 +310,18 @@ function setupMeigenAdmin() {
       seen.add(signature);
       merged.push({ ...normalized, source });
     };
-
     remoteSubmissions.forEach((item) => pushItem(item, "remote"));
     meigenGetLocalSubmissions().forEach((item) => pushItem(item, "local"));
     return merged;
   };
-
   const renderSubmissionList = () => {
     if (!submissionList) return;
     const submissions = allSubmissions();
-
     if (!submissions.length) {
       const suffix = remoteReady ? "" : " 受信APIが未設定の場合は、この端末に届いた投稿案だけ表示されます。";
       submissionList.innerHTML = `<div class="empty-meigen-box">投稿案はまだありません。${suffix}</div>`;
       return;
     }
-
     submissionList.innerHTML = submissions.map((item) => {
       const received = item.createdAt ? new Date(item.createdAt).toLocaleString("ja-JP") : "未設定";
       return `
@@ -400,7 +342,6 @@ function setupMeigenAdmin() {
       `;
     }).join("");
   };
-
   const refreshRemoteSubmissions = async () => {
     if (!isAdminUnlocked()) return;
     try {
@@ -413,7 +354,6 @@ function setupMeigenAdmin() {
     }
     renderSubmissionList();
   };
-
   const removeSubmission = async (source, id) => {
     if (source === "remote") {
       await meigenDeleteRemoteSubmission(id);
@@ -422,7 +362,6 @@ function setupMeigenAdmin() {
       meigenSaveLocalSubmissions(meigenGetLocalSubmissions().filter((item) => item.id !== id));
     }
   };
-
   const openPanel = () => {
     adminUnlocked = true;
     lock.hidden = true;
@@ -432,18 +371,15 @@ function setupMeigenAdmin() {
     renderSubmissionList();
     refreshRemoteSubmissions();
   };
-
   const showLock = () => {
     adminUnlocked = false;
     lock.hidden = false;
     panel.hidden = true;
     setPanelInteractive(false);
   };
-
   consumeIncomingSubmission();
   showLock();
   if (sessionStorage.getItem(MEIGEN_ADMIN_PASS_KEY) === "true") openPanel();
-
   if (passBtn) {
     passBtn.addEventListener("click", () => {
       if ((passInput?.value || "").trim() === MEIGEN_ADMIN_PASSWORD) {
@@ -454,20 +390,17 @@ function setupMeigenAdmin() {
       }
     });
   }
-
   if (passInput) {
     passInput.addEventListener("keydown", (event) => {
       if (event.key === "Enter") passBtn?.click();
     });
   }
-
   function renderAdminList() {
     const localItems = meigenGetLocalItems();
     if (!localItems.length) {
       list.innerHTML = `<div class="empty-meigen-box">管理中の迷言はまだありません。上のフォームから追加してね。</div>`;
       return;
     }
-
     list.innerHTML = localItems.map((item) => `
       <article class="admin-meigen-item ${item.visible === false ? "is-hidden" : ""}">
         <div>
@@ -484,7 +417,6 @@ function setupMeigenAdmin() {
       </article>
     `).join("");
   }
-
   form.addEventListener("submit", (event) => {
     event.preventDefault();
     if (!isAdminUnlocked()) {
@@ -502,21 +434,17 @@ function setupMeigenAdmin() {
       memo: String(formData.get("memo") || "").trim(),
       visible: formData.get("visible") === "true"
     };
-
     if (!item.text) return;
-
     const localItems = meigenGetLocalItems();
     const nextItems = editId
       ? localItems.map((current) => current.id === editId ? item : current)
       : [item, ...localItems];
-
     meigenSaveLocalItems(nextItems);
     form.reset();
     form.querySelector("[name='editId']").value = "";
     form.querySelector("[name='visible']").value = "true";
     renderAdminList();
   });
-
   list.addEventListener("click", (event) => {
     if (!isAdminUnlocked()) {
       showLock();
@@ -529,19 +457,16 @@ function setupMeigenAdmin() {
     const localItems = meigenGetLocalItems();
     const target = localItems.find((item) => item.id === id);
     if (!target) return;
-
     if (action === "toggle") {
       target.visible = target.visible === false;
       meigenSaveLocalItems(localItems);
       renderAdminList();
     }
-
     if (action === "delete") {
       if (!confirm("この迷言を削除しますか？")) return;
       meigenSaveLocalItems(localItems.filter((item) => item.id !== id));
       renderAdminList();
     }
-
     if (action === "edit") {
       form.querySelector("[name='editId']").value = target.id;
       form.querySelector("[name='text']").value = target.text || "";
@@ -553,7 +478,6 @@ function setupMeigenAdmin() {
       form.scrollIntoView({ behavior: "smooth", block: "center" });
     }
   });
-
   if (submissionList) {
     submissionList.addEventListener("click", async (event) => {
       if (!isAdminUnlocked()) {
@@ -562,16 +486,13 @@ function setupMeigenAdmin() {
       }
       const button = event.target.closest("button[data-action]");
       if (!button) return;
-
       const action = button.dataset.action;
       const source = button.dataset.source;
       const id = button.dataset.id;
       const target = allSubmissions().find((item) => item.id === id && item.source === source);
       if (!target) return;
-
       button.disabled = true;
       showSubmissionMessage("処理中です…");
-
       try {
         if (action === "delete-submission") {
           if (!confirm("この投稿案を削除しますか？")) {
@@ -582,7 +503,6 @@ function setupMeigenAdmin() {
           await removeSubmission(source, id);
           showSubmissionMessage("投稿案を削除しました。");
         }
-
         if (action === "accept-public" || action === "accept-private") {
           const visible = action === "accept-public";
           const localItems = meigenGetLocalItems();
@@ -594,11 +514,9 @@ function setupMeigenAdmin() {
       } catch (error) {
         showSubmissionMessage("処理に失敗しました。時間をおいてもう一度試してください。");
       }
-
       renderSubmissionList();
     });
   }
-
   if (exportBtn && exportArea) {
     exportBtn.addEventListener("click", () => {
       if (!isAdminUnlocked()) {
@@ -612,7 +530,6 @@ function setupMeigenAdmin() {
       exportArea.select();
     });
   }
-
   if (resetBtn) {
     resetBtn.addEventListener("click", () => {
       if (!isAdminUnlocked()) {
@@ -627,24 +544,20 @@ function setupMeigenAdmin() {
     });
   }
 }
-
 function setupMeigenSubmitForm() {
   const form = document.getElementById("meigenSubmitForm");
   const sendBtn = document.getElementById("meigenSubmitSendBtn");
   const status = document.getElementById("meigenSubmitStatus");
   const successBox = document.getElementById("meigenSubmitSuccess");
   if (!form) return;
-
   const setStatus = (message) => {
     if (status) status.textContent = message || "";
   };
-
   const resetSendButton = () => {
     if (!sendBtn) return;
     sendBtn.disabled = false;
     sendBtn.textContent = "送信";
   };
-
   const showSubmitSuccess = () => {
     form.reset();
     form.hidden = true;
@@ -654,7 +567,6 @@ function setupMeigenSubmitForm() {
       successBox.scrollIntoView({ behavior: "smooth", block: "center" });
     }
   };
-
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
     const data = new FormData(form);
@@ -668,18 +580,15 @@ function setupMeigenSubmitForm() {
       memo: data.get("memo"),
       createdAt: new Date().toISOString()
     });
-
     if (!item.text) {
       setStatus("迷言を入力してください。");
       return;
     }
-
     if (sendBtn) {
       sendBtn.disabled = true;
       sendBtn.textContent = "送信中…";
     }
     setStatus("投稿案を送信しています…");
-
     try {
       await meigenPostRemoteSubmission(item);
       showSubmitSuccess();
@@ -690,7 +599,6 @@ function setupMeigenSubmitForm() {
     }
   });
 }
-
 renderMeigenList();
 setupMeigenAdmin();
 setupMeigenSubmitForm();

@@ -7,44 +7,35 @@ const YUZU_DAILY_THEMES = [
   { key: "friday", dayName: "金曜", themeName: "黄金オレンジ・お祭り", note: "黄金、オレンジ、炎色の光を強め、文字は淡い金白で読みやすくしたテーマ。" },
   { key: "saturday", dayName: "土曜", themeName: "電脳ブルー・深夜配信", note: "電脳ブルー、シアン、紫の光を強め、文字は青白く読みやすくしたテーマ。" }
 ];
-
 const YUZU_THEME_OVERRIDE_KEY = "yuzuThemeOverride";
-
 function getYuzuThemeByKey(key) {
   return YUZU_DAILY_THEMES.find((theme) => theme.key === key) || null;
 }
-
 function getYuzuTodayTheme() {
   return YUZU_DAILY_THEMES[new Date().getDay()] || YUZU_DAILY_THEMES[1];
 }
-
 function getNextLocalMidnightTime() {
   const next = new Date();
   next.setHours(24, 0, 0, 0);
   return next.getTime();
 }
-
 function getSavedYuzuThemeOverride() {
   try {
     const raw = localStorage.getItem(YUZU_THEME_OVERRIDE_KEY);
     if (!raw) return null;
-
     const saved = JSON.parse(raw);
     const theme = saved && getYuzuThemeByKey(saved.themeKey);
     const expiresAt = Number(saved && saved.expiresAt);
-
     if (!theme || !expiresAt || Date.now() >= expiresAt) {
       localStorage.removeItem(YUZU_THEME_OVERRIDE_KEY);
       return null;
     }
-
     return { theme, expiresAt };
   } catch (error) {
     localStorage.removeItem(YUZU_THEME_OVERRIDE_KEY);
     return null;
   }
 }
-
 function getYuzuActiveThemeState() {
   const todayTheme = getYuzuTodayTheme();
   const override = getSavedYuzuThemeOverride();
@@ -54,115 +45,90 @@ function getYuzuActiveThemeState() {
     override
   };
 }
-
 function applyYuzuTheme() {
   const state = getYuzuActiveThemeState();
   document.documentElement.setAttribute("data-yuzu-theme", state.activeTheme.key);
   return state;
 }
-
 function setYuzuThemeOverride(themeKey) {
   const theme = getYuzuThemeByKey(themeKey);
   if (!theme) return null;
-
   const expiresAt = getNextLocalMidnightTime();
   localStorage.setItem(YUZU_THEME_OVERRIDE_KEY, JSON.stringify({ themeKey: theme.key, expiresAt }));
   return applyYuzuTheme();
 }
-
 function formatYuzuThemeExpiry(expiresAt) {
   const date = new Date(expiresAt);
   return `${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
 }
-
 (function setupYuzuTheme() {
   let midnightTimerId = null;
-
   const updateThemePage = () => {
     const state = applyYuzuTheme();
     const { todayTheme, activeTheme, override } = state;
-
     document.querySelectorAll("[data-theme-day]").forEach((row) => {
       row.classList.toggle("is-today", row.dataset.themeDay === todayTheme.key);
       row.classList.toggle("is-active", row.dataset.themeDay === activeTheme.key);
     });
-
     document.querySelectorAll("[data-theme-pick]").forEach((button) => {
       const isActive = button.dataset.themePick === activeTheme.key;
       button.classList.toggle("is-active", isActive);
       button.setAttribute("aria-pressed", isActive ? "true" : "false");
     });
-
     const todayLabel = document.getElementById("todayThemeLabel");
     if (todayLabel) {
       todayLabel.textContent = override
         ? `現在のテーマ：${activeTheme.dayName}｜${activeTheme.themeName}（0:00まで固定中）`
         : `今日のテーマ：${todayTheme.dayName}｜${todayTheme.themeName}`;
     }
-
     const todayCopy = document.getElementById("todayThemeCopy");
     if (todayCopy) {
       todayCopy.textContent = override
         ? `${activeTheme.note} 次の0:00になると曜日テーマへ戻ります。`
         : activeTheme.note;
     }
-
     const overrideStatus = document.getElementById("themeOverrideStatus");
     if (overrideStatus) {
       overrideStatus.textContent = override
         ? `${activeTheme.dayName}テーマを${formatYuzuThemeExpiry(override.expiresAt)}まで固定中です。`
         : "通常の曜日テーマで表示中です。好きな曜日テーマを押すと、次の0:00まで固定できます。";
     }
-
     if (midnightTimerId) window.clearTimeout(midnightTimerId);
     const msUntilMidnight = Math.max(1000, getNextLocalMidnightTime() - Date.now() + 1200);
     midnightTimerId = window.setTimeout(updateThemePage, Math.min(msUntilMidnight, 2147483000));
   };
-
   const bootThemeUi = () => {
     updateThemePage();
-
     document.querySelectorAll("[data-theme-pick]").forEach((button) => {
       button.addEventListener("click", () => {
         setYuzuThemeOverride(button.dataset.themePick);
         updateThemePage();
       });
     });
-
     document.addEventListener("visibilitychange", () => {
       if (!document.hidden) updateThemePage();
     });
   };
-
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", bootThemeUi, { once: true });
   } else {
     bootThemeUi();
   }
 })();
-
 const TWITCH_FUNCTION_URL = "/api/twitch";
-
 async function checkLiveStatus() {
   try {
     const response = await fetch(TWITCH_FUNCTION_URL, { cache: "no-store" });
     const data = await response.json();
-
     updateLiveArea(data);
     updateScheduleArea(data);
-
   } catch (error) {
-
     console.error("Twitch取得エラー:", error);
-
     showLiveError();
     showScheduleError();
-
   }
 }
-
 function updateLiveArea(data) {
-
   const liveBadge = document.getElementById("liveBadge");
   const liveBadgeText = document.getElementById("liveBadgeText");
   const liveDetail = document.getElementById("liveDetail");
@@ -171,78 +137,47 @@ function updateLiveArea(data) {
   const twitchSwitchText = document.getElementById("twitchSwitchText");
   const liveThumb = document.getElementById("liveThumb");
   const scheduleBtn = document.querySelector(".schedule-btn");
-
   if (!liveBadge || !liveBadgeText || !liveDetail || !todayGame || !twitchSwitchText || !liveThumb) return;
-
   if (data.isLive && data.stream) {
-
     const stream = data.stream;
-
     liveBadge.classList.remove("is-checking", "is-offline");
     liveBadge.classList.add("is-live");
-
     if (scheduleBtn) scheduleBtn.classList.add("is-live");
     if (twitchSwitch) twitchSwitch.classList.add("is-live");
-
     liveBadgeText.innerText = "🔴 LIVE配信中";
-
     liveDetail.innerHTML = `
       ${escapeHtml(stream.title || "配信中")}<br>
       👀 ${stream.viewerCount ?? 0}人視聴中
     `;
-
     todayGame.innerHTML = `
       🎮 今日のゲーム：${escapeHtml(stream.gameName || "未設定")}
     `;
-
     twitchSwitchText.innerText = "LIVE中！";
-
     if (stream.thumbnailUrl) {
-
       liveThumb.src = `${stream.thumbnailUrl}?t=${Date.now()}`;
-
       liveThumb.hidden = false;
-
     } else {
-
       liveThumb.hidden = true;
-
     }
-
   } else {
-
     liveBadge.classList.remove("is-checking", "is-live");
     liveBadge.classList.add("is-offline");
-
     if (scheduleBtn) scheduleBtn.classList.remove("is-live");
     if (twitchSwitch) twitchSwitch.classList.remove("is-live");
-
     liveBadgeText.innerText = "⚫ OFFLINE";
-
     liveDetail.innerText = "現在オフラインです";
-
     todayGame.innerHTML = "🎮 今日のゲーム：未定";
-
     twitchSwitchText.innerText = "現在オフライン";
-
     liveThumb.hidden = true;
-
   }
-
 }
-
 function updateScheduleArea(data) {
-
   const scheduleStatus = document.getElementById("scheduleStatus");
   const scheduleList = document.getElementById("scheduleList");
   const scheduleNote = document.getElementById("scheduleNote");
-
   if (!scheduleStatus || !scheduleList || !scheduleNote) return;
-
   if (!data.scheduleConfigured) {
-
     scheduleStatus.innerText = "Twitch予定を取得できませんでした";
-
     scheduleList.innerHTML = `
       <li>
         <span class="schedule-title">予定取得の準備中</span>
@@ -251,23 +186,16 @@ function updateScheduleArea(data) {
         </span>
       </li>
     `;
-
     scheduleNote.innerText =
       data.scheduleMessage || "予定はX・Discordでもお知らせします。";
-
     return;
-
   }
-
   const segments = Array.isArray(data.schedule)
     ? data.schedule
     : [];
-
   if (segments.length === 0) {
-
     scheduleStatus.innerText =
       "Twitchに登録済みの予定はまだありません";
-
     scheduleList.innerHTML = `
       <li>
         <span class="schedule-title">予定未登録</span>
@@ -276,87 +204,60 @@ function updateScheduleArea(data) {
         </span>
       </li>
     `;
-
     scheduleNote.innerText =
       "Twitchの配信スケジュールに予定を入れると、ここへ自動反映されます。";
-
     return;
-
   }
-
   scheduleStatus.innerText = "Twitchの配信予定";
-
   scheduleList.innerHTML = segments.map((item) => {
-
     const startText = formatScheduleDate(item.startTime);
-
     const title = item.title || "配信予定";
-
     const category = item.category || "カテゴリ未設定";
-
     return `
       <li>
         <span class="schedule-date">
           ${escapeHtml(startText)}
         </span>
-
         <span class="schedule-title">
           ${escapeHtml(title)}
         </span>
-
         <span class="schedule-category">
           🎮 ${escapeHtml(category)}
         </span>
       </li>
     `;
-
   }).join("");
-
   scheduleNote.innerText =
     "予定変更はTwitch・X・Discordで確認してね。";
-
 }
-
 function showLiveError() {
-
   const liveBadgeText = document.getElementById("liveBadgeText");
   const liveDetail = document.getElementById("liveDetail");
   const todayGame = document.getElementById("todayGame");
   const twitchSwitchText = document.getElementById("twitchSwitchText");
   const liveThumb = document.getElementById("liveThumb");
-
   if (liveBadgeText)
     liveBadgeText.innerText = "⚠️ 確認失敗";
-
   if (liveDetail)
     liveDetail.innerText =
       "Twitchの配信状態を取得できませんでした";
-
   if (todayGame)
     todayGame.innerHTML =
       "🎮 今日のゲーム：確認失敗";
-
   if (twitchSwitchText)
     twitchSwitchText.innerText =
       "配信状態を確認できません";
-
   if (liveThumb)
     liveThumb.hidden = true;
-
 }
-
 function showScheduleError() {
-
   const scheduleStatus = document.getElementById("scheduleStatus");
   const scheduleList = document.getElementById("scheduleList");
   const scheduleNote = document.getElementById("scheduleNote");
-
   if (scheduleStatus)
     scheduleStatus.innerText =
       "配信予定を取得できませんでした";
-
   if (scheduleList) {
-
     scheduleList.innerHTML = `
       <li>
         <span class="schedule-title">取得エラー</span>
@@ -365,24 +266,16 @@ function showScheduleError() {
         </span>
       </li>
     `;
-
   }
-
   if (scheduleNote)
     scheduleNote.innerText =
       "Twitch予定が取れない場合はX・Discordを確認してね。";
-
 }
-
 function formatScheduleDate(value) {
-
   if (!value) return "日時未定";
-
   const date = new Date(value);
-
   if (Number.isNaN(date.getTime()))
     return "日時未定";
-
   return new Intl.DateTimeFormat("ja-JP", {
     month: "numeric",
     day: "numeric",
@@ -390,48 +283,35 @@ function formatScheduleDate(value) {
     hour: "2-digit",
     minute: "2-digit"
   }).format(date);
-
 }
-
 function queueLowPriorityTask(callback, timeout = 1800) {
   if (typeof callback !== "function") return;
-
   if ("requestIdleCallback" in window) {
     window.requestIdleCallback(callback, { timeout });
     return;
   }
-
   window.setTimeout(callback, Math.min(timeout, 1200));
 }
-
 function runAfterWindowLoad(callback, delay = 0) {
   const start = () => window.setTimeout(callback, delay);
-
   if (document.readyState === "complete") {
     start();
     return;
   }
-
   window.addEventListener("load", start, { once: true });
 }
-
 function escapeHtml(value) {
-
   return String(value)
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
-
 }
-
-// キャラ切り替え
 const ghostMascot = document.getElementById("ghostMascot");
 const tanuMascot = document.getElementById("tanuMascot");
 const ghostBubble = document.getElementById("ghostBubble");
 const tanuBubble = document.getElementById("tanuBubble");
-
 const ghostFaces = [
   {
     src: "assets/ghost.webp",
@@ -442,7 +322,6 @@ const ghostFaces = [
     text: "コメントくれるとめっちゃ嬉しいよ〜！"
   }
 ];
-
 const tanuFaces = [
   {
     src: "assets/tanuchan.webp",
@@ -457,67 +336,49 @@ const tanuFaces = [
     text: "秘密基地でのんびりしてってね！"
   }
 ];
-
 let faceIndex = 0;
-
 function rotateMascots() {
-
   if (
     !ghostMascot ||
     !tanuMascot ||
     !ghostBubble ||
     !tanuBubble
   ) return;
-
   faceIndex =
     (faceIndex + 1) % ghostFaces.length;
-
   ghostMascot.src =
     ghostFaces[faceIndex].src;
-
   ghostBubble.innerText =
     ghostFaces[faceIndex].text;
-
   tanuMascot.src =
     tanuFaces[faceIndex].src;
-
   tanuBubble.innerText =
     tanuFaces[faceIndex].text;
-
 }
-
 function startTwitchStatusPolling() {
   checkLiveStatus();
   setInterval(checkLiveStatus, 60000);
 }
-
 function scheduleTwitchStatusPolling() {
   const start = () => startTwitchStatusPolling();
-
   runAfterWindowLoad(() => {
     queueLowPriorityTask(start, 2600);
   }, 700);
 }
-
 scheduleTwitchStatusPolling();
-
 function scheduleMascotRotation() {
   let timerId = null;
   const start = () => {
     if (timerId) return;
     timerId = setInterval(rotateMascots, 14000);
   };
-
   const area = document.querySelector(".mascot-area");
   const prefersReducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
   if (prefersReducedMotion) return;
-
   if (!area || !("IntersectionObserver" in window)) {
     runAfterWindowLoad(() => queueLowPriorityTask(start, 3500), 900);
     return;
   }
-
   const observer = new IntersectionObserver((entries) => {
     if (!entries.some((entry) => entry.isIntersecting)) return;
     start();
@@ -526,16 +387,10 @@ function scheduleMascotRotation() {
     rootMargin: "180px 0px",
     threshold: 0.01
   });
-
   observer.observe(area);
   runAfterWindowLoad(() => window.setTimeout(start, 9000), 900);
 }
-
 scheduleMascotRotation();
-
-// 配信履歴：同じ日に複数ゲームを入れられます。
-// 例：{ date: "2026年5月25日", games: ["VALORANT", "雑談"] }
-
 const dailyQuotes = [
   {
     text: "成功とは、失敗を重ねても情熱を失わないことだ。",
@@ -598,7 +453,6 @@ const dailyQuotes = [
     author: "アルベルト・アインシュタイン"
   }
 ];
-
 function getTodayKey() {
   const now = new Date();
   return [
@@ -607,23 +461,18 @@ function getTodayKey() {
     String(now.getDate()).padStart(2, "0")
   ].join("-");
 }
-
 function setDailyQuote() {
   const text = document.getElementById("dailyWordText");
   if (!text) return;
-
   const todayKey = getTodayKey();
   const storageKey = "yuzukosyoDailyQuote";
   let saved = null;
-
   try {
     saved = JSON.parse(localStorage.getItem(storageKey) || "null");
   } catch (error) {
     saved = null;
   }
-
   let quote = null;
-
   if (
     saved &&
     saved.date === todayKey &&
@@ -634,27 +483,22 @@ function setDailyQuote() {
   } else {
     const index = Math.floor(Math.random() * dailyQuotes.length);
     quote = dailyQuotes[index];
-
     try {
       localStorage.setItem(storageKey, JSON.stringify({
         date: todayKey,
         index
       }));
     } catch (error) {
-      // localStorageが使えない環境でも表示は続ける
     }
   }
-
   text.innerHTML = `
     <span class="quote-mark">“</span>${escapeHtml(quote.text)}<span class="quote-mark">”</span>
     <small>— ${escapeHtml(quote.author)}</small>
   `;
 }
-
 function normalizeMeigenValue(value) {
   return String(value || "").trim().replace(/\s+/g, " ");
 }
-
 function getMeigenSignature(item) {
   return [
     normalizeMeigenValue(item?.text),
@@ -663,13 +507,11 @@ function getMeigenSignature(item) {
     normalizeMeigenValue(item?.date || "未設定")
   ].join("|");
 }
-
 function getVisibleMeigensForTop() {
   const publicItems = Array.isArray(window.YUZUKOSYO_PUBLIC_MEIGEN)
     ? window.YUZUKOSYO_PUBLIC_MEIGEN
     : [];
   let localItems = [];
-
   try {
     const raw = localStorage.getItem("yuzukosyoMeigenItems");
     const parsed = raw ? JSON.parse(raw) : [];
@@ -677,9 +519,7 @@ function getVisibleMeigensForTop() {
   } catch (error) {
     localItems = [];
   }
-
   const seen = new Set();
-
   return [...publicItems, ...localItems].filter((item) => {
     if (!item || item.visible === false || !String(item.text || "").trim()) return false;
     const signature = getMeigenSignature(item);
@@ -688,32 +528,26 @@ function getVisibleMeigensForTop() {
     return true;
   });
 }
-
 function getDailyMeigenForTop(items) {
   const todayKey = getTodayKey();
   const storageKey = "yuzukosyoDailyMeigen";
   let saved = null;
-
   try {
     saved = JSON.parse(localStorage.getItem(storageKey) || "null");
   } catch (error) {
     saved = null;
   }
-
   if (saved && saved.date === todayKey) {
     if (saved.id) {
       const savedItem = items.find((item) => item.id === saved.id);
       if (savedItem) return savedItem;
     }
-
     if (Number.isInteger(saved.index) && items[saved.index]) {
       return items[saved.index];
     }
   }
-
   const index = Math.floor(Math.random() * items.length);
   const item = items[index];
-
   try {
     localStorage.setItem(storageKey, JSON.stringify({
       date: todayKey,
@@ -721,18 +555,13 @@ function getDailyMeigenForTop(items) {
       id: item.id || ""
     }));
   } catch (error) {
-    // localStorageが使えない環境でも表示は続ける
   }
-
   return item;
 }
-
 function setDailyMeigen() {
   const text = document.getElementById("dailyMeigenText");
   if (!text) return;
-
   const items = getVisibleMeigensForTop();
-
   if (!items.length) {
     text.innerHTML = `
       公開中の迷言はまだありません。
@@ -740,17 +569,14 @@ function setDailyMeigen() {
     `;
     return;
   }
-
   const item = getDailyMeigenForTop(items);
   const speaker = item.speaker || "発言者未設定";
   const place = item.place ? ` / ${item.place}` : "";
-
   text.innerHTML = `
     <span class="quote-mark">“</span>${escapeHtml(item.text)}<span class="quote-mark">”</span>
     <small>— ${escapeHtml(speaker + place)}</small>
   `;
 }
-
 const omikujiItems = [
   {
     fortune: "大吉",
@@ -859,7 +685,6 @@ const omikujiItems = [
     weight: 1
   }
 ];
-
 function showOmikujiResult(item) {
   const ready = document.getElementById("omikujiReady");
   const result = document.getElementById("omikujiResult");
@@ -868,7 +693,6 @@ function showOmikujiResult(item) {
   const stream = document.getElementById("omikujiStream");
   const game = document.getElementById("omikujiGame");
   const chat = document.getElementById("omikujiChat");
-
   if (ready) ready.hidden = true;
   if (result) {
     result.hidden = false;
@@ -880,9 +704,7 @@ function showOmikujiResult(item) {
   if (game) game.textContent = item.game;
   if (chat) chat.textContent = item.chat;
 }
-
 const SITE_SHARE_URL = "https://yuzukosyo.pages.dev/";
-
 function wrapCanvasText(ctx, text, x, y, maxWidth, lineHeight, maxLines = 99) {
   const rawText = String(text || "");
   const paragraphs = rawText.split(/\n+/);
@@ -907,13 +729,11 @@ function wrapCanvasText(ctx, text, x, y, maxWidth, lineHeight, maxLines = 99) {
   lines.forEach((line, index) => ctx.fillText(line, x, y + index * lineHeight));
   return y + lines.length * lineHeight;
 }
-
 function canvasToPngBlob(canvas) {
   return new Promise((resolve) => {
     canvas.toBlob((blob) => resolve(blob), "image/png");
   });
 }
-
 function downloadBlobFile(blob, filename) {
   if (!blob) return;
   const url = URL.createObjectURL(blob);
@@ -925,13 +745,11 @@ function downloadBlobFile(blob, filename) {
   link.remove();
   window.setTimeout(() => URL.revokeObjectURL(url), 1200);
 }
-
 function openXShareText(text) {
   const shareText = `${text}\n\n#柚胡椒の秘密基地\n${SITE_SHARE_URL}`;
   const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`;
   window.open(url, "_blank", "noopener,noreferrer");
 }
-
 async function shareOrDownloadImage(blob, filename, text, title) {
   if (!blob) return;
   const file = new File([blob], filename, { type: "image/png" });
@@ -940,25 +758,20 @@ async function shareOrDownloadImage(blob, filename, text, title) {
     text: `${text}\n\n#柚胡椒の秘密基地\n${SITE_SHARE_URL}`,
     files: [file]
   };
-
   try {
     if (navigator.canShare && navigator.canShare({ files: [file] }) && navigator.share) {
       await navigator.share(shareData);
       return;
     }
   } catch (error) {
-
   }
-
   downloadBlobFile(blob, filename);
   openXShareText(`${text}\n\n画像を保存したので、投稿画面で添付してね。`);
 }
-
 async function shareImageOnly(blob, filename, text, title) {
   if (!blob) return false;
   const file = new File([blob], filename, { type: "image/png" });
   const shareText = `${text}\n\n#柚胡椒の秘密基地\n${SITE_SHARE_URL}`;
-
   try {
     if (navigator.share) {
       if (!navigator.canShare || navigator.canShare({ files: [file] })) {
@@ -969,7 +782,6 @@ async function shareImageOnly(blob, filename, text, title) {
         });
         return true;
       }
-
       await navigator.share({
         title: title || "柚胡椒の秘密基地",
         text: shareText,
@@ -980,24 +792,19 @@ async function shareImageOnly(blob, filename, text, title) {
   } catch (error) {
     return false;
   }
-
   window.alert("このブラウザでは共有画面を開けません。下の保存ボタンから画像を保存して投稿してください。");
   return false;
 }
-
 function pickWeightedOmikujiIndex() {
   const totalWeight = omikujiItems.reduce((sum, item) => sum + (Number(item.weight) > 0 ? Number(item.weight) : 10), 0);
   let random = Math.random() * totalWeight;
-
   for (let i = 0; i < omikujiItems.length; i += 1) {
     const weight = Number(omikujiItems[i].weight) > 0 ? Number(omikujiItems[i].weight) : 10;
     random -= weight;
     if (random <= 0) return i;
   }
-
   return Math.max(0, omikujiItems.length - 1);
 }
-
 function createOmikujiShareCanvas(item) {
   const scale = 2;
   const width = 980;
@@ -1007,16 +814,13 @@ function createOmikujiShareCanvas(item) {
   canvas.height = height * scale;
   const ctx = canvas.getContext("2d");
   if (!ctx) return null;
-
   ctx.scale(scale, scale);
-
   const bg = ctx.createLinearGradient(0, 0, width, height);
   bg.addColorStop(0, "#160726");
   bg.addColorStop(0.52, "#0b0314");
   bg.addColorStop(1, "#21071f");
   ctx.fillStyle = bg;
   ctx.fillRect(0, 0, width, height);
-
   ctx.fillStyle = "rgba(168,85,247,.26)";
   ctx.beginPath();
   ctx.arc(120, 120, 190, 0, Math.PI * 2);
@@ -1029,12 +833,10 @@ function createOmikujiShareCanvas(item) {
   ctx.beginPath();
   ctx.arc(490, 1040, 260, 0, Math.PI * 2);
   ctx.fill();
-
   ctx.strokeStyle = "rgba(216,180,254,.62)";
   ctx.lineWidth = 3;
   drawRoundedRect(ctx, 46, 46, width - 92, height - 92, 38);
   ctx.stroke();
-
   ctx.textAlign = "center";
   ctx.shadowColor = "rgba(168,85,247,.85)";
   ctx.shadowBlur = 18;
@@ -1042,25 +844,21 @@ function createOmikujiShareCanvas(item) {
   ctx.font = "900 34px -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Noto Sans JP', sans-serif";
   ctx.fillText("🔮 今日の柚胡椒みくじ", width / 2, 118);
   ctx.shadowBlur = 0;
-
   ctx.font = "800 20px -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Noto Sans JP', sans-serif";
   ctx.fillStyle = "rgba(237,225,255,.76)";
   ctx.fillText(formatDateJa(new Date()), width / 2, 156);
-
   ctx.fillStyle = item && item.rare ? "rgba(250,204,21,.18)" : "rgba(112,214,255,.13)";
   ctx.strokeStyle = item && item.rare ? "rgba(250,204,21,.62)" : "rgba(112,214,255,.52)";
   ctx.lineWidth = 2;
   drawRoundedRect(ctx, 105, 210, width - 210, 190, 28);
   ctx.fill();
   ctx.stroke();
-
   ctx.shadowColor = item && item.rare ? "rgba(250,204,21,.82)" : "rgba(112,214,255,.78)";
   ctx.shadowBlur = 20;
   ctx.fillStyle = "#ffffff";
   ctx.font = "900 58px -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Noto Sans JP', sans-serif";
   ctx.fillText(item.fortune || "-", width / 2, 322);
   ctx.shadowBlur = 0;
-
   ctx.textAlign = "left";
   ctx.fillStyle = "#f7ecff";
   ctx.font = "900 28px -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Noto Sans JP', sans-serif";
@@ -1069,7 +867,6 @@ function createOmikujiShareCanvas(item) {
   ctx.font = "800 25px -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Noto Sans JP', sans-serif";
   ctx.fillStyle = "rgba(245,234,255,.94)";
   y = wrapCanvasText(ctx, item.comment || "-", 120, y + 48, width - 240, 38, 5) + 34;
-
   const rows = [
     ["配信運", item.stream || "-"],
     ["ゲーム運", item.game || "-"],
@@ -1082,17 +879,14 @@ function createOmikujiShareCanvas(item) {
     drawRoundedRect(ctx, 120, y, width - 240, 82, 20);
     ctx.fill();
     ctx.stroke();
-
     ctx.fillStyle = "#d8f3ff";
     ctx.font = "900 22px -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Noto Sans JP', sans-serif";
     ctx.fillText(label, 150, y + 51);
-
     ctx.fillStyle = "#ffffff";
     ctx.font = "900 25px -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Noto Sans JP', sans-serif";
     wrapCanvasText(ctx, value, 310, y + 51, width - 460, 30, 1);
     y += 102;
   });
-
   ctx.textAlign = "center";
   ctx.fillStyle = "rgba(237,225,255,.78)";
   ctx.font = "800 22px -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Noto Sans JP', sans-serif";
@@ -1100,10 +894,8 @@ function createOmikujiShareCanvas(item) {
   ctx.fillStyle = "#d8b4fe";
   ctx.font = "900 24px -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Noto Sans JP', sans-serif";
   ctx.fillText(SITE_SHARE_URL, width / 2, height - 84);
-
   return canvas;
 }
-
 function getTodayOmikujiItem() {
   const todayKey = getTodayKey();
   try {
@@ -1116,26 +908,22 @@ function getTodayOmikujiItem() {
   }
   return null;
 }
-
 function updateOmikujiShareButtonState() {
   const shareButton = document.getElementById("omikujiShareButton");
   const saveButton = document.getElementById("omikujiSaveButton");
   const item = getTodayOmikujiItem();
   const disabled = !item;
-
   if (shareButton) {
     shareButton.disabled = disabled;
     shareButton.setAttribute("aria-disabled", disabled ? "true" : "false");
     shareButton.textContent = disabled ? "みくじ後にSNS投稿できます" : "みくじ画像をSNSに投稿 →";
   }
-
   if (saveButton) {
     saveButton.disabled = disabled;
     saveButton.setAttribute("aria-disabled", disabled ? "true" : "false");
     saveButton.textContent = disabled ? "みくじ後に画像保存できます" : "みくじ画像を保存 →";
   }
 }
-
 function setupOmikujiShareButton() {
   const shareButton = document.getElementById("omikujiShareButton");
   if (!shareButton) return;
@@ -1156,7 +944,6 @@ function setupOmikujiShareButton() {
     );
   });
 }
-
 function setupOmikujiSaveButton() {
   const saveButton = document.getElementById("omikujiSaveButton");
   if (!saveButton) return;
@@ -1172,22 +959,18 @@ function setupOmikujiSaveButton() {
     downloadBlobFile(blob, `yuzukosyo-omikuji-${getTodayKey()}.png`);
   });
 }
-
 function setupDailyOmikuji() {
   const button = document.getElementById("omikujiButton");
   const box = document.getElementById("omikujiBox");
   if (!button || !box) return;
-
   const todayKey = getTodayKey();
   const storageKey = "yuzukosyoDailyOmikuji";
   let saved = null;
-
   try {
     saved = JSON.parse(localStorage.getItem(storageKey) || "null");
   } catch (error) {
     saved = null;
   }
-
   if (
     saved &&
     saved.date === todayKey &&
@@ -1201,10 +984,8 @@ function setupDailyOmikuji() {
     button.setAttribute("aria-disabled", "true");
     updateOmikujiShareButtonState();
   }
-
   button.addEventListener("click", () => {
     let index;
-
     try {
       const current = JSON.parse(localStorage.getItem(storageKey) || "null");
       if (
@@ -1218,7 +999,6 @@ function setupDailyOmikuji() {
     } catch (error) {
       index = undefined;
     }
-
     if (!Number.isInteger(index)) {
       index = pickWeightedOmikujiIndex();
       try {
@@ -1227,18 +1007,14 @@ function setupDailyOmikuji() {
           index
         }));
       } catch (error) {
-
       }
     }
-
     button.disabled = true;
     button.setAttribute("aria-disabled", "true");
     button.textContent = "占い中…";
-
     box.classList.remove("omikuji-reveal", "omikuji-drawing");
     void box.offsetWidth;
     box.classList.add("omikuji-drawing");
-
     window.setTimeout(() => {
       box.classList.remove("omikuji-drawing", "omikuji-reveal");
       void box.offsetWidth;
@@ -1252,18 +1028,15 @@ function setupDailyOmikuji() {
     }, 520);
   });
 }
-
 const VISIT_STAMP_STORAGE_KEY = "yuzukosyoVisitStampsV1";
 const VISIT_STAMP_HISTORY_MONTHS = 24;
 const SECRET_ROOM_UNLOCK_DAYS = 20;
 const SECRET_REWARD_TIERS = [20, 40, 60, 80, 100];
-
 function parseDateKeyToLocalDate(dateKey) {
   const parts = String(dateKey).split("-").map(Number);
   if (parts.length !== 3 || parts.some(Number.isNaN)) return null;
   return new Date(parts[0], parts[1] - 1, parts[2]);
 }
-
 function formatDateKeyFromDate(date) {
   return [
     date.getFullYear(),
@@ -1271,44 +1044,36 @@ function formatDateKeyFromDate(date) {
     String(date.getDate()).padStart(2, "0")
   ].join("-");
 }
-
 function addDays(date, offset) {
   const next = new Date(date.getFullYear(), date.getMonth(), date.getDate());
   next.setDate(next.getDate() + offset);
   return next;
 }
-
 function addMonths(date, offset) {
   return new Date(date.getFullYear(), date.getMonth() + offset, 1);
 }
-
 function getVisitStampRetentionStartDate(today = new Date()) {
   const currentMonth = new Date(today.getFullYear(), today.getMonth(), 1);
   return addMonths(currentMonth, -(VISIT_STAMP_HISTORY_MONTHS - 1));
 }
-
 function getVisitStampRetentionRange(today = new Date()) {
   const startDate = getVisitStampRetentionStartDate(today);
   const endDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
   const nextExpiryDate = addMonths(new Date(today.getFullYear(), today.getMonth(), 1), 1);
   return { startDate, endDate, nextExpiryDate };
 }
-
 function pruneVisitStampDatesToRetention(dates, today = new Date()) {
   const { startDate, endDate } = getVisitStampRetentionRange(today);
   const startKey = formatDateKeyFromDate(startDate);
   const endKey = formatDateKeyFromDate(endDate);
   return Array.from(new Set(dates.filter((dateKey) => dateKey >= startKey && dateKey <= endKey))).sort();
 }
-
 function formatYearMonthJa(date) {
   return `${date.getFullYear()}年${date.getMonth() + 1}月`;
 }
-
 function formatDateJa(date) {
   return `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`;
 }
-
 function loadVisitStampDates() {
   try {
     const raw = JSON.parse(localStorage.getItem(VISIT_STAMP_STORAGE_KEY) || "[]");
@@ -1319,30 +1084,23 @@ function loadVisitStampDates() {
     return [];
   }
 }
-
 function saveVisitStampDates(dates) {
   try {
     localStorage.setItem(VISIT_STAMP_STORAGE_KEY, JSON.stringify(pruneVisitStampDatesToRetention(dates)));
   } catch (error) {
-
   }
 }
-
 function getConsecutiveVisitStreak(stampedSet, todayKey) {
   const today = parseDateKeyToLocalDate(todayKey);
   if (!today) return 0;
-
   let streak = 0;
   let cursor = today;
-
   while (stampedSet.has(formatDateKeyFromDate(cursor))) {
     streak += 1;
     cursor = addDays(cursor, -1);
   }
-
   return streak;
 }
-
 function getSecretMilestoneInfo(streak) {
   const cycle = SECRET_ROOM_UNLOCK_DAYS;
   const unlockedTiers = SECRET_REWARD_TIERS.filter((days) => streak >= days);
@@ -1359,31 +1117,26 @@ function getSecretMilestoneInfo(streak) {
   const milestoneLabel = isUnlocked ? `${milestoneCount}個目` : "1個目";
   return { cycle, milestoneCount, cycleProgress, isMilestoneDay, isUnlocked, isAllUnlocked, nextMilestone, remaining, progressCount, milestoneLabel };
 }
-
 function getTwoMonthRangeKeys(today) {
   const currentMonth = new Date(today.getFullYear(), today.getMonth(), 1);
   const previousMonth = addMonths(currentMonth, -1);
   return { previousMonth, currentMonth };
 }
-
 function countVisitsInTwoMonths(dates, today) {
   const { previousMonth } = getTwoMonthRangeKeys(today);
   const startKey = formatDateKeyFromDate(previousMonth);
   const endKey = formatDateKeyFromDate(today);
   return dates.filter((dateKey) => dateKey >= startKey && dateKey <= endKey).length;
 }
-
 function countVisitsInRetentionMonths(dates, today) {
   const startKey = formatDateKeyFromDate(getVisitStampRetentionStartDate(today));
   const endKey = formatDateKeyFromDate(today);
   return dates.filter((dateKey) => dateKey >= startKey && dateKey <= endKey).length;
 }
-
 function getStampHistoryMonths(today = new Date()) {
   const currentMonth = new Date(today.getFullYear(), today.getMonth(), 1);
   return Array.from({ length: VISIT_STAMP_HISTORY_MONTHS }, (_, index) => addMonths(currentMonth, -index));
 }
-
 function buildStampMonth(monthDate,stampedSet,todayKey,freshlyStampedToday=false,options={}){
 const year=monthDate.getFullYear();
 const month=monthDate.getMonth();
@@ -1435,12 +1188,10 @@ ${monthBody}
 </section>
 `;
 }
-
 function triggerVisitStampAnimation(root, streak) {
   if (!root) return;
   const prefersReducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   root.classList.add("is-stamp-pressed");
-
   if (!prefersReducedMotion) {
     const effect = document.createElement("div");
     effect.className = "stamp-press-effect";
@@ -1449,21 +1200,16 @@ function triggerVisitStampAnimation(root, streak) {
     root.appendChild(effect);
     window.setTimeout(() => effect.remove(), 1900);
   }
-
   window.setTimeout(() => root.classList.remove("is-stamp-pressed"), 1900);
 }
-
 let arrivalStampHideTimer = null;
 let arrivalStampRemoveTimer = null;
-
 function closeArrivalStampOverlay() {
   const overlay = document.getElementById("arrivalStampOverlay");
   const previewEl = document.getElementById("arrivalStampPreview");
   if (!overlay || overlay.hidden) return;
-
   clearTimeout(arrivalStampHideTimer);
   clearTimeout(arrivalStampRemoveTimer);
-
   overlay.classList.add("is-hiding");
   arrivalStampRemoveTimer = window.setTimeout(() => {
     overlay.classList.remove("is-showing", "is-hiding");
@@ -1474,44 +1220,35 @@ function closeArrivalStampOverlay() {
     }
   }, 520);
 }
-
 function showArrivalStampOverlay(streak, monthDate, stampedSet, todayKey, options = {}) {
   const overlay = document.getElementById("arrivalStampOverlay");
   const streakEl = document.getElementById("arrivalStampStreak");
   const previewEl = document.getElementById("arrivalStampPreview");
   const closeButton = document.getElementById("arrivalStampClose");
   if (!overlay) return;
-
   const { autoHide = true, hideDelay = 7000 } = options;
   clearTimeout(arrivalStampHideTimer);
   clearTimeout(arrivalStampRemoveTimer);
-
   if (streakEl) streakEl.textContent = String(streak);
   overlay.querySelectorAll("img[data-src]").forEach((img) => {
     if (!img.getAttribute("src")) {
       img.setAttribute("src", img.dataset.src);
     }
   });
-
   if (previewEl && monthDate && stampedSet && todayKey) {
     previewEl.dataset.previewTitle = `${monthDate.getMonth() + 1}月の出席表`;
     previewEl.innerHTML = buildStampMonth(monthDate, stampedSet, todayKey, true);
   }
-
   if (closeButton) {
     closeButton.onclick = closeArrivalStampOverlay;
   }
-
   overlay.hidden = false;
   overlay.classList.remove("is-hiding");
   overlay.classList.add("is-showing");
-
   if (!autoHide) return;
-
   arrivalStampHideTimer = window.setTimeout(() => {
     overlay.classList.add("is-hiding");
   }, hideDelay);
-
   arrivalStampRemoveTimer = window.setTimeout(() => {
     overlay.classList.remove("is-showing", "is-hiding");
     overlay.hidden = true;
@@ -1521,7 +1258,6 @@ function showArrivalStampOverlay(streak, monthDate, stampedSet, todayKey, option
     }
   }, hideDelay + 650);
 }
-
 function setupVisitStampCard() {
   const root = document.getElementById("visitStamp");
   const todayStatus = document.getElementById("stampTodayStatus");
@@ -1537,24 +1273,19 @@ function setupVisitStampCard() {
   const secretRoomLink = document.getElementById("secretRoomLink");
   const unlockProgressBar = document.getElementById("secretUnlockProgressBar");
   const unlockProgressText = document.getElementById("secretUnlockProgressText");
-
   if (!root || !months) return;
-
   const today = new Date();
   const todayKey = getTodayKey();
   const dates = loadVisitStampDates();
   const hadTodayStamp = dates.includes(todayKey);
-
   if (!hadTodayStamp) {
     dates.push(todayKey);
     saveVisitStampDates(dates);
   }
-
   const stampedSet = new Set(dates);
   const streak = getConsecutiveVisitStreak(stampedSet, todayKey);
   const retentionVisits = countVisitsInRetentionMonths(dates, today);
   const { currentMonth } = getTwoMonthRangeKeys(today);
-
   if (todayStatus) {
     todayStatus.textContent = hadTodayStamp ? "今日の来場スタンプ：済" : "今日の来場スタンプ：済（今日分を押しました）";
     todayStatus.classList.toggle("is-new-stamp-status", !hadTodayStamp);
@@ -1565,34 +1296,27 @@ function setupVisitStampCard() {
     streakCount.setAttribute("aria-label", `連続来場${streak}日`);
   }
   if (twoMonthCount) twoMonthCount.textContent = String(retentionVisits);
-
   months.innerHTML = buildStampMonth(currentMonth, stampedSet, todayKey, !hadTodayStamp, { showYear: true });
-
   if (replayButton) {
     replayButton.onclick = () => {
       showArrivalStampOverlay(streak, currentMonth, stampedSet, todayKey, { autoHide: false });
       triggerVisitStampAnimation(root, streak);
     };
   }
-
   if (stampShareButton) {
     stampShareButton.onclick = () => shareStampMonthImage(currentMonth, stampedSet, todayKey);
   }
-
   if (stampSaveButton) {
     stampSaveButton.onclick = () => downloadStampMonthImage(currentMonth, stampedSet, todayKey);
   }
-
   if (!hadTodayStamp) {
     showArrivalStampOverlay(streak, currentMonth, stampedSet, todayKey, { autoHide: true, hideDelay: 7000 });
     triggerVisitStampAnimation(root, streak);
   }
-
   if (unlockTitle && unlockText && secretRoomLink) {
     const milestone = getSecretMilestoneInfo(streak);
     const progressPercent = Math.round((milestone.progressCount / milestone.cycle) * 100);
     if (unlockProgressBar) unlockProgressBar.style.width = `${progressPercent}%`;
-
     if (milestone.isUnlocked) {
       unlockCard?.classList.add("is-unlocked");
       secretRoomLink.hidden = false;
@@ -1614,36 +1338,28 @@ function setupVisitStampCard() {
     }
   }
 }
-
 let visitStampLastRefreshKey = "";
-
 function refreshVisitStampViewsForCurrentDay(options = {}) {
   const hasVisitStampCard = Boolean(document.getElementById("visitStamp"));
   const hasStampHistoryPage = Boolean(document.getElementById("stampHistoryPage"));
   if (!hasVisitStampCard && !hasStampHistoryPage) return;
-
   const todayKey = getTodayKey();
   if (!options.force && visitStampLastRefreshKey === todayKey) return;
   visitStampLastRefreshKey = todayKey;
-
   setupVisitStampCard();
   setupStampHistoryPage();
 }
-
 function setupVisitStampResumeChecks() {
   if (window.__yuzukosyoVisitStampResumeChecksReady) return;
   window.__yuzukosyoVisitStampResumeChecksReady = true;
-
   const refresh = () => {
     if (document.visibilityState && document.visibilityState !== "visible") return;
     window.setTimeout(() => refreshVisitStampViewsForCurrentDay(), 0);
   };
-
   document.addEventListener("visibilitychange", refresh, { passive: true });
   window.addEventListener("pageshow", refresh, { passive: true });
   window.addEventListener("focus", refresh, { passive: true });
 }
-
 function countVisitsInMonth(monthDate, stampedSet) {
   const year = monthDate.getFullYear();
   const month = monthDate.getMonth();
@@ -1654,7 +1370,6 @@ function countVisitsInMonth(monthDate, stampedSet) {
   }
   return count;
 }
-
 function buildStampHistoryMonth(monthDate, stampedSet, todayKey) {
   const year = monthDate.getFullYear();
   const monthNumber = monthDate.getMonth() + 1;
@@ -1673,7 +1388,6 @@ function buildStampHistoryMonth(monthDate, stampedSet, todayKey) {
 </article>
 `;
 }
-
 function drawRoundedRect(ctx, x, y, width, height, radius) {
   const r = Math.min(radius, width / 2, height / 2);
   ctx.beginPath();
@@ -1688,14 +1402,11 @@ function drawRoundedRect(ctx, x, y, width, height, radius) {
   ctx.quadraticCurveTo(x, y, x + r, y);
   ctx.closePath();
 }
-
 function drawTanukiVisitStamp(ctx, cx, cy, size = 48) {
   const r = size / 2;
   ctx.save();
-
   ctx.shadowColor = "rgba(250,204,21,.46)";
   ctx.shadowBlur = 12;
-
   ctx.fillStyle = "rgba(250,204,21,.18)";
   ctx.strokeStyle = "rgba(250,204,21,.70)";
   ctx.lineWidth = 3;
@@ -1703,9 +1414,7 @@ function drawTanukiVisitStamp(ctx, cx, cy, size = 48) {
   ctx.arc(cx, cy, r + 5, 0, Math.PI * 2);
   ctx.fill();
   ctx.stroke();
-
   ctx.shadowBlur = 0;
-
   ctx.fillStyle = "#8b4a21";
   ctx.beginPath();
   ctx.moveTo(cx - r * 0.78, cy - r * 0.34);
@@ -1713,24 +1422,20 @@ function drawTanukiVisitStamp(ctx, cx, cy, size = 48) {
   ctx.lineTo(cx - r * 0.32, cy - r * 0.72);
   ctx.closePath();
   ctx.fill();
-
   ctx.beginPath();
   ctx.moveTo(cx + r * 0.78, cy - r * 0.34);
   ctx.lineTo(cx + r * 1.05, cy - r * 0.98);
   ctx.lineTo(cx + r * 0.32, cy - r * 0.72);
   ctx.closePath();
   ctx.fill();
-
   ctx.fillStyle = "#b86b2d";
   ctx.beginPath();
   ctx.arc(cx, cy, r * 0.82, 0, Math.PI * 2);
   ctx.fill();
-
   ctx.fillStyle = "#f2c48d";
   ctx.beginPath();
   ctx.ellipse(cx, cy + r * 0.18, r * 0.56, r * 0.42, 0, 0, Math.PI * 2);
   ctx.fill();
-
   ctx.fillStyle = "#3b1f13";
   ctx.beginPath();
   ctx.ellipse(cx - r * 0.32, cy - r * 0.08, r * 0.18, r * 0.22, -0.28, 0, Math.PI * 2);
@@ -1738,7 +1443,6 @@ function drawTanukiVisitStamp(ctx, cx, cy, size = 48) {
   ctx.beginPath();
   ctx.ellipse(cx + r * 0.32, cy - r * 0.08, r * 0.18, r * 0.22, 0.28, 0, Math.PI * 2);
   ctx.fill();
-
   ctx.fillStyle = "#fff7ed";
   ctx.beginPath();
   ctx.arc(cx - r * 0.36, cy - r * 0.12, r * 0.055, 0, Math.PI * 2);
@@ -1746,12 +1450,10 @@ function drawTanukiVisitStamp(ctx, cx, cy, size = 48) {
   ctx.beginPath();
   ctx.arc(cx + r * 0.28, cy - r * 0.12, r * 0.055, 0, Math.PI * 2);
   ctx.fill();
-
   ctx.fillStyle = "#2a130b";
   ctx.beginPath();
   ctx.arc(cx, cy + r * 0.12, r * 0.10, 0, Math.PI * 2);
   ctx.fill();
-
   ctx.strokeStyle = "#2a130b";
   ctx.lineWidth = 2;
   ctx.beginPath();
@@ -1760,16 +1462,13 @@ function drawTanukiVisitStamp(ctx, cx, cy, size = 48) {
   ctx.beginPath();
   ctx.arc(cx + r * 0.10, cy + r * 0.25, r * 0.12, 0.1, Math.PI - 0.15);
   ctx.stroke();
-
   ctx.strokeStyle = "rgba(255,255,255,.58)";
   ctx.lineWidth = 2;
   ctx.beginPath();
   ctx.arc(cx, cy, r * 0.98, -0.35, Math.PI * 1.35);
   ctx.stroke();
-
   ctx.restore();
 }
-
 function loadImageAsset(src) {
   return new Promise((resolve) => {
     const img = new Image();
@@ -1779,7 +1478,6 @@ function loadImageAsset(src) {
     img.src = src;
   });
 }
-
 let stampShareTanukiAssetPromise = null;
 function getStampShareTanukiAsset() {
   if (!stampShareTanukiAssetPromise) {
@@ -1787,7 +1485,6 @@ function getStampShareTanukiAsset() {
   }
   return stampShareTanukiAssetPromise;
 }
-
 function drawStampShareCellBase(ctx, x, y, size, strokeStyle, fillStyle, lineWidth) {
   ctx.fillStyle = fillStyle;
   ctx.strokeStyle = strokeStyle;
@@ -1796,7 +1493,6 @@ function drawStampShareCellBase(ctx, x, y, size, strokeStyle, fillStyle, lineWid
   ctx.fill();
   ctx.stroke();
 }
-
 async function createStampMonthCanvas(monthDate, stampedSet, todayKey) {
   const year = monthDate.getFullYear();
   const month = monthDate.getMonth();
@@ -1806,7 +1502,6 @@ async function createStampMonthCanvas(monthDate, stampedSet, todayKey) {
   const todayDate = parseDateKeyToLocalDate(todayKey);
   const todayTime = todayDate ? todayDate.getTime() : Date.now();
   const tanukiImage = await getStampShareTanukiAsset();
-
   const scale = 2;
   const width = 980;
   const height = 1080;
@@ -1815,16 +1510,13 @@ async function createStampMonthCanvas(monthDate, stampedSet, todayKey) {
   canvas.height = height * scale;
   const ctx = canvas.getContext("2d");
   if (!ctx) return null;
-
   ctx.scale(scale, scale);
-
   const bg = ctx.createLinearGradient(0, 0, width, height);
   bg.addColorStop(0, "#12051f");
   bg.addColorStop(0.55, "#170620");
   bg.addColorStop(1, "#030006");
   ctx.fillStyle = bg;
   ctx.fillRect(0, 0, width, height);
-
   ctx.fillStyle = "rgba(168, 85, 247, 0.10)";
   ctx.beginPath();
   ctx.arc(160, 140, 150, 0, Math.PI * 2);
@@ -1833,19 +1525,16 @@ async function createStampMonthCanvas(monthDate, stampedSet, todayKey) {
   ctx.beginPath();
   ctx.arc(820, 130, 170, 0, Math.PI * 2);
   ctx.fill();
-
   const cardX = 68;
   const cardY = 42;
   const cardW = width - 136;
   const cardH = 872;
-
   ctx.fillStyle = "rgba(10, 3, 19, 0.72)";
   ctx.strokeStyle = "rgba(125,211,252,.42)";
   ctx.lineWidth = 2.6;
   drawRoundedRect(ctx, cardX, cardY, cardW, cardH, 34);
   ctx.fill();
   ctx.stroke();
-
   ctx.textAlign = "center";
   ctx.fillStyle = "#ffffff";
   ctx.font = "900 48px -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Noto Sans JP', sans-serif";
@@ -1853,11 +1542,9 @@ async function createStampMonthCanvas(monthDate, stampedSet, todayKey) {
   ctx.shadowBlur = 22;
   ctx.fillText(`${monthNumber}月の出席表`, width / 2, 118);
   ctx.shadowBlur = 0;
-
   ctx.font = "800 17px -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Noto Sans JP', sans-serif";
   ctx.fillStyle = "rgba(237,225,255,.62)";
   ctx.fillText(`${year}年 / 来場 ${countVisitsInMonth(monthDate, stampedSet)}日`, width / 2, 148);
-
   const weekdays = ["日", "月", "火", "水", "木", "金", "土"];
   const cell = 92;
   const gap = 12;
@@ -1865,13 +1552,11 @@ async function createStampMonthCanvas(monthDate, stampedSet, todayKey) {
   const gridX = Math.round((width - gridWidth) / 2);
   const weekY = 222;
   const firstRowY = 256;
-
   ctx.font = "900 21px -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Noto Sans JP', sans-serif";
   weekdays.forEach((day, index) => {
     ctx.fillStyle = index === 0 ? "rgba(244,214,255,.88)" : index === 6 ? "rgba(201,233,255,.92)" : "rgba(233,213,255,.82)";
     ctx.fillText(day, gridX + index * (cell + gap) + cell / 2, weekY);
   });
-
   for (let day = 1; day <= daysInMonth; day += 1) {
     const date = new Date(year, month, day);
     const dateKey = formatDateKeyFromDate(date);
@@ -1883,7 +1568,6 @@ async function createStampMonthCanvas(monthDate, stampedSet, todayKey) {
     const isStamped = stampedSet.has(dateKey);
     const isToday = dateKey === todayKey;
     const isFuture = date.getTime() > todayTime;
-
     let fillStyle = "rgba(7,3,14,.72)";
     let strokeStyle = "rgba(216,180,254,.24)";
     let lineWidth = 2;
@@ -1895,13 +1579,10 @@ async function createStampMonthCanvas(monthDate, stampedSet, todayKey) {
       lineWidth = 4.5;
       strokeStyle = "rgba(250,204,21,.96)";
     }
-
     drawStampShareCellBase(ctx, x, y, cell, strokeStyle, fillStyle, lineWidth);
-
     ctx.fillStyle = isFuture ? "rgba(237,225,255,.32)" : "#ffffff";
     ctx.font = "900 22px -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Noto Sans JP', sans-serif";
     ctx.fillText(String(day), x + cell / 2, y + 30);
-
     if (isStamped) {
       if (tanukiImage) {
         const imgSize = 54;
@@ -1917,7 +1598,6 @@ async function createStampMonthCanvas(monthDate, stampedSet, todayKey) {
       }
     }
   }
-
   ctx.textAlign = "center";
   ctx.fillStyle = "rgba(237,225,255,.68)";
   ctx.font = "800 18px -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Noto Sans JP', sans-serif";
@@ -1925,10 +1605,8 @@ async function createStampMonthCanvas(monthDate, stampedSet, todayKey) {
   ctx.fillStyle = "#d8b4fe";
   ctx.font = "900 20px -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Noto Sans JP', sans-serif";
   ctx.fillText(SITE_SHARE_URL, width / 2, cardY + cardH + 92);
-
   return canvas;
 }
-
 async function downloadStampMonthImage(monthDate, stampedSet, todayKey) {
   const canvas = await createStampMonthCanvas(monthDate, stampedSet, todayKey);
   if (!canvas) return;
@@ -1938,7 +1616,6 @@ async function downloadStampMonthImage(monthDate, stampedSet, todayKey) {
     downloadBlobFile(blob, `yuzukosyo-stamp-${year}-${String(monthNumber).padStart(2, "0")}.png`);
   }, "image/png");
 }
-
 async function shareStampMonthImage(monthDate, stampedSet, todayKey) {
   const canvas = await createStampMonthCanvas(monthDate, stampedSet, todayKey);
   const blob = canvas ? await canvasToPngBlob(canvas) : null;
@@ -1951,12 +1628,10 @@ async function shareStampMonthImage(monthDate, stampedSet, todayKey) {
     "来場スタンプカード"
   );
 }
-
 function setupStampHistoryPage() {
   const root = document.getElementById("stampHistoryPage");
   const monthsRoot = document.getElementById("stampHistoryMonths");
   if (!root || !monthsRoot) return;
-
   const today = new Date();
   const todayKey = getTodayKey();
   const dates = loadVisitStampDates();
@@ -1964,18 +1639,15 @@ function setupStampHistoryPage() {
     dates.push(todayKey);
     saveVisitStampDates(dates);
   }
-
   const stampedSet = new Set(loadVisitStampDates());
   const range = getVisitStampRetentionRange(today);
   const months = getStampHistoryMonths(today);
   const total = countVisitsInRetentionMonths(Array.from(stampedSet), today);
   const streak = getConsecutiveVisitStreak(stampedSet, todayKey);
-
   const rangeText = document.getElementById("stampHistoryRangeText");
   const expiryText = document.getElementById("stampHistoryExpiryText");
   const totalEl = document.getElementById("stampHistoryTotal");
   const streakEl = document.getElementById("stampHistoryStreak");
-
   if (rangeText) {
     rangeText.textContent = `現在の保存対象：${formatYearMonthJa(range.startDate)}〜${formatYearMonthJa(today)}の24ヶ月分。`;
   }
@@ -1984,7 +1656,6 @@ function setupStampHistoryPage() {
   }
   if (totalEl) totalEl.textContent = String(total);
   if (streakEl) streakEl.textContent = String(streak);
-
   try {
     monthsRoot.innerHTML = months.map((monthDate) => buildStampHistoryMonth(monthDate, stampedSet, todayKey)).join("");
   } catch (error) {
@@ -1995,7 +1666,6 @@ function setupStampHistoryPage() {
       return `<article class="stamp-history-month-card"><div class="stamp-history-month-actions"><div><strong>${year}年${monthNumber}月</strong><span>${count}日 来場</span></div></div>${buildStampMonth(monthDate, stampedSet, todayKey, false, { showYear: true })}</article>`;
     }).join("");
   }
-
   monthsRoot.addEventListener("click", (event) => {
     const target = event.target instanceof Element ? event.target.closest("[data-save-stamp-month]") : null;
     if (!target) return;
@@ -2006,27 +1676,22 @@ function setupStampHistoryPage() {
     downloadStampMonthImage(monthDate, stampedSet, todayKey);
   });
 }
-
 let secretToastTimer = null;
-
 function showSecretToast(title, text, rare = false) {
   const toast = document.getElementById("secretToast");
   const toastTitle = document.getElementById("secretToastTitle");
   const toastText = document.getElementById("secretToastText");
   if (!toast || !toastTitle || !toastText) return;
-
   toastTitle.textContent = title;
   toastText.textContent = text;
   toast.classList.toggle("is-rare", rare);
   toast.hidden = false;
-
   clearTimeout(secretToastTimer);
   secretToastTimer = window.setTimeout(() => {
     toast.hidden = true;
     toast.classList.remove("is-rare");
   }, rare ? 5200 : 3600);
 }
-
 function setupSecretInteractions() {
   const tanuLines = [
     "今日も来てくれてありがとうぽん。スタンプ押しておいたよ。",
@@ -2040,7 +1705,6 @@ function setupSecretInteractions() {
     "静かに見てるだけでも、ちゃんと来場者です。",
     "今日の小ネタはここまで。たぶん。"
   ];
-
   if (tanuMascot) {
     tanuMascot.setAttribute("tabindex", "0");
     tanuMascot.setAttribute("role", "button");
@@ -2059,7 +1723,6 @@ function setupSecretInteractions() {
       }
     });
   }
-
   if (ghostMascot) {
     ghostMascot.setAttribute("tabindex", "0");
     ghostMascot.setAttribute("role", "button");
@@ -2077,7 +1740,6 @@ function setupSecretInteractions() {
         showSecretToast("幽霊ちゃんレア演出", line, true);
         return;
       }
-
       const line = ghostLines[Math.floor(Math.random() * ghostLines.length)];
       if (ghostBubble) ghostBubble.textContent = line;
       showSecretToast("幽霊ちゃんの小ネタ", line);
@@ -2090,7 +1752,6 @@ function setupSecretInteractions() {
       }
     });
   }
-
   const footerSecret = document.getElementById("footerSecretTrigger");
   if (footerSecret) {
     const footerSecretMessage = "よくここが分かったねΣ（・□・；）\n君はもう立派な柚胡椒ファミリーや！！\nこれからもよろしくね♪";
@@ -2099,7 +1760,6 @@ function setupSecretInteractions() {
     });
   }
 }
-
 setDailyQuote();
 setDailyMeigen();
 setupDailyOmikuji();
@@ -2108,50 +1768,40 @@ setupOmikujiSaveButton();
 refreshVisitStampViewsForCurrentDay({ force: true });
 setupVisitStampResumeChecks();
 setupSecretInteractions();
-
 function setupCursorParticles() {
   const cursorLight = document.getElementById("cursorLight");
   const particleLayer = document.getElementById("particleLayer");
   const canHover = window.matchMedia && window.matchMedia("(hover: hover) and (pointer: fine)").matches;
   const prefersReducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
   if (!canHover || prefersReducedMotion) {
     if (cursorLight) cursorLight.style.display = "none";
     return;
   }
-
   document.body.classList.add("has-pointer");
-
   let lastParticleAt = 0;
   window.addEventListener("mousemove", (event) => {
     if (cursorLight) {
       cursorLight.style.transform = `translate(${event.clientX - 110}px, ${event.clientY - 110}px)`;
     }
-
     const now = Date.now();
     if (!particleLayer || now - lastParticleAt < 180) return;
     lastParticleAt = now;
-
     const particle = document.createElement("span");
     particle.className = "cursor-particle";
     particle.style.left = `${event.clientX}px`;
     particle.style.top = `${event.clientY}px`;
     particle.style.setProperty("--px", `${Math.round((Math.random() - 0.5) * 34)}px`);
     particle.style.setProperty("--py", `${Math.round((Math.random() - 0.8) * 38)}px`);
-
     particleLayer.appendChild(particle);
     window.setTimeout(() => particle.remove(), 700);
   }, { passive: true });
 }
-
 function setupAmbientParticles() {
   const particleLayer = document.getElementById("particleLayer");
   const prefersReducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   if (!particleLayer || prefersReducedMotion) return;
-
   const count = window.innerWidth < 520 ? 4 : 10;
   const fragment = document.createDocumentFragment();
-
   for (let i = 0; i < count; i += 1) {
     const particle = document.createElement("span");
     particle.className = "ambient-particle";
@@ -2164,10 +1814,8 @@ function setupAmbientParticles() {
     particle.style.setProperty("--delay", `${Math.round(Math.random() * -14)}s`);
     fragment.appendChild(particle);
   }
-
   particleLayer.appendChild(fragment);
 }
-
 function setupScrollReveal() {
   const targets = [
     ".hero",
@@ -2181,19 +1829,15 @@ function setupScrollReveal() {
     ".mascot-profile-card",
     ".update-history-card"
   ];
-
   const elements = Array.from(document.querySelectorAll(targets.join(",")));
   if (!elements.length) return;
-
   elements.forEach((el, index) => {
     el.classList.add("reveal-on-scroll", `reveal-delay-${(index % 3) + 1}`);
   });
-
   if (!("IntersectionObserver" in window)) {
     elements.forEach((el) => el.classList.add("is-visible"));
     return;
   }
-
   const observer = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
       if (!entry.isIntersecting) return;
@@ -2204,14 +1848,11 @@ function setupScrollReveal() {
     threshold: 0.12,
     rootMargin: "0px 0px -8% 0px"
   });
-
   elements.forEach((el) => observer.observe(el));
 }
-
 function setupAnimationPack() {
   setupScrollReveal();
 }
-
 function scheduleVisualEffects() {
   runAfterWindowLoad(() => {
     queueLowPriorityTask(() => {
@@ -2220,44 +1861,35 @@ function scheduleVisualEffects() {
     }, 2800);
   }, 500);
 }
-
 setupAnimationPack();
 scheduleVisualEffects();
-
 function setupUpdateHistoryMore() {
   const card = document.querySelector(".update-history-card");
   const button = document.getElementById("updateMoreBtn");
   const viewport = document.getElementById("updateHistoryViewport");
   if (!card || !button || !viewport) return;
-
   const items = viewport.querySelectorAll(".update-history-list li");
   if (items.length <= 3) {
     button.style.display = "none";
     card.classList.add("is-expanded");
     return;
   }
-
   card.classList.remove("is-expanded");
   button.textContent = "もっと見る";
-
   button.addEventListener("click", () => {
     const expanded = card.classList.toggle("is-expanded");
     button.setAttribute("aria-expanded", expanded ? "true" : "false");
     button.textContent = expanded ? "閉じる" : "もっと見る";
-
     if (!expanded) {
       viewport.scrollTo({ top: 0, behavior: "smooth" });
       card.scrollIntoView({ behavior: "smooth", block: "center" });
     }
   });
 }
-
 setupUpdateHistoryMore();
-
 function setupStableShortcutJumps() {
   const nav = document.querySelector(".topbar-actions");
   if (!nav) return;
-
   const anchorMap = new Set(["#top", "#visitStamp", "#schedule", "#omikuji", "#themeColors", "#novel", "#updates", "#stream-gear"]);
   const jumpPrepareTargets = [
     ".visit-stamp-section",
@@ -2272,95 +1904,69 @@ function setupStableShortcutJumps() {
     ".update-history-section",
     ".gear-market-section"
   ].join(",");
-
   let shortcutLayoutPrepared = false;
-
   function prepareShortcutLayoutOnce() {
     if (shortcutLayoutPrepared) return;
     shortcutLayoutPrepared = true;
-
     document.body.classList.add("anchor-jump-prep");
-
     document.querySelectorAll(jumpPrepareTargets).forEach((element) => {
       element.getBoundingClientRect();
     });
-
     document.documentElement.getBoundingClientRect();
     document.body.offsetHeight;
   }
-
   function getShortcutOffset(hash) {
     if (hash === "#top") return 0;
-
     const width = window.innerWidth || document.documentElement.clientWidth || 0;
-
     if (width <= 760) {
       const toggle = document.querySelector(".mobile-shortcut-toggle");
       const topbar = document.querySelector(".topbar");
       const toggleHeight = toggle ? Math.ceil(toggle.getBoundingClientRect().height) : 42;
       const topbarTop = topbar ? Math.max(0, Math.round(topbar.getBoundingClientRect().top)) : 16;
-
       return Math.max(76, topbarTop + toggleHeight + 18);
     }
-
     const actions = document.querySelector(".topbar-actions");
     const navHeight = actions ? Math.ceil(actions.getBoundingClientRect().height) : 0;
-
     if (hash === "#stream-gear" || hash === "#updates" || hash === "#visitStamp" || hash === "#themeColors" || hash === "#novel") {
       if (width <= 900) return Math.max(188, navHeight + 16);
       return 210;
     }
-
     if (width <= 900) return Math.max(132, navHeight + 14);
     return 170;
   }
-
   function getTargetTop(hash) {
     if (hash === "#top") return 0;
-
     const target = document.querySelector(hash);
     if (!target) return null;
-
     const offset = getShortcutOffset(hash);
     return Math.max(0, Math.round(window.scrollY + target.getBoundingClientRect().top - offset));
   }
-
   function scrollToShortcutTarget(hash) {
     const top = getTargetTop(hash);
     if (top === null) return;
-
     window.scrollTo({
       top,
       behavior: "auto"
     });
   }
-
   function performStableJump(hash, shouldUpdateHash) {
     if (!anchorMap.has(hash)) return;
-
     prepareShortcutLayoutOnce();
-
     window.requestAnimationFrame(() => {
       scrollToShortcutTarget(hash);
-
       if (shouldUpdateHash && history.pushState) {
         history.pushState(null, "", hash);
       }
     });
   }
-
   nav.addEventListener("click", (event) => {
     const target = event.target instanceof Element ? event.target : event.target && event.target.parentElement;
     const link = target ? target.closest('a[href^="#"]') : null;
     if (!link) return;
-
     const hash = link.hash;
     if (!anchorMap.has(hash)) return;
-
     event.preventDefault();
-
     performStableJump(hash, true);
-
     const mobileToggle = document.querySelector(".mobile-shortcut-toggle");
     const isMobile = (window.innerWidth || document.documentElement.clientWidth || 0) <= 760;
     if (isMobile && nav.classList.contains("is-open")) {
@@ -2370,55 +1976,42 @@ function setupStableShortcutJumps() {
       });
     }
   });
-
   if (window.location.hash && anchorMap.has(window.location.hash)) {
     window.addEventListener("load", () => {
       window.setTimeout(() => performStableJump(window.location.hash, false), 140);
     }, { once: true });
   }
 }
-
 setupStableShortcutJumps();
-
 function setupMobileShortcutMenu() {
   const actions = document.querySelector(".topbar-actions");
   const toggle = document.querySelector(".mobile-shortcut-toggle");
   if (!actions || !toggle) return;
-
   function closeMenu() {
     actions.classList.remove("is-open");
     toggle.setAttribute("aria-expanded", "false");
   }
-
   function openMenu() {
     actions.classList.add("is-open");
     toggle.setAttribute("aria-expanded", "true");
   }
-
   toggle.addEventListener("click", (event) => {
     event.preventDefault();
     event.stopPropagation();
-
     if (actions.classList.contains("is-open")) {
       closeMenu();
     } else {
       openMenu();
     }
   });
-
   document.addEventListener("click", (event) => {
     if (!actions.classList.contains("is-open")) return;
     const target = event.target instanceof Element ? event.target : null;
     if (target && actions.contains(target)) return;
     closeMenu();
   });
-
 }
-
 setupMobileShortcutMenu();
-
-
-/* v163: novel episode release gate */
 (function(){
   function yuzuLocalDateKey(d){
     var y=d.getFullYear();
