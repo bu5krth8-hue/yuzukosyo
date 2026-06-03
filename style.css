@@ -179,3 +179,74 @@
     font-size:10.5px!important;
   }
 }
+
+/* v172: スマホ版の初回来場スタンプ演出で出席表を潰れにくい幅へ再調整 */
+@media (max-width: 760px){
+  .arrival-stamp-card{
+    width:min(94vw,370px)!important;
+    max-width:370px!important;
+    padding-left:14px!important;
+    padding-right:14px!important;
+  }
+  .arrival-stamp-preview{
+    width:min(100%,342px)!important;
+    max-width:342px!important;
+    margin-left:auto!important;
+    margin-right:auto!important;
+  }
+  .arrival-stamp-preview .stamp-month-card{
+    width:100%!important;
+    max-width:100%!important;
+    padding:10px!important;
+    border-radius:15px!important;
+  }
+  .arrival-stamp-preview .stamp-weekdays,
+  .arrival-stamp-preview .stamp-grid{
+    gap:3px!important;
+  }
+  .arrival-stamp-preview .stamp-weekday{
+    font-size:10px!important;
+    line-height:1.15!important;
+  }
+  .arrival-stamp-preview .stamp-day{
+    min-height:26px!important;
+    border-radius:8px!important;
+    padding-top:2px!important;
+    font-size:10px!important;
+  }
+  .arrival-stamp-preview .stamp-day span{
+    top:2px!important;
+    left:3px!important;
+    right:3px!important;
+    width:auto!important;
+    white-space:nowrap!important;
+    text-align:center!important;
+    font-size:8.5px!important;
+    line-height:1!important;
+  }
+  .arrival-stamp-preview .stamp-day.is-stamped::after{
+    inset:3px!important;
+  }
+}
+@media (max-width: 380px), (max-height: 680px){
+  .arrival-stamp-card{
+    width:min(94vw,370px)!important;
+    max-width:370px!important;
+    padding-left:12px!important;
+    padding-right:12px!important;
+  }
+  .arrival-stamp-preview{
+    width:min(100%,338px)!important;
+    max-width:338px!important;
+  }
+  .arrival-stamp-preview .stamp-month-card{
+    padding:9px!important;
+  }
+  .arrival-stamp-preview .stamp-weekdays,
+  .arrival-stamp-preview .stamp-grid{
+    gap:3px!important;
+  }
+  .arrival-stamp-preview .stamp-day{
+    min-height:25px!important;
+  }
+}
