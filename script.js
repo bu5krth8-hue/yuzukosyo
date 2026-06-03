@@ -1545,9 +1545,9 @@ function setupStampBackupButtons() {
       try {
         await copyTextToClipboard(url);
         button.textContent = "コピーしました";
-        if (status) status.textContent = "コピーしたリンクを、iPhoneメモ・LINE・自分宛メールなどブラウザの外に保存してください。スタンプとみくじ履歴を復元できます。";
+        if (status) status.textContent = "PC・スマホで履歴削除する前に、コピーしたリンクをメモ・LINE・自分宛メールなどに保存してください。消えた後はそのリンクから復元できます。";
         if (typeof showSecretToast === "function") {
-          showSecretToast("復元リンクをコピーしました", "スタンプとみくじ履歴を戻せるリンクです。メモやLINEへ保存してください。", false);
+          showSecretToast("復元リンクをコピーしました", "検索履歴やサイトデータを消す前に、メモ・LINE・自分宛メールなどへ保存してください。", false);
         }
       } catch (error) {
         button.textContent = originalText;
