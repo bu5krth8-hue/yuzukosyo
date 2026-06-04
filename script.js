@@ -399,7 +399,6 @@ function scheduleMascotRotation() {
     threshold: 0.01
   });
   observer.observe(area);
-  runAfterWindowLoad(() => window.setTimeout(start, 9000), 900);
 }
 scheduleMascotRotation();
 const dailyQuotes = [
@@ -892,6 +891,7 @@ function pickWeightedOmikujiIndex() {
   return Math.max(0, omikujiItems.length - 1);
 }
 const OMIKUJI_HISTORY_STORAGE_KEY = "yuzukosyoOmikujiHistoryV1";
+const OMIKUJI_DAILY_STORAGE_KEY = "yuzukosyoDailyOmikuji";
 const OMIKUJI_HISTORY_MAX_ENTRIES = 730;
 function getOmikujiItemByIndex(index) {
   return Number.isInteger(index) && omikujiItems[index] ? omikujiItems[index] : null;
@@ -944,6 +944,71 @@ function saveOmikujiHistory(entries) {
     localStorage.setItem(OMIKUJI_HISTORY_STORAGE_KEY, JSON.stringify(mergeOmikujiHistoryEntries(entries)));
   } catch (error) {
   }
+}
+function getOmikujiHistoryEntryForDate(dateKey) {
+  const key = String(dateKey || "");
+  return loadOmikujiHistory().find((entry) => entry.date === key) || null;
+}
+function getStoredDailyOmikujiIndex(dateKey) {
+  try {
+    const saved = JSON.parse(localStorage.getItem(OMIKUJI_DAILY_STORAGE_KEY) || "null");
+    if (
+      saved &&
+      saved.date === dateKey &&
+      Number.isInteger(saved.index) &&
+      omikujiItems[saved.index]
+    ) {
+      return saved.index;
+    }
+  } catch (error) {
+  }
+  return null;
+}
+function saveDailyOmikujiRecord(dateKey, index) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(String(dateKey || "")) || !getOmikujiItemByIndex(index)) return false;
+  try {
+    localStorage.setItem(OMIKUJI_DAILY_STORAGE_KEY, JSON.stringify({
+      date: dateKey,
+      index
+    }));
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
+function getDailyOmikujiIndexForDate(dateKey) {
+  const storedIndex = getStoredDailyOmikujiIndex(dateKey);
+  if (Number.isInteger(storedIndex)) return storedIndex;
+  const historyEntry = getOmikujiHistoryEntryForDate(dateKey);
+  if (historyEntry && getOmikujiItemByIndex(historyEntry.index)) {
+    saveDailyOmikujiRecord(dateKey, historyEntry.index);
+    return historyEntry.index;
+  }
+  return null;
+}
+function lockDailyOmikujiButton(button, index) {
+  const item = getOmikujiItemByIndex(index);
+  if (!button || !item) return false;
+  showOmikujiResult(item);
+  button.textContent = "今日はもう引いたよ";
+  button.classList.add("omikuji-button-done");
+  button.disabled = true;
+  button.setAttribute("aria-disabled", "true");
+  updateOmikujiShareButtonState();
+  return true;
+}
+function refreshDailyOmikujiStateFromHistory() {
+  const button = document.getElementById("omikujiButton");
+  const box = document.getElementById("omikujiBox");
+  if (!button) return false;
+  const todayKey = getTodayKey();
+  const index = getDailyOmikujiIndexForDate(todayKey);
+  if (!Number.isInteger(index)) return false;
+  if (box) {
+    box.classList.remove("omikuji-drawing");
+    box.classList.add("omikuji-reveal");
+  }
+  return lockDailyOmikujiButton(button, index);
 }
 function recordOmikujiHistory(dateKey, index) {
   const item = getOmikujiItemByIndex(index);
@@ -1162,16 +1227,8 @@ function createOmikujiShareCanvas(item) {
   return canvas;
 }
 function getTodayOmikujiItem() {
-  const todayKey = getTodayKey();
-  try {
-    const saved = JSON.parse(localStorage.getItem("yuzukosyoDailyOmikuji") || "null");
-    if (saved && saved.date === todayKey && Number.isInteger(saved.index) && omikujiItems[saved.index]) {
-      return omikujiItems[saved.index];
-    }
-  } catch (error) {
-    return null;
-  }
-  return null;
+  const index = getDailyOmikujiIndexForDate(getTodayKey());
+  return Number.isInteger(index) ? getOmikujiItemByIndex(index) : null;
 }
 function updateOmikujiShareButtonState() {
   const shareButton = document.getElementById("omikujiShareButton");
@@ -1229,52 +1286,24 @@ function setupDailyOmikuji() {
   const box = document.getElementById("omikujiBox");
   if (!button || !box) return;
   const todayKey = getTodayKey();
-  const storageKey = "yuzukosyoDailyOmikuji";
-  let saved = null;
-  try {
-    saved = JSON.parse(localStorage.getItem(storageKey) || "null");
-  } catch (error) {
-    saved = null;
-  }
-  if (
-    saved &&
-    saved.date === todayKey &&
-    Number.isInteger(saved.index) &&
-    omikujiItems[saved.index]
-  ) {
-    recordOmikujiHistory(todayKey, saved.index);
-    showOmikujiResult(omikujiItems[saved.index]);
-    button.textContent = "今日はもう引いたよ";
-    button.classList.add("omikuji-button-done");
-    button.disabled = true;
-    button.setAttribute("aria-disabled", "true");
-    updateOmikujiShareButtonState();
+  const savedIndex = getDailyOmikujiIndexForDate(todayKey);
+  if (Number.isInteger(savedIndex)) {
+    recordOmikujiHistory(todayKey, savedIndex);
+    box.classList.add("omikuji-reveal");
+    lockDailyOmikujiButton(button, savedIndex);
   }
   button.addEventListener("click", () => {
-    let index;
-    try {
-      const current = JSON.parse(localStorage.getItem(storageKey) || "null");
-      if (
-        current &&
-        current.date === todayKey &&
-        Number.isInteger(current.index) &&
-        omikujiItems[current.index]
-      ) {
-        index = current.index;
-      }
-    } catch (error) {
-      index = undefined;
+    const lockedIndex = getDailyOmikujiIndexForDate(todayKey);
+    if (Number.isInteger(lockedIndex)) {
+      recordOmikujiHistory(todayKey, lockedIndex);
+      box.classList.remove("omikuji-drawing");
+      box.classList.add("omikuji-reveal");
+      lockDailyOmikujiButton(button, lockedIndex);
+      return;
     }
-    if (!Number.isInteger(index)) {
-      index = pickWeightedOmikujiIndex();
-      try {
-        localStorage.setItem(storageKey, JSON.stringify({
-          date: todayKey,
-          index
-        }));
-      } catch (error) {
-      }
-    }
+
+    const index = pickWeightedOmikujiIndex();
+    saveDailyOmikujiRecord(todayKey, index);
     recordOmikujiHistory(todayKey, index);
     button.disabled = true;
     button.setAttribute("aria-disabled", "true");
@@ -1286,15 +1315,11 @@ function setupDailyOmikuji() {
       box.classList.remove("omikuji-drawing", "omikuji-reveal");
       void box.offsetWidth;
       box.classList.add("omikuji-reveal");
-      showOmikujiResult(omikujiItems[index]);
-      button.textContent = "今日はもう引いたよ";
-      button.classList.add("omikuji-button-done");
-      button.disabled = true;
-      button.setAttribute("aria-disabled", "true");
-      updateOmikujiShareButtonState();
+      lockDailyOmikujiButton(button, index);
     }, 520);
   });
 }
+
 const VISIT_STAMP_STORAGE_KEY = "yuzukosyoVisitStampsV1";
 const VISIT_STAMP_BACKUP_PARAM = "stampBackup";
 const VISIT_STAMP_HISTORY_MONTHS = 24;
@@ -1500,6 +1525,11 @@ function processVisitStampBackupFromLocation() {
   if (!window.confirm(message)) return false;
   if (mergedDates.length) saveVisitStampDates(mergedDates);
   if (mergedOmikujiEntries.length) saveOmikujiHistory(mergedOmikujiEntries);
+  const todayOmikujiEntry = mergedOmikujiEntries.find((entry) => entry.date === getTodayKey());
+  if (todayOmikujiEntry && getOmikujiItemByIndex(todayOmikujiEntry.index)) {
+    saveDailyOmikujiRecord(todayOmikujiEntry.date, todayOmikujiEntry.index);
+    refreshDailyOmikujiStateFromHistory();
+  }
   clearVisitStampBackupFromUrl();
   window.alert(`復元しました。\n来場スタンプ：${mergedDates.length}日分\n柚胡椒くじ履歴：${mergedOmikujiEntries.length}件`);
   return true;
@@ -2252,12 +2282,23 @@ function setupCursorParticles() {
   }
   document.body.classList.add("has-pointer");
   let lastParticleAt = 0;
-  window.addEventListener("mousemove", (event) => {
+  let cursorFrame = null;
+  let cursorX = 0;
+  let cursorY = 0;
+  const updateCursorLight = () => {
+    cursorFrame = null;
     if (cursorLight) {
-      cursorLight.style.transform = `translate(${event.clientX - 110}px, ${event.clientY - 110}px)`;
+      cursorLight.style.transform = `translate(${cursorX - 110}px, ${cursorY - 110}px)`;
+    }
+  };
+  window.addEventListener("mousemove", (event) => {
+    cursorX = event.clientX;
+    cursorY = event.clientY;
+    if (cursorLight && !cursorFrame) {
+      cursorFrame = window.requestAnimationFrame(updateCursorLight);
     }
     const now = Date.now();
-    if (!particleLayer || now - lastParticleAt < 260) return;
+    if (!particleLayer || now - lastParticleAt < 320) return;
     lastParticleAt = now;
     const particle = document.createElement("span");
     particle.className = "cursor-particle";
