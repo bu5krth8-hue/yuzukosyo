@@ -60,3 +60,4 @@ body#top .omikuji-history-switch{margin-top:12px!important;margin-bottom:0!impor
   .profile-room-grid .profile-card h2{min-height:1.35em}
   .profile-room-grid .profile-genre-card{height:auto}
 }
+.daily-word-link>.daily-word-jump.daily-word-action-btn{display:flex!important;width:max-content;max-width:100%;margin:8px auto 0}.daily-word-link>.daily-word-jump.daily-word-action-btn:hover{transform:translateY(-2px);box-shadow:0 0 26px rgba(168,85,247,.5)}@media (max-width:700px){.daily-word-link>.daily-word-jump.daily-word-action-btn{width:100%;min-width:0}}
