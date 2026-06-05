@@ -2407,8 +2407,10 @@ setupUpdateHistoryMore();
 function setupStableShortcutJumps() {
   const nav = document.querySelector(".topbar-actions");
   if (!nav) return;
-  const anchorMap = new Set(["#top", "#visitStamp", "#schedule", "#omikuji", "#themeColors", "#novel", "#updates", "#stream-gear"]);
+  const anchorMap = new Set(["#top", "#socialLinks", "#visitStamp", "#schedule", "#omikuji", "#themeColors", "#novel", "#updates", "#stream-gear"]);
   const jumpPrepareTargets = [
+    ".social-anchor",
+    ".social-switches",
     ".visit-stamp-section",
     ".mascot-area",
     ".beginner-section",
@@ -2444,7 +2446,7 @@ function setupStableShortcutJumps() {
     }
     const actions = document.querySelector(".topbar-actions");
     const navHeight = actions ? Math.ceil(actions.getBoundingClientRect().height) : 0;
-    if (hash === "#stream-gear" || hash === "#updates" || hash === "#visitStamp" || hash === "#themeColors" || hash === "#novel") {
+    if (hash === "#stream-gear" || hash === "#updates" || hash === "#visitStamp" || hash === "#themeColors" || hash === "#novel" || hash === "#socialLinks") {
       if (width <= 900) return Math.max(188, navHeight + 16);
       return 210;
     }
