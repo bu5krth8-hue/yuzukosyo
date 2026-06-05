@@ -2298,7 +2298,7 @@ function setupCursorParticles() {
       cursorFrame = window.requestAnimationFrame(updateCursorLight);
     }
     const now = Date.now();
-    if (!particleLayer || now - lastParticleAt < 320) return;
+    if (!particleLayer || now - lastParticleAt < 380) return;
     lastParticleAt = now;
     const particle = document.createElement("span");
     particle.className = "cursor-particle";
@@ -2314,7 +2314,7 @@ function setupAmbientParticles() {
   const particleLayer = document.getElementById("particleLayer");
   const prefersReducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   if (!particleLayer || prefersReducedMotion) return;
-  const count = window.innerWidth < 760 ? 0 : 4;
+  const count = window.innerWidth < 760 ? 0 : 3;
   if (count <= 0) return;
   const fragment = document.createDocumentFragment();
   for (let i = 0; i < count; i += 1) {
@@ -2495,9 +2495,16 @@ function setupStableShortcutJumps() {
       });
     }
   });
+  function runInitialShortcutJump() {
+    const initialHash = window.location.hash;
+    if (!initialHash || !anchorMap.has(initialHash)) return;
+    performStableJump(initialHash, false);
+  }
   if (window.location.hash && anchorMap.has(window.location.hash)) {
+    window.requestAnimationFrame(runInitialShortcutJump);
+    window.setTimeout(runInitialShortcutJump, 80);
     window.addEventListener("load", () => {
-      window.setTimeout(() => performStableJump(window.location.hash, false), 140);
+      window.setTimeout(runInitialShortcutJump, 80);
     }, { once: true });
   }
 }
