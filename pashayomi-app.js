@@ -125,9 +125,9 @@ function renderApp() {
         <div>
           <label class="control-label" for="layoutSelect">文章の向き</label>
           <select id="layoutSelect">
-            <option value="3" selected>自動</option>
-            <option value="6">横書き・文章</option>
-            <option value="5">縦書き寄り</option>
+            <option value="6" selected>横書き・文章（安定）</option>
+            <option value="3">自動（重め）</option>
+            <option value="5">縦書き寄り（重め）</option>
             <option value="11">看板・短い文字</option>
           </select>
         </div>
@@ -144,11 +144,11 @@ function renderApp() {
 
       <label class="checkbox-label ocr-stable-label">
         <input id="mobileStableCheck" type="checkbox" checked />
-        <span>スマホ安定モード（画像を軽くして止まりにくくする）</span>
+        <span>スマホ超安定モード（画像をさらに軽くして止まりにくくする）</span>
       </label>
 
       <p class="hint">
-        まずは「標準」＋「日本語中心・安定」がおすすめです。英語・縦書きは必要な時だけ使ってください。
+        まずは「標準」＋「横書き・文章（安定）」＋「日本語中心・安定」がおすすめです。英語・縦書き・自動判定は必要な時だけ使ってください。
       </p>
 
       <button id="ocrButton" class="primary-button" disabled>
@@ -325,8 +325,8 @@ let lastSelectionStart = 0
 let lastSelectionEnd = 0
 let currentImageUrl = null
 
-const HISTORY_KEY = 'pashayomi_history_v4'
-const VOICE_KEY = 'pashayomi_voice_name_v4'
+const HISTORY_KEY = 'pashayomi_history_v5'
+const VOICE_KEY = 'pashayomi_voice_name_v5'
 
 function setStatus(message) {
   statusText.textContent = message
@@ -475,7 +475,7 @@ async function getWorker(languageCode) {
       }
 
       if (message.status === 'initialized tesseract') {
-        setStatus('OCRエンジン準備完了。文字認識を開始します...')
+        setStatus('OCRエンジン準備完了。画像を軽くした状態で文字認識を開始します...')
         setProgress(35)
         return
       }
@@ -562,12 +562,12 @@ async function prepareImageForOcr(file) {
   const stableMode = mobileStableCheck.checked
 
   const maxWidth = stableMode
-    ? (highAccuracy ? 1400 : 1100)
-    : (highAccuracy ? 2000 : 1500)
+    ? (highAccuracy ? 980 : 760)
+    : (highAccuracy ? 1600 : 1200)
 
   const maxPixels = stableMode
-    ? (highAccuracy ? 1800000 : 1200000)
-    : (highAccuracy ? 3600000 : 2400000)
+    ? (highAccuracy ? 900000 : 420000)
+    : (highAccuracy ? 2400000 : 1500000)
 
   const widthScale = Math.min(1, maxWidth / image.naturalWidth)
   const pixelScale = Math.min(1, Math.sqrt(maxPixels / Math.max(1, image.naturalWidth * image.naturalHeight)))
@@ -620,6 +620,19 @@ async function prepareImageForOcr(file) {
   return canvas
 }
 
+function canvasToRecognitionSource(canvas) {
+  try {
+    return canvas.toDataURL('image/jpeg', 0.82)
+  } catch (error) {
+    console.warn('JPEG変換をスキップしてcanvasで読み取ります。', error)
+    return canvas
+  }
+}
+
+function delay(ms) {
+  return new Promise((resolve) => window.setTimeout(resolve, ms))
+}
+
 async function runOcr() {
   if (!selectedImageFile) {
     setStatus('先に写真を選んでください。')
@@ -632,9 +645,12 @@ async function runOcr() {
   try {
     setLoading(true)
     setProgress(0)
-    setStatus('画像をスマホ向けに軽くして、読み取りやすく調整しています...')
+    setStatus('画像をスマホ向けに小さくして、読み取りやすく調整しています...')
 
-    const preparedImage = await prepareImageForOcr(selectedImageFile)
+    const preparedCanvas = await prepareImageForOcr(selectedImageFile)
+    const recognitionSource = canvasToRecognitionSource(preparedCanvas)
+    await delay(80)
+
     const languageInfo = getSelectedLanguageInfo()
     const currentWorker = await getWorker(languageInfo.code)
 
@@ -645,17 +661,31 @@ async function runOcr() {
     await currentWorker.setParameters({
       tessedit_pageseg_mode: layoutSelect.value,
       preserve_interword_spaces: '1',
+      user_defined_dpi: '150',
     })
 
     setStatus(`文字を読み取り中... 使用言語: ${languageInfo.label}`)
     setProgress(35)
 
-    const timeoutMs = mobileStableCheck.checked ? 90000 : 130000
-    const result = await withTimeout(
-      currentWorker.recognize(preparedImage),
-      timeoutMs,
-      '読み取りに時間がかかりすぎました。スマホ安定モードON、読み取り精度「標準」、Wi-Fi接続で再試行してください。'
-    )
+    const slowNoticeId = window.setTimeout(() => {
+      if (runId === currentOcrRun) {
+        setStatus('文字を読み取り中です。スマホでは30〜90秒かかる場合があります。画面は閉じずに待ってください...')
+        setProgress(45)
+      }
+    }, 18000)
+
+    const timeoutMs = mobileStableCheck.checked ? 75000 : 120000
+    let result
+
+    try {
+      result = await withTimeout(
+        currentWorker.recognize(recognitionSource),
+        timeoutMs,
+        '読み取りに時間がかかりすぎました。スマホ超安定モードON、文章の向き「横書き・文章（安定）」、読み取り精度「標準」で再試行してください。'
+      )
+    } finally {
+      window.clearTimeout(slowNoticeId)
+    }
 
     if (runId !== currentOcrRun) {
       return
