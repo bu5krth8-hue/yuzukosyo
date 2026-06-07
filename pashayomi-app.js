@@ -6,15 +6,12 @@ const lockError = document.querySelector('#lockError')
 const logoutButton = document.querySelector('#logoutButton')
 
 const AUTH_KEY = 'pashayomi_public_auth_v1'
-const PASSWORD_HASH = 'd684279a'
+const PASSWORD_HASH = '74df8c5d3d4d0dfd8492a11947041bae5e90776bcedad4a92d9a7b4b9e190fb0'
 
-function passwordHash(value) {
-  let hash = 2166136261
-  for (const char of value) {
-    hash ^= char.charCodeAt(0)
-    hash = Math.imul(hash, 16777619)
-  }
-  return (hash >>> 0).toString(16)
+async function sha256Hex(value) {
+  const data = new TextEncoder().encode(value)
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data)
+  return Array.from(new Uint8Array(hashBuffer)).map((byte) => byte.toString(16).padStart(2, '0')).join('')
 }
 
 function showApp() {
@@ -24,7 +21,7 @@ function showApp() {
   renderApp()
 }
 
-function tryLogin() {
+async function tryLogin() {
   const value = passwordInput.value.trim()
 
   if (!value) {
@@ -32,7 +29,7 @@ function tryLogin() {
     return
   }
 
-  const hash = passwordHash(value)
+  const hash = await sha256Hex(value)
 
   if (hash !== PASSWORD_HASH) {
     lockError.textContent = 'パスワードが違います。'
