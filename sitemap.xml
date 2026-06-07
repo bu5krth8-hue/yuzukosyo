@@ -51,4 +51,9 @@
   <url>
     <loc>https://yuzukosyo.pages.dev/novel.html</loc>
   </url>
+  <url>
+    <loc>https://yuzukosyo.pages.dev/apps.html</loc>
+    <lastmod>2026-06-08</lastmod>
+    <priority>0.6</priority>
+  </url>
 </urlset>
