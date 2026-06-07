@@ -105,8 +105,8 @@ function renderApp() {
         <div>
           <label class="control-label" for="accuracySelect">読み取り精度</label>
           <select id="accuracySelect">
-            <option value="normal">標準</option>
-            <option value="high" selected>高精度</option>
+            <option value="normal" selected>標準</option>
+            <option value="high">高精度</option>
           </select>
         </div>
 
@@ -135,12 +135,21 @@ function renderApp() {
         <div>
           <label class="control-label" for="languageSelect">読み取り言語</label>
           <select id="languageSelect">
-            <option value="jpn" selected>日本語中心</option>
-            <option value="jpn_eng">日本語＋英語</option>
-            <option value="jpn_vert">縦書き日本語</option>
+            <option value="jpn" selected>日本語中心・安定</option>
+            <option value="jpn_eng">日本語＋英語（重め）</option>
+            <option value="jpn_vert">縦書き日本語（重め）</option>
           </select>
         </div>
       </div>
+
+      <label class="checkbox-label ocr-stable-label">
+        <input id="mobileStableCheck" type="checkbox" checked />
+        <span>スマホ安定モード（画像を軽くして止まりにくくする）</span>
+      </label>
+
+      <p class="hint">
+        まずは「標準」＋「日本語中心・安定」がおすすめです。英語・縦書きは必要な時だけ使ってください。
+      </p>
 
       <button id="ocrButton" class="primary-button" disabled>
         文字を読み取る
@@ -280,6 +289,7 @@ const accuracySelect = document.querySelector('#accuracySelect')
 const ocrModeSelect = document.querySelector('#ocrModeSelect')
 const layoutSelect = document.querySelector('#layoutSelect')
 const languageSelect = document.querySelector('#languageSelect')
+const mobileStableCheck = document.querySelector('#mobileStableCheck')
 
 const sampleButton = document.querySelector('#sampleButton')
 const clearButton = document.querySelector('#clearButton')
@@ -306,6 +316,8 @@ const historyList = document.querySelector('#historyList')
 
 let selectedImageFile = null
 let worker = null
+let workerLanguageKey = ''
+let currentOcrRun = 0
 let voices = []
 let speechQueue = []
 let speechQueueIndex = 0
@@ -388,22 +400,46 @@ function getSelectedVoice() {
   return voices.find((voice) => voice.name === selectedName && voice.lang.toLowerCase().startsWith('ja')) || null
 }
 
-function getSelectedLanguages() {
+function getSelectedLanguageInfo() {
   const selected = languageSelect.value
 
   if (selected === 'jpn_eng') {
-    return ['jpn', 'eng', 'jpn_vert']
+    return {
+      code: 'jpn+eng',
+      label: '日本語＋英語',
+    }
   }
 
   if (selected === 'jpn_vert') {
-    return ['jpn_vert', 'jpn']
+    return {
+      code: 'jpn_vert',
+      label: '縦書き日本語',
+    }
   }
 
-  return ['jpn', 'jpn_vert']
+  return {
+    code: 'jpn',
+    label: '日本語',
+  }
 }
 
-async function getWorker() {
-  if (worker) {
+async function terminateWorker() {
+  if (!worker) {
+    return
+  }
+
+  try {
+    await worker.terminate()
+  } catch (error) {
+    console.warn('OCR worker terminate skipped', error)
+  } finally {
+    worker = null
+    workerLanguageKey = ''
+  }
+}
+
+async function getWorker(languageCode) {
+  if (worker && workerLanguageKey === languageCode) {
     return worker
   }
 
@@ -411,30 +447,70 @@ async function getWorker() {
     throw new Error('OCRライブラリを読み込めませんでした。通信状態を確認してください。')
   }
 
-  setStatus('初回準備中です。日本語OCRデータを読み込んでいます...')
+  await terminateWorker()
+
+  setStatus(`初回準備中です。${languageCode} のOCRデータを読み込んでいます...`)
   setProgress(5)
 
-  worker = window.Tesseract.createWorker({
+  const nextWorker = window.Tesseract.createWorker({
     logger: (message) => {
       if (message.status === 'recognizing text') {
         const percent = Math.round((message.progress || 0) * 100)
         setStatus(`文字を読み取り中... ${percent}%`)
-        setProgress(percent)
-      } else if (message.status) {
+        setProgress(Math.max(35, percent))
+        return
+      }
+
+      if (message.status === 'loading language traineddata') {
+        const percent = Math.round((message.progress || 0) * 30)
+        setStatus('日本語OCRデータを読み込んでいます。初回は少し時間がかかります...')
+        setProgress(Math.max(8, percent))
+        return
+      }
+
+      if (message.status === 'initializing tesseract') {
+        setStatus('OCRエンジンを初期化しています...')
+        setProgress(28)
+        return
+      }
+
+      if (message.status === 'initialized tesseract') {
+        setStatus('OCRエンジン準備完了。文字認識を開始します...')
+        setProgress(35)
+        return
+      }
+
+      if (message.status) {
         setStatus(`準備中: ${message.status}`)
       }
     },
   })
 
-  await worker.load()
-  setProgress(15)
-  setStatus('日本語OCRデータを読み込んでいます...')
-  await worker.loadLanguage('jpn+eng+jpn_vert')
-  setProgress(30)
-  setStatus('日本語OCRを初期化しています...')
-  await worker.initialize('jpn+eng+jpn_vert')
+  await withTimeout(nextWorker.load(), 45000, 'OCRエンジンの読み込みに時間がかかっています。通信状態を確認して再試行してください。')
+  setProgress(12)
+  setStatus('OCR言語データを読み込んでいます...')
+  await withTimeout(nextWorker.loadLanguage(languageCode), 90000, '日本語OCRデータの読み込みに時間がかかっています。Wi-Fiで再試行してください。')
+  setProgress(28)
+  setStatus('OCRエンジンを初期化しています...')
+  await withTimeout(nextWorker.initialize(languageCode), 60000, 'OCRエンジンの初期化に時間がかかっています。ページを再読み込みして再試行してください。')
 
+  worker = nextWorker
+  workerLanguageKey = languageCode
   return worker
+}
+
+function withTimeout(promise, timeoutMs, message) {
+  let timeoutId
+
+  const timeoutPromise = new Promise((_, reject) => {
+    timeoutId = window.setTimeout(() => {
+      reject(new Error(message))
+    }, timeoutMs)
+  })
+
+  return Promise.race([promise, timeoutPromise]).finally(() => {
+    window.clearTimeout(timeoutId)
+  })
 }
 
 function handleFileSelected(file) {
@@ -483,8 +559,19 @@ function loadImageFromFile(file) {
 async function prepareImageForOcr(file) {
   const image = await loadImageFromFile(file)
   const highAccuracy = accuracySelect.value === 'high'
-  const maxWidth = highAccuracy ? 2400 : 1600
-  const scale = Math.min(1, maxWidth / image.naturalWidth)
+  const stableMode = mobileStableCheck.checked
+
+  const maxWidth = stableMode
+    ? (highAccuracy ? 1400 : 1100)
+    : (highAccuracy ? 2000 : 1500)
+
+  const maxPixels = stableMode
+    ? (highAccuracy ? 1800000 : 1200000)
+    : (highAccuracy ? 3600000 : 2400000)
+
+  const widthScale = Math.min(1, maxWidth / image.naturalWidth)
+  const pixelScale = Math.min(1, Math.sqrt(maxPixels / Math.max(1, image.naturalWidth * image.naturalHeight)))
+  const scale = Math.min(widthScale, pixelScale)
 
   const canvas = document.createElement('canvas')
   canvas.width = Math.max(1, Math.round(image.naturalWidth * scale))
@@ -494,6 +581,8 @@ async function prepareImageForOcr(file) {
     willReadFrequently: true,
   })
 
+  context.imageSmoothingEnabled = true
+  context.imageSmoothingQuality = 'high'
   context.drawImage(image, 0, 0, canvas.width, canvas.height)
 
   const mode = ocrModeSelect.value
@@ -514,12 +603,12 @@ async function prepareImageForOcr(file) {
     }
 
     if (mode === 'contrast') {
-      adjusted = Math.max(0, Math.min(255, (gray - 128) * 1.55 + 128))
+      adjusted = Math.max(0, Math.min(255, (gray - 128) * 1.45 + 128))
     }
 
     if (mode === 'document') {
-      const contrast = Math.max(0, Math.min(255, (gray - 128) * 1.35 + 128))
-      adjusted = contrast > 155 ? 255 : Math.max(0, contrast - 35)
+      const contrast = Math.max(0, Math.min(255, (gray - 128) * 1.25 + 128))
+      adjusted = contrast > 165 ? 255 : Math.max(0, contrast - 25)
     }
 
     data[i] = adjusted
@@ -537,24 +626,41 @@ async function runOcr() {
     return
   }
 
+  const runId = currentOcrRun + 1
+  currentOcrRun = runId
+
   try {
     setLoading(true)
     setProgress(0)
-    setStatus('画像を読み取りやすく調整しています...')
+    setStatus('画像をスマホ向けに軽くして、読み取りやすく調整しています...')
 
     const preparedImage = await prepareImageForOcr(selectedImageFile)
-    const currentWorker = await getWorker()
-    const languages = getSelectedLanguages()
+    const languageInfo = getSelectedLanguageInfo()
+    const currentWorker = await getWorker(languageInfo.code)
+
+    if (runId !== currentOcrRun) {
+      return
+    }
 
     await currentWorker.setParameters({
       tessedit_pageseg_mode: layoutSelect.value,
       preserve_interword_spaces: '1',
     })
 
-    setStatus(`文字を読み取り中... 使用言語: ${languages.join(' + ')}`)
-    setProgress(10)
+    setStatus(`文字を読み取り中... 使用言語: ${languageInfo.label}`)
+    setProgress(35)
 
-    const result = await currentWorker.recognize(preparedImage)
+    const timeoutMs = mobileStableCheck.checked ? 90000 : 130000
+    const result = await withTimeout(
+      currentWorker.recognize(preparedImage),
+      timeoutMs,
+      '読み取りに時間がかかりすぎました。スマホ安定モードON、読み取り精度「標準」、Wi-Fi接続で再試行してください。'
+    )
+
+    if (runId !== currentOcrRun) {
+      return
+    }
+
     let text = result.data.text.trim()
     text = cleanupOcrText(text)
 
@@ -573,7 +679,8 @@ async function runOcr() {
     setProgress(100)
   } catch (error) {
     console.error(error)
-    setStatus('エラーが出ました。画像補正を「補正なし」か「グレー補正」に変えて試してください。')
+    await terminateWorker()
+    setStatus(error.message || 'エラーが出ました。スマホ安定モードON、読み取り精度「標準」、画像補正「書類向け」で再試行してください。')
     setProgress(0)
   } finally {
     setLoading(false)
@@ -853,6 +960,12 @@ clearButton.addEventListener('click', () => {
   lastSelectionStart = 0
   lastSelectionEnd = 0
   setStatus('文章を消しました。')
+})
+
+languageSelect.addEventListener('change', async () => {
+  await terminateWorker()
+  setStatus('読み取り言語を変更しました。次回の読み取り時にOCRを準備し直します。')
+  setProgress(0)
 })
 
 voiceSelect.addEventListener('change', () => {
