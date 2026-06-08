@@ -12,6 +12,10 @@ const SETTINGS_KEY = 'pashayomi_lite_settings_v1'
 
 let voices = []
 let lastCursorPosition = 0
+let selectedImageFile = null
+let currentImageUrl = null
+let ocrWorker = null
+let ocrWorkerKey = ''
 
 async function sha256Hex(value) {
   const data = new TextEncoder().encode(value)
@@ -75,11 +79,11 @@ function renderApp() {
           <p class="eyebrow">Web版</p>
           <h1>パシャ読み Lite</h1>
         </div>
-        <span class="badge">無料安定版</span>
+        <span class="badge">無料版</span>
       </div>
 
       <p class="lead">
-        文章を貼り付けて、好きな位置から日本語音声で読み上げます。OCRなしなので無料で安定しやすい版です。
+        文章を貼り付けて、好きな位置から日本語音声で読み上げます。PC推奨の画像読み取りβも追加しました。
       </p>
     </section>
 
@@ -87,9 +91,79 @@ function renderApp() {
       <h2>1. 文章を入れる</h2>
 
       <div class="server-ocr-note">
-        <strong>読み上げ専用方式</strong>
-        <p>写真から文字を読み取るOCRは使いません。文章を手入力・コピー＆ペーストして読み上げるので、OpenAI API料金なしで使えます。</p>
+        <strong>無料安定版</strong>
+        <p>基本は文章を手入力・コピー＆ペーストして読み上げます。画像読み取りβは無料ですが、ブラウザ内OCRのためPC推奨です。</p>
       </div>
+
+
+
+      <details class="ocr-beta-panel">
+        <summary>画像から読み取る β版（PC推奨）</summary>
+
+        <div class="ocr-beta-note">
+          <strong>無料のブラウザ内OCRです</strong>
+          <p>OpenAI APIは使いません。けいたさんのPCでは画像読み取りも試せるようにしています。スマホでは重くなる場合があるため、安定運用は「写真アプリで文字コピー → ここに貼り付け」がおすすめです。</p>
+        </div>
+
+        <div class="input-grid">
+          <label class="file-label photo-label">
+            <input id="photoInput" type="file" accept="image/*" />
+            <span>写真フォルダから選ぶ</span>
+          </label>
+
+          <label class="file-label camera-label">
+            <input id="cameraInput" type="file" accept="image/*" capture="environment" />
+            <span>カメラで撮る</span>
+          </label>
+        </div>
+
+        <div id="imagePreviewWrap" class="preview-wrap hidden">
+          <img id="imagePreview" alt="選択した画像のプレビュー" />
+        </div>
+
+        <div class="setting-grid compact-grid">
+          <div>
+            <label class="control-label" for="accuracySelect">読み取り精度</label>
+            <select id="accuracySelect">
+              <option value="normal" selected>標準・軽め</option>
+              <option value="high">高精度・重め</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="control-label" for="ocrModeSelect">画像補正</label>
+            <select id="ocrModeSelect">
+              <option value="document" selected>書類向け</option>
+              <option value="grayscale">グレー補正</option>
+              <option value="contrast">くっきり強め</option>
+              <option value="none">補正なし</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="setting-grid compact-grid">
+          <div>
+            <label class="control-label" for="layoutSelect">文章の向き</label>
+            <select id="layoutSelect">
+              <option value="6" selected>横書き・文章</option>
+              <option value="11">短い文字・看板</option>
+              <option value="3">自動・重め</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="control-label" for="languageSelect">読み取り言語</label>
+            <select id="languageSelect">
+              <option value="jpn" selected>日本語のみ</option>
+              <option value="jpn_eng">日本語＋英語・重め</option>
+            </select>
+          </div>
+        </div>
+
+        <button id="ocrButton" class="primary-button" type="button" disabled>
+          画像から文字を読み取る β
+        </button>
+      </details>
 
       <textarea
         id="resultText"
@@ -119,7 +193,7 @@ function renderApp() {
       </div>
 
       <p class="hint">
-        写真から読み取りたい場合は、iPhoneの「テキスト認識表示」や画像内テキストコピー機能で文字をコピーしてから貼り付けてください。
+        スマホで画像読み取りβが重い場合は、iPhoneの「テキスト認識表示」や画像内テキストコピー機能で文字をコピーしてから貼り付けてください。
       </p>
     </section>
 
@@ -219,7 +293,7 @@ function renderApp() {
     </section>
 
     <p class="footer-note">
-      パシャ読み LiteはOCRなしの無料安定版です。文章と履歴はこのブラウザ内に保存されます。
+      パシャ読み Liteは無料安定版です。画像読み取りβはPC推奨です。文章と履歴はこのブラウザ内に保存されます。
     </p>
   </main>
 `
@@ -235,6 +309,16 @@ function initializeApp() {
   const clearButton = document.querySelector('#clearButton')
   const saveHistoryButton = document.querySelector('#saveHistoryButton')
   const copyTextButton = document.querySelector('#copyTextButton')
+
+  const photoInput = document.querySelector('#photoInput')
+  const cameraInput = document.querySelector('#cameraInput')
+  const imagePreviewWrap = document.querySelector('#imagePreviewWrap')
+  const imagePreview = document.querySelector('#imagePreview')
+  const accuracySelect = document.querySelector('#accuracySelect')
+  const ocrModeSelect = document.querySelector('#ocrModeSelect')
+  const layoutSelect = document.querySelector('#layoutSelect')
+  const languageSelect = document.querySelector('#languageSelect')
+  const ocrButton = document.querySelector('#ocrButton')
 
   const statusText = document.querySelector('#statusText')
   const progressBar = document.querySelector('#progressBar')
@@ -524,6 +608,207 @@ function initializeApp() {
     })
   }
 
+
+  function setOcrLoading(isLoading) {
+    if (!ocrButton) {
+      return
+    }
+
+    ocrButton.disabled = isLoading || !selectedImageFile
+    if (photoInput) photoInput.disabled = isLoading
+    if (cameraInput) cameraInput.disabled = isLoading
+    ocrButton.textContent = isLoading ? '読み取り中...' : '画像から文字を読み取る β'
+  }
+
+  function handleFileSelected(file) {
+    if (!file) {
+      selectedImageFile = null
+      if (ocrButton) ocrButton.disabled = true
+      return
+    }
+
+    selectedImageFile = file
+    makeImagePreview(file)
+    if (ocrButton) ocrButton.disabled = false
+    setStatus('画像を選びました。「画像から文字を読み取る β」を押してください。')
+    setProgress(0)
+  }
+
+  function makeImagePreview(file) {
+    if (!imagePreview || !imagePreviewWrap) {
+      return
+    }
+
+    if (currentImageUrl) {
+      URL.revokeObjectURL(currentImageUrl)
+    }
+
+    currentImageUrl = URL.createObjectURL(file)
+    imagePreview.src = currentImageUrl
+    imagePreviewWrap.classList.remove('hidden')
+  }
+
+  function loadImageFromFile(file) {
+    return new Promise((resolve, reject) => {
+      const image = new Image()
+      const url = URL.createObjectURL(file)
+
+      image.onload = () => {
+        URL.revokeObjectURL(url)
+        resolve(image)
+      }
+
+      image.onerror = () => {
+        URL.revokeObjectURL(url)
+        reject(new Error('画像を読み込めませんでした。'))
+      }
+
+      image.src = url
+    })
+  }
+
+  async function prepareImageForOcr(file) {
+    const image = await loadImageFromFile(file)
+    const highAccuracy = accuracySelect?.value === 'high'
+    const maxWidth = highAccuracy ? 1800 : 1200
+    const scale = Math.min(1, maxWidth / image.naturalWidth)
+
+    const canvas = document.createElement('canvas')
+    canvas.width = Math.max(1, Math.round(image.naturalWidth * scale))
+    canvas.height = Math.max(1, Math.round(image.naturalHeight * scale))
+
+    const context = canvas.getContext('2d', { willReadFrequently: true })
+    context.drawImage(image, 0, 0, canvas.width, canvas.height)
+
+    const mode = ocrModeSelect?.value || 'document'
+    if (mode === 'none') {
+      return canvas
+    }
+
+    const imageData = context.getImageData(0, 0, canvas.width, canvas.height)
+    const data = imageData.data
+
+    for (let i = 0; i < data.length; i += 4) {
+      const gray = data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114
+      let adjusted = gray
+
+      if (mode === 'contrast') {
+        adjusted = Math.max(0, Math.min(255, (gray - 128) * 1.55 + 128))
+      }
+
+      if (mode === 'document') {
+        const contrast = Math.max(0, Math.min(255, (gray - 128) * 1.35 + 128))
+        adjusted = contrast > 155 ? 255 : Math.max(0, contrast - 30)
+      }
+
+      data[i] = adjusted
+      data[i + 1] = adjusted
+      data[i + 2] = adjusted
+    }
+
+    context.putImageData(imageData, 0, 0)
+    return canvas
+  }
+
+  function getOcrLanguages() {
+    if (languageSelect?.value === 'jpn_eng') {
+      return ['jpn', 'eng']
+    }
+
+    return ['jpn']
+  }
+
+  async function getOcrWorker() {
+    if (!window.Tesseract?.createWorker) {
+      throw new Error('OCRライブラリを読み込めませんでした。通信環境を確認してページを再読み込みしてください。')
+    }
+
+    const languages = getOcrLanguages()
+    const key = languages.join('+')
+
+    if (ocrWorker && ocrWorkerKey === key) {
+      return ocrWorker
+    }
+
+    if (ocrWorker) {
+      try {
+        await ocrWorker.terminate()
+      } catch {}
+      ocrWorker = null
+    }
+
+    setStatus(`OCR準備中です。初回だけ少し時間がかかります。使用言語: ${key}`)
+    setProgress(5)
+
+    ocrWorker = await window.Tesseract.createWorker(languages, 1, {
+      logger: (message) => {
+        if (message.status === 'recognizing text') {
+          const percent = Math.round((message.progress || 0) * 100)
+          setStatus(`画像読み取り中... ${percent}%`)
+          setProgress(percent)
+        } else if (message.status) {
+          setStatus(`OCR準備中: ${message.status}`)
+        }
+      },
+    })
+    ocrWorkerKey = key
+    return ocrWorker
+  }
+
+  function cleanupOcrText(text) {
+    return text
+      .replaceAll('|', '｜')
+      .replace(/[ \t]+\n/g, '\n')
+      .replace(/\n{3,}/g, '\n\n')
+      .trim()
+  }
+
+  async function runOcr() {
+    if (!selectedImageFile) {
+      setStatus('先に画像を選んでください。')
+      return
+    }
+
+    try {
+      setOcrLoading(true)
+      setProgress(0)
+      setStatus('画像を読み取りやすく調整しています...')
+
+      const preparedImage = await prepareImageForOcr(selectedImageFile)
+      const worker = await getOcrWorker()
+
+      await worker.setParameters({
+        tessedit_pageseg_mode: layoutSelect?.value || '6',
+        preserve_interword_spaces: '1',
+      })
+
+      setStatus('画像から文字を読み取り中です。PC推奨のβ機能です。')
+      setProgress(10)
+
+      const result = await worker.recognize(preparedImage)
+      const text = cleanupOcrText(result?.data?.text || '')
+
+      if (!text) {
+        setStatus('文字を読み取れませんでした。文字を大きく、明るく撮って再試行してください。')
+        setProgress(0)
+        return
+      }
+
+      resultText.value = text
+      updateTextCount()
+      saveTextToHistory(text)
+      setStatus('画像から文字を読み取りました。必要なら修正してから読み上げてください。')
+      setProgress(100)
+      resultText.focus()
+    } catch (error) {
+      console.error(error)
+      setStatus(error?.message || '画像読み取りでエラーが出ました。PCで試すか、写真アプリで文字コピーして貼り付けてください。')
+      setProgress(0)
+    } finally {
+      setOcrLoading(false)
+    }
+  }
+
   async function pasteFromClipboard() {
     try {
       const text = await navigator.clipboard.readText()
@@ -568,6 +853,16 @@ function initializeApp() {
   function rememberCursor() {
     lastCursorPosition = resultText.selectionStart ?? lastCursorPosition
   }
+
+  photoInput?.addEventListener('change', () => {
+    handleFileSelected(photoInput.files?.[0])
+  })
+
+  cameraInput?.addEventListener('change', () => {
+    handleFileSelected(cameraInput.files?.[0])
+  })
+
+  ocrButton?.addEventListener('click', runOcr)
 
   resultText.addEventListener('input', () => {
     updateTextCount()

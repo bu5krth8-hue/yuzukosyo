@@ -459,3 +459,40 @@ input[type="range"] {
 .server-ocr-note p {
   margin: 0;
 }
+
+
+.ocr-beta-panel {
+  margin-top: 16px;
+  margin-bottom: 16px;
+  padding: 14px;
+  border: 1px solid rgba(109, 93, 252, 0.18);
+  border-radius: 18px;
+  background: rgba(247, 247, 251, 0.92);
+}
+
+.ocr-beta-panel summary {
+  cursor: pointer;
+  color: #4f43d3;
+  font-weight: 900;
+  line-height: 1.5;
+}
+
+.ocr-beta-note {
+  margin-top: 12px;
+  margin-bottom: 14px;
+  padding: 12px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.82);
+  color: #3f4354;
+  line-height: 1.7;
+}
+
+.ocr-beta-note strong {
+  display: block;
+  margin-bottom: 4px;
+  color: #4f43d3;
+}
+
+.ocr-beta-note p {
+  margin: 0;
+}
