@@ -83,27 +83,30 @@ function renderApp() {
       </div>
 
       <p class="lead">
-        文章を貼り付けて、好きな位置から日本語音声で読み上げます。PC推奨の画像読み取りβも追加しました。
+        文章を入れて、流れを整えながら日本語音声で読み上げできます。画像から文字を読み取る機能も使えます。
       </p>
     </section>
 
     <section class="card">
       <h2>1. 文章を入れる</h2>
 
-      <div class="server-ocr-note">
-        <strong>無料安定版</strong>
-        <p>基本は文章を手入力・コピー＆ペーストして読み上げます。画像読み取りβは無料ですが、ブラウザ内OCRのためPC推奨です。</p>
-      </div>
-
-
+      <details class="smart-help">
+        <summary>使い方・補足を開く</summary>
+        <div class="help-body">
+          <p>文章を直接入力するか、コピーした文章を貼り付けて読み上げます。画像から文字を読み取る機能も使えます。</p>
+          <p>画像読み取りは無料のブラウザ内OCRです。環境によって重い場合は、iPhoneの写真アプリで文字をコピーして貼り付ける方法が安定します。</p>
+        </div>
+      </details>
 
       <details class="ocr-beta-panel">
-        <summary>画像から読み取る β版（PC推奨）</summary>
+        <summary>画像から読み取る</summary>
 
-        <div class="ocr-beta-note">
-          <strong>無料のブラウザ内OCRです</strong>
-          <p>OpenAI APIは使いません。けいたさんのPCでは画像読み取りも試せるようにしています。スマホでは重くなる場合があるため、安定運用は「写真アプリで文字コピー → ここに貼り付け」がおすすめです。</p>
-        </div>
+        <details class="smart-help nested-help">
+          <summary>画像読み取りの補足を開く</summary>
+          <div class="help-body">
+            <p>OpenAI APIは使わず、ブラウザ内で画像の文字を読み取ります。画像が大きい場合は少し時間がかかることがあります。</p>
+          </div>
+        </details>
 
         <div class="input-grid">
           <label class="file-label photo-label">
@@ -161,7 +164,7 @@ function renderApp() {
         </div>
 
         <button id="ocrButton" class="primary-button" type="button" disabled>
-          画像から文字を読み取る β
+          画像から文字を読み取る
         </button>
       </details>
 
@@ -192,17 +195,23 @@ function renderApp() {
         </button>
       </div>
 
-      <p class="hint">
-        スマホで画像読み取りβが重い場合は、iPhoneの「テキスト認識表示」や画像内テキストコピー機能で文字をコピーしてから貼り付けてください。
-      </p>
+      <details class="smart-help compact-help">
+        <summary>画像読み取りが重い時</summary>
+        <div class="help-body">
+          <p>iPhoneの写真アプリで画像を開き、文字をコピーしてからこの欄に貼り付けると安定します。</p>
+        </div>
+      </details>
     </section>
 
     <section class="card">
       <h2>2. 読み上げ</h2>
 
-      <p class="hint">
-        途中から読みたい時は、文章内の読み始めたい場所をタップしてから「ここから読む」を押してください。
-      </p>
+      <details class="smart-help compact-help">
+        <summary>途中から読む時の使い方</summary>
+        <div class="help-body">
+          <p>文章内の読み始めたい場所をタップしてから「ここから読む」を押してください。文章を選んで「選択部分を読む」こともできます。</p>
+        </div>
+      </details>
 
       <div class="button-grid speech-grid">
         <button id="speakAllButton" class="primary-button no-margin">
@@ -243,6 +252,21 @@ function renderApp() {
     <section class="card">
       <h2>3. 読み上げ設定</h2>
 
+      <label class="control-label" for="speechPresetSelect">聞きやすさ</label>
+      <select id="speechPresetSelect">
+        <option value="clear" selected>聞きやすい標準</option>
+        <option value="slow">ゆっくり・はっきり</option>
+        <option value="bright">少し明るめ</option>
+        <option value="long">長文向け・落ち着き</option>
+      </select>
+
+      <label class="control-label" for="pauseSelect">間の取り方</label>
+      <select id="pauseSelect">
+        <option value="natural" selected>自然</option>
+        <option value="light">少なめ</option>
+        <option value="strong">しっかり</option>
+      </select>
+
       <label class="control-label" for="voiceSelect">声（日本語のみ）</label>
       <select id="voiceSelect"></select>
 
@@ -268,12 +292,15 @@ function renderApp() {
 
       <label class="checkbox-label">
         <input id="naturalSpeechCheck" type="checkbox" checked />
-        <span>読み上げ用に整える（改行や句読点で間を作る）</span>
+        <span>文章の流れを整える（改行で途切れにくくする）</span>
       </label>
 
-      <p class="hint">
-        抑揚そのものはブラウザ音声に依存します。ここでは速度・高さ・区切りを調整して聞きやすくしています。
-      </p>
+      <details class="smart-help compact-help">
+        <summary>声について</summary>
+        <div class="help-body">
+          <p>選べる声は端末に入っている日本語音声です。「聞きやすさ」と「間の取り方」で、速度・高さ・句読点の間を調整できます。</p>
+        </div>
+      </details>
     </section>
 
     <section class="card">
@@ -293,7 +320,7 @@ function renderApp() {
     </section>
 
     <p class="footer-note">
-      パシャ読み Liteは無料安定版です。画像読み取りβはPC推奨です。文章と履歴はこのブラウザ内に保存されます。
+      パシャ読み Liteは無料安定版です。文章と履歴はこのブラウザ内に保存されます。
     </p>
   </main>
 `
@@ -330,6 +357,8 @@ function initializeApp() {
   const pauseButton = document.querySelector('#pauseButton')
   const resumeButton = document.querySelector('#resumeButton')
 
+  const speechPresetSelect = document.querySelector('#speechPresetSelect')
+  const pauseSelect = document.querySelector('#pauseSelect')
   const voiceSelect = document.querySelector('#voiceSelect')
   const refreshVoicesButton = document.querySelector('#refreshVoicesButton')
   const testVoiceButton = document.querySelector('#testVoiceButton')
@@ -366,6 +395,8 @@ function initializeApp() {
 
   function saveSettings() {
     const settings = {
+      speechPreset: speechPresetSelect.value,
+      pauseMode: pauseSelect?.value || 'natural',
       voiceName: voiceSelect.value,
       rate: rateRange.value,
       pitch: pitchRange.value,
@@ -377,6 +408,14 @@ function initializeApp() {
 
   function applySettings() {
     const settings = loadSettings()
+
+    if (settings.speechPreset) {
+      speechPresetSelect.value = settings.speechPreset
+    }
+
+    if (settings.pauseMode && pauseSelect) {
+      pauseSelect.value = settings.pauseMode
+    }
 
     if (settings.rate) {
       rateRange.value = settings.rate
@@ -394,9 +433,34 @@ function initializeApp() {
     pitchValue.textContent = pitchRange.value
   }
 
+  function getVoiceScore(voice) {
+    const name = `${voice.name} ${voice.lang}`.toLowerCase()
+    let score = 0
+
+    if (voice.lang.toLowerCase().startsWith('ja')) score += 100
+    if (name.includes('siri')) score += 30
+    if (name.includes('kyoko') || name.includes('otoya')) score += 26
+    if (name.includes('nanami') || name.includes('keita')) score += 24
+    if (name.includes('google')) score += 22
+    if (name.includes('microsoft')) score += 20
+    if (name.includes('premium') || name.includes('enhanced')) score += 12
+    if (name.includes('compact')) score -= 4
+    if (voice.localService) score += 3
+
+    return score
+  }
+
+  function getVoiceLabel(voice, index) {
+    const score = getVoiceScore(voice)
+    const recommend = index === 0 || score >= 124 ? 'おすすめ・' : ''
+    return `${recommend}${voice.name} / ${voice.lang}`
+  }
+
   function loadVoices() {
     voices = window.speechSynthesis?.getVoices?.() || []
-    const japaneseVoices = voices.filter((voice) => voice.lang.toLowerCase().startsWith('ja'))
+    const japaneseVoices = voices
+      .filter((voice) => voice.lang.toLowerCase().startsWith('ja'))
+      .sort((a, b) => getVoiceScore(b) - getVoiceScore(a) || a.name.localeCompare(b.name, 'ja'))
     const settings = loadSettings()
 
     voiceSelect.innerHTML = ''
@@ -415,17 +479,25 @@ function initializeApp() {
     autoOption.textContent = '自動で選ぶ（日本語）'
     voiceSelect.appendChild(autoOption)
 
-    japaneseVoices.forEach((voice) => {
+    japaneseVoices.forEach((voice, index) => {
       const option = document.createElement('option')
       option.value = voice.name
-      option.textContent = `${voice.name} / ${voice.lang}`
+      option.textContent = getVoiceLabel(voice, index)
 
       if (settings.voiceName && settings.voiceName === voice.name) {
         option.selected = true
       }
 
+      if (!settings.voiceName && index === 0) {
+        option.selected = true
+      }
+
       voiceSelect.appendChild(option)
     })
+
+    if (!settings.voiceName && japaneseVoices[0]) {
+      saveSettings()
+    }
   }
 
   function getSelectedVoice() {
@@ -433,22 +505,94 @@ function initializeApp() {
     return voices.find((voice) => voice.name === selectedName && voice.lang.toLowerCase().startsWith('ja')) || null
   }
 
-  function cleanTextForSpeech(text) {
-    const baseText = text
-      .replace(/\r\n/g, '\n')
+  function fixSeparatedDakuten(text) {
+    const dakutenMap = {
+      'か': 'が', 'き': 'ぎ', 'く': 'ぐ', 'け': 'げ', 'こ': 'ご',
+      'さ': 'ざ', 'し': 'じ', 'す': 'ず', 'せ': 'ぜ', 'そ': 'ぞ',
+      'た': 'だ', 'ち': 'ぢ', 'つ': 'づ', 'て': 'で', 'と': 'ど',
+      'は': 'ば', 'ひ': 'び', 'ふ': 'ぶ', 'へ': 'べ', 'ほ': 'ぼ',
+      'う': 'ゔ', 'ゝ': 'ゞ',
+      'カ': 'ガ', 'キ': 'ギ', 'ク': 'グ', 'ケ': 'ゲ', 'コ': 'ゴ',
+      'サ': 'ザ', 'シ': 'ジ', 'ス': 'ズ', 'セ': 'ゼ', 'ソ': 'ゾ',
+      'タ': 'ダ', 'チ': 'ヂ', 'ツ': 'ヅ', 'テ': 'デ', 'ト': 'ド',
+      'ハ': 'バ', 'ヒ': 'ビ', 'フ': 'ブ', 'ヘ': 'ベ', 'ホ': 'ボ',
+      'ウ': 'ヴ', 'ヽ': 'ヾ'
+    }
+
+    const handakutenMap = {
+      'は': 'ぱ', 'ひ': 'ぴ', 'ふ': 'ぷ', 'へ': 'ぺ', 'ほ': 'ぽ',
+      'ハ': 'パ', 'ヒ': 'ピ', 'フ': 'プ', 'ヘ': 'ペ', 'ホ': 'ポ'
+    }
+
+    const dakutenBases = Object.keys(dakutenMap).join('')
+    const handakutenBases = Object.keys(handakutenMap).join('')
+
+    return text
+      .replace(new RegExp(`([${dakutenBases}])\\s*[゛ﾞ\\u3099]`, 'g'), (_, base) => dakutenMap[base] || base)
+      .replace(new RegExp(`([${handakutenBases}])\\s*[゜ﾟ\\u309A]`, 'g'), (_, base) => handakutenMap[base] || base)
+      .normalize('NFC')
+  }
+
+  function applyPunctuationPauses(text) {
+    const mode = pauseSelect?.value || 'natural'
+    const gaps = {
+      light: { comma: '', sentence: ' ', paragraph: '  ' },
+      natural: { comma: ' ', sentence: '　', paragraph: '　　' },
+      strong: { comma: '　', sentence: '　　', paragraph: '　　　' },
+    }
+    const gap = gaps[mode] || gaps.natural
+
+    return text
+      .replace(/\n{2,}/g, `。${gap.paragraph}`)
+      .replace(/([、，])\s*/g, `$1${gap.comma}`)
+      .replace(/([。．])\s*/g, `$1${gap.sentence}`)
+      .replace(/([！？!?])\s*/g, `$1${gap.sentence}`)
+      .replace(/\s{4,}/g, gap.paragraph)
+      .trim()
+  }
+
+  function joinBrokenLines(text) {
+    const normalized = text
+      .replace(new RegExp('\\r\\n?', 'g'), '\n')
+      .replace(/[\t　]+/g, ' ')
       .replace(/\n{3,}/g, '\n\n')
       .trim()
 
-    if (!naturalSpeechCheck.checked) {
-      return baseText
+    if (!normalized) {
+      return ''
     }
 
-    return baseText
-      .replace(/([。！？!?])\s*/g, '$1\n')
-      .replace(/\n+/g, '。')
+    return normalized
+      .split(/\n{2,}/)
+      .map((paragraph) => {
+        return paragraph
+          .split('\n')
+          .map((line) => line.trim())
+          .filter(Boolean)
+          .join('\n')
+          .replace(/([ぁ-んァ-ン一-龥々ー])\n([ぁ-んァ-ン一-龥々ー])/g, '$1$2')
+          .replace(/([A-Za-z0-9])\n([A-Za-z0-9])/g, '$1 $2')
+          .replace(/([。！？!?、，,.．」』）】》〉])\n/g, '$1 ')
+          .replace(/\n([。！？!?、，,.．])/g, '$1')
+          .replace(/\n/g, ' ')
+          .replace(/\s{2,}/g, ' ')
+          .trim()
+      })
+      .filter(Boolean)
+      .join('。')
       .replace(/。。+/g, '。')
-      .replace(/、\s*/g, '、')
+      .replace(/([。！？!?])([ぁ-んァ-ン一-龥々ーA-Za-z0-9])/g, '$1 $2')
       .trim()
+  }
+
+  function cleanTextForSpeech(text) {
+    const baseText = fixSeparatedDakuten(text)
+      .replace(/\r\n?/g, '\n')
+      .trim()
+
+    const flowText = naturalSpeechCheck.checked ? joinBrokenLines(baseText) : baseText
+
+    return applyPunctuationPauses(flowText)
   }
 
   function getReadableText(mode) {
@@ -617,7 +761,7 @@ function initializeApp() {
     ocrButton.disabled = isLoading || !selectedImageFile
     if (photoInput) photoInput.disabled = isLoading
     if (cameraInput) cameraInput.disabled = isLoading
-    ocrButton.textContent = isLoading ? '読み取り中...' : '画像から文字を読み取る β'
+    ocrButton.textContent = isLoading ? '読み取り中...' : '画像から文字を読み取る'
   }
 
   function handleFileSelected(file) {
@@ -630,7 +774,7 @@ function initializeApp() {
     selectedImageFile = file
     makeImagePreview(file)
     if (ocrButton) ocrButton.disabled = false
-    setStatus('画像を選びました。「画像から文字を読み取る β」を押してください。')
+    setStatus('画像を選びました。「画像から文字を読み取る」を押してください。')
     setProgress(0)
   }
 
@@ -756,7 +900,7 @@ function initializeApp() {
   }
 
   function cleanupOcrText(text) {
-    return text
+    return fixSeparatedDakuten(text)
       .replaceAll('|', '｜')
       .replace(/[ \t]+\n/g, '\n')
       .replace(/\n{3,}/g, '\n\n')
@@ -782,7 +926,7 @@ function initializeApp() {
         preserve_interword_spaces: '1',
       })
 
-      setStatus('画像から文字を読み取り中です。PC推奨のβ機能です。')
+      setStatus('画像から文字を読み取り中です。画像読み取り機能です。')
       setProgress(10)
 
       const result = await worker.recognize(preparedImage)
@@ -802,7 +946,7 @@ function initializeApp() {
       resultText.focus()
     } catch (error) {
       console.error(error)
-      setStatus(error?.message || '画像読み取りでエラーが出ました。PCで試すか、写真アプリで文字コピーして貼り付けてください。')
+      setStatus(error?.message || '画像読み取りでエラーが出ました。別の画像で試すか、写真アプリで文字コピーして貼り付けてください。')
       setProgress(0)
     } finally {
       setOcrLoading(false)
@@ -854,6 +998,25 @@ function initializeApp() {
     lastCursorPosition = resultText.selectionStart ?? lastCursorPosition
   }
 
+  function applySpeechPreset(preset) {
+    const presets = {
+      clear: { rate: '0.95', pitch: '1.0', naturalSpeech: true, pauseMode: 'natural', label: '聞きやすい標準にしました。' },
+      slow: { rate: '0.82', pitch: '0.95', naturalSpeech: true, pauseMode: 'strong', label: 'ゆっくり・はっきりにしました。' },
+      bright: { rate: '1.03', pitch: '1.08', naturalSpeech: true, pauseMode: 'natural', label: '少し明るめの設定にしました。' },
+      long: { rate: '0.88', pitch: '0.92', naturalSpeech: true, pauseMode: 'strong', label: '長文向けの落ち着いた設定にしました。' },
+    }
+
+    const selected = presets[preset] || presets.clear
+    rateRange.value = selected.rate
+    pitchRange.value = selected.pitch
+    naturalSpeechCheck.checked = selected.naturalSpeech
+    if (pauseSelect) pauseSelect.value = selected.pauseMode
+    rateValue.textContent = rateRange.value
+    pitchValue.textContent = pitchRange.value
+    saveSettings()
+    setStatus(selected.label)
+  }
+
   photoInput?.addEventListener('change', () => {
     handleFileSelected(photoInput.files?.[0])
   })
@@ -875,7 +1038,7 @@ function initializeApp() {
   pasteButton.addEventListener('click', pasteFromClipboard)
 
   sampleButton.addEventListener('click', () => {
-    resultText.value = 'こんにちは。これはパシャ読みLiteのテストです。文章を貼り付けて、最初から読む、ここから読む、選択部分を読む機能を試せます。'
+    resultText.value = 'こんにちは。これはパシャ読みLiteのテストです。文章を貼り付けて、改行で分かれた文章も流れを整えて読み上げます。最初から読む、ここから読む、選択部分を読む機能を試せます。'
     updateTextCount()
     setStatus('サンプル文を入れました。')
     resultText.focus()
@@ -960,6 +1123,12 @@ function initializeApp() {
     window.speechSynthesis.speak(utterance)
   }
 
+  speechPresetSelect.addEventListener('change', () => {
+    applySpeechPreset(speechPresetSelect.value)
+  })
+
+  pauseSelect?.addEventListener('change', saveSettings)
+
   voiceSelect.addEventListener('change', () => {
     saveSettings()
     setStatus('声を変更しました。')
@@ -977,12 +1146,15 @@ function initializeApp() {
 
   naturalSpeechCheck.addEventListener('change', () => {
     saveSettings()
-    setStatus(naturalSpeechCheck.checked ? '読み上げ用に文章を整える設定をONにしました。' : '読み上げ用に文章を整える設定をOFFにしました。')
+    setStatus(naturalSpeechCheck.checked ? '文章の流れを整える設定をONにしました。' : '文章の流れを整える設定をOFFにしました。')
   })
 
   window.speechSynthesis?.addEventListener?.('voiceschanged', loadVoices)
 
   applySettings()
+  if (!loadSettings().speechPreset) {
+    applySpeechPreset('clear')
+  }
   loadVoices()
   renderHistory()
   updateTextCount()
