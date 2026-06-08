@@ -537,3 +537,37 @@ input[type="range"] {
   margin-bottom: 14px;
   background: rgba(255, 255, 255, 0.82);
 }
+
+.time-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+  color: #4c5060;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.speech-seek-range {
+  display: block;
+  width: 100%;
+  margin: 8px 0 8px;
+  accent-color: #6d5dfc;
+}
+
+.seek-hint {
+  margin: 8px 0 0;
+  color: #777b8c;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.wide-button,
+.stop-bottom-button {
+  margin-top: 14px;
+}
+
+.stop-bottom-button {
+  min-height: 54px;
+}

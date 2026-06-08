@@ -105,6 +105,8 @@ function renderApp() {
           <summary>画像読み取りの補足を開く</summary>
           <div class="help-body">
             <p>OpenAI APIは使わず、ブラウザ内で画像の文字を読み取ります。画像が大きい場合は少し時間がかかることがあります。</p>
+            <p>精度を上げたい時は、明るい場所で文字を大きく撮り、「小さい文字向け」「薄い文字向け」「画面スクショ向け」を試してください。</p>
+            <p>高精度・最高精度は複数回読み取って良さそうな結果を採用するため、標準より時間がかかります。</p>
           </div>
         </details>
 
@@ -128,8 +130,9 @@ function renderApp() {
           <div>
             <label class="control-label" for="accuracySelect">読み取り精度</label>
             <select id="accuracySelect">
-              <option value="normal" selected>標準・軽め</option>
-              <option value="high">高精度・重め</option>
+              <option value="normal" selected>標準</option>
+              <option value="high">高精度（2回読み取り）</option>
+              <option value="best">最高精度（3回読み取り・重め）</option>
             </select>
           </div>
 
@@ -137,6 +140,9 @@ function renderApp() {
             <label class="control-label" for="ocrModeSelect">画像補正</label>
             <select id="ocrModeSelect">
               <option value="document" selected>書類向け</option>
+              <option value="smallText">小さい文字向け</option>
+              <option value="thinText">薄い文字向け</option>
+              <option value="screenshot">画面スクショ向け</option>
               <option value="grayscale">グレー補正</option>
               <option value="contrast">くっきり強め</option>
               <option value="none">補正なし</option>
@@ -221,14 +227,23 @@ function renderApp() {
         <button id="speakFromCursorButton" class="primary-button no-margin">
           ここから読む
         </button>
+      </div>
 
-        <button id="speakSelectedButton" class="secondary-button">
-          選択部分を読む
-        </button>
+      <button id="speakSelectedButton" class="secondary-button wide-button">
+        選択部分を読む
+      </button>
 
-        <button id="stopButton" class="danger-button">
-          停止
-        </button>
+      <div class="status-box">
+        <p id="statusText">文章を入れると読み上げできます。</p>
+        <div class="time-row" aria-label="読み上げ時間">
+          <span id="currentTimeText">0:00</span>
+          <span id="remainingTimeText">残り 0:00</span>
+        </div>
+        <input id="speechSeekRange" class="speech-seek-range" type="range" min="0" max="1000" step="1" value="0" disabled aria-label="読み上げ位置を移動" />
+        <div class="progress-track" aria-hidden="true">
+          <div id="progressBar" class="progress-bar"></div>
+        </div>
+        <p class="seek-hint">読み上げ中にバーを動かすと、そのあたりから読み直せます。</p>
       </div>
 
       <div class="button-grid">
@@ -241,12 +256,9 @@ function renderApp() {
         </button>
       </div>
 
-      <div class="status-box">
-        <p id="statusText">文章を入れると読み上げできます。</p>
-        <div class="progress-track">
-          <div id="progressBar" class="progress-bar"></div>
-        </div>
-      </div>
+      <button id="stopButton" class="danger-button stop-bottom-button">
+        停止
+      </button>
     </section>
 
     <section class="card">
@@ -349,6 +361,9 @@ function initializeApp() {
 
   const statusText = document.querySelector('#statusText')
   const progressBar = document.querySelector('#progressBar')
+  const speechSeekRange = document.querySelector('#speechSeekRange')
+  const currentTimeText = document.querySelector('#currentTimeText')
+  const remainingTimeText = document.querySelector('#remainingTimeText')
 
   const speakAllButton = document.querySelector('#speakAllButton')
   const speakFromCursorButton = document.querySelector('#speakFromCursorButton')
@@ -370,6 +385,24 @@ function initializeApp() {
   const clearHistoryButton = document.querySelector('#clearHistoryButton')
   const historyList = document.querySelector('#historyList')
 
+  const speechState = {
+    cleanText: '',
+    currentIndex: 0,
+    startIndex: 0,
+    totalSeconds: 0,
+    charsPerSecond: 6,
+    startedAt: 0,
+    pausedAt: 0,
+    pausedMs: 0,
+    timerId: null,
+    isSpeaking: false,
+    isPaused: false,
+    isSeeking: false,
+    isStopping: false,
+    mode: 'all',
+    token: 0,
+  }
+
   function setStatus(message) {
     statusText.textContent = message
   }
@@ -377,6 +410,93 @@ function initializeApp() {
   function setProgress(value) {
     const safeValue = Math.max(0, Math.min(100, value))
     progressBar.style.width = `${safeValue}%`
+    if (!speechState.isSeeking && speechSeekRange) {
+      speechSeekRange.value = String(Math.round(safeValue * 10))
+    }
+  }
+
+  function formatClock(seconds) {
+    const safeSeconds = Math.max(0, Math.round(Number.isFinite(seconds) ? seconds : 0))
+    const minutes = Math.floor(safeSeconds / 60)
+    const restSeconds = safeSeconds % 60
+    return `${minutes}:${String(restSeconds).padStart(2, '0')}`
+  }
+
+  function getSpeechCharRate() {
+    const rate = Number(rateRange?.value || 1)
+    return Math.max(3.2, 6.0 * rate)
+  }
+
+  function estimateSpeechSeconds(text) {
+    const charRate = getSpeechCharRate()
+    const punctuationCount = (text.match(/[、。！？!?]/g) || []).length
+    const paragraphCount = (text.match(/[　]{2,}|\n{2,}/g) || []).length
+    return Math.max(1, (text.length / charRate) + (punctuationCount * 0.18) + (paragraphCount * 0.6))
+  }
+
+  function updateTimeDisplay(index) {
+    const totalLength = Math.max(1, speechState.cleanText.length)
+    const safeIndex = Math.max(0, Math.min(totalLength, index))
+    const percent = totalLength ? (safeIndex / totalLength) * 100 : 0
+    const currentSeconds = speechState.totalSeconds * (safeIndex / totalLength)
+    const remainingSeconds = Math.max(0, speechState.totalSeconds - currentSeconds)
+
+    speechState.currentIndex = safeIndex
+    setProgress(percent)
+    if (currentTimeText) currentTimeText.textContent = formatClock(currentSeconds)
+    if (remainingTimeText) remainingTimeText.textContent = `残り ${formatClock(remainingSeconds)}`
+  }
+
+  function resetSpeechProgress() {
+    speechState.token += 1
+    speechState.cleanText = ''
+    speechState.currentIndex = 0
+    speechState.startIndex = 0
+    speechState.totalSeconds = 0
+    speechState.charsPerSecond = getSpeechCharRate()
+    speechState.startedAt = 0
+    speechState.pausedAt = 0
+    speechState.pausedMs = 0
+    speechState.isSpeaking = false
+    speechState.isPaused = false
+    speechState.isSeeking = false
+    window.clearInterval(speechState.timerId)
+    speechState.timerId = null
+    if (speechSeekRange) {
+      speechSeekRange.value = '0'
+      speechSeekRange.disabled = true
+    }
+    setProgress(0)
+    if (currentTimeText) currentTimeText.textContent = '0:00'
+    if (remainingTimeText) remainingTimeText.textContent = '残り 0:00'
+  }
+
+  function stopSpeechTimer() {
+    window.clearInterval(speechState.timerId)
+    speechState.timerId = null
+  }
+
+  function startSpeechTimer() {
+    stopSpeechTimer()
+    speechState.timerId = window.setInterval(() => {
+      if (!speechState.isSpeaking || speechState.isPaused || speechState.isSeeking || !speechState.cleanText) {
+        return
+      }
+
+      const activeMs = Math.max(0, Date.now() - speechState.startedAt - speechState.pausedMs)
+      const activeSeconds = activeMs / 1000
+      const nextIndex = Math.min(
+        speechState.cleanText.length,
+        Math.round(speechState.startIndex + activeSeconds * speechState.charsPerSecond)
+      )
+      updateTimeDisplay(nextIndex)
+    }, 350)
+  }
+
+  function getIndexFromSeekRange() {
+    const value = Number(speechSeekRange?.value || 0)
+    const ratio = Math.max(0, Math.min(1, value / 1000))
+    return Math.round((speechState.cleanText.length || 0) * ratio)
   }
 
   function updateTextCount() {
@@ -615,24 +735,40 @@ function initializeApp() {
     return fullText.trim()
   }
 
-  function speak(mode) {
-    const rawText = getReadableText(mode)
+  function getSpeechStatusLabel(mode, fromSeek = false) {
+    if (fromSeek) return 'バーの位置から読み上げ中です。'
+    if (mode === 'selected') return '選択部分を読み上げ中です。'
+    if (mode === 'cursor') return 'カーソル位置から読み上げ中です。'
+    return '最初から読み上げ中です。'
+  }
 
-    if (!rawText) {
-      if (mode === 'selected') {
-        setStatus('選択されている文章がありません。読みたい部分を選択してください。')
-      } else if (mode === 'cursor') {
-        setStatus('カーソル位置より後ろに文章がありません。読み始めたい場所をタップしてください。')
-      } else {
-        setStatus('読み上げる文章がありません。')
-      }
-      setProgress(0)
+  function startSpeechFromIndex(index, fromSeek = false) {
+    const cleanText = speechState.cleanText
+    const safeIndex = Math.max(0, Math.min(cleanText.length, index))
+    const speakTarget = cleanText.slice(safeIndex).trim()
+
+    if (!speakTarget) {
+      setStatus('その位置より後ろに読み上げる文章がありません。')
+      updateTimeDisplay(cleanText.length)
       return
     }
 
+    speechState.isStopping = true
     window.speechSynthesis.cancel()
+    stopSpeechTimer()
+    const speechToken = ++speechState.token
+    speechState.isStopping = false
 
-    const utterance = new SpeechSynthesisUtterance(cleanTextForSpeech(rawText))
+    speechState.startIndex = safeIndex
+    speechState.currentIndex = safeIndex
+    speechState.charsPerSecond = Math.max(1, cleanText.length / Math.max(1, speechState.totalSeconds))
+    speechState.startedAt = Date.now()
+    speechState.pausedAt = 0
+    speechState.pausedMs = 0
+    speechState.isSpeaking = false
+    speechState.isPaused = false
+
+    const utterance = new SpeechSynthesisUtterance(speakTarget)
     utterance.lang = 'ja-JP'
     utterance.rate = Number(rateRange.value)
     utterance.pitch = Number(pitchRange.value)
@@ -644,28 +780,78 @@ function initializeApp() {
     }
 
     utterance.onstart = () => {
-      if (mode === 'selected') {
-        setStatus('選択部分を読み上げ中です。')
-      } else if (mode === 'cursor') {
-        setStatus('カーソル位置から読み上げ中です。')
-      } else {
-        setStatus('最初から読み上げ中です。')
+      if (speechState.token !== speechToken) return
+      speechState.isSpeaking = true
+      speechState.isPaused = false
+      if (speechSeekRange) speechSeekRange.disabled = false
+      setStatus(getSpeechStatusLabel(speechState.mode, fromSeek))
+      updateTimeDisplay(safeIndex)
+      startSpeechTimer()
+    }
+
+    utterance.onboundary = (event) => {
+      if (speechState.token !== speechToken) return
+      if (typeof event.charIndex === 'number' && Number.isFinite(event.charIndex)) {
+        updateTimeDisplay(Math.min(cleanText.length, safeIndex + event.charIndex))
       }
-      setProgress(50)
     }
 
     utterance.onend = () => {
+      if (speechState.token !== speechToken) return
+      stopSpeechTimer()
+      speechState.isSpeaking = false
+      speechState.isPaused = false
+      updateTimeDisplay(cleanText.length)
       setStatus('読み上げが終わりました。')
-      setProgress(100)
     }
 
     utterance.onerror = () => {
-      setStatus('読み上げでエラーが出ました。もう一度試してください。')
-      setProgress(0)
+      if (speechState.token !== speechToken) return
+      stopSpeechTimer()
+      speechState.isSpeaking = false
+      speechState.isPaused = false
+      if (!speechState.isStopping) {
+        setStatus('読み上げでエラーが出ました。もう一度試してください。')
+      }
     }
 
     saveSettings()
     window.speechSynthesis.speak(utterance)
+  }
+
+  function speak(mode) {
+    const rawText = getReadableText(mode)
+
+    if (!rawText) {
+      if (mode === 'selected') {
+        setStatus('選択されている文章がありません。読みたい部分を選択してください。')
+      } else if (mode === 'cursor') {
+        setStatus('カーソル位置より後ろに文章がありません。読み始めたい場所をタップしてください。')
+      } else {
+        setStatus('読み上げる文章がありません。')
+      }
+      resetSpeechProgress()
+      return
+    }
+
+    const cleanText = cleanTextForSpeech(rawText)
+    speechState.mode = mode
+    speechState.cleanText = cleanText
+    speechState.totalSeconds = estimateSpeechSeconds(cleanText)
+    speechState.charsPerSecond = Math.max(1, cleanText.length / Math.max(1, speechState.totalSeconds))
+
+    startSpeechFromIndex(0, false)
+  }
+
+  function seekSpeechToCurrentRange() {
+    if (!speechState.cleanText) {
+      setStatus('先に読み上げを開始してください。')
+      return
+    }
+
+    const seekIndex = getIndexFromSeekRange()
+    updateTimeDisplay(seekIndex)
+    startSpeechFromIndex(seekIndex, true)
   }
 
   function getHistory() {
@@ -811,10 +997,23 @@ function initializeApp() {
     })
   }
 
-  async function prepareImageForOcr(file) {
+  function clampByte(value) {
+    return Math.max(0, Math.min(255, Math.round(value)))
+  }
+
+  function getOcrMaxWidth(mode, accuracy) {
+    if (accuracy === 'best') return 2200
+    if (accuracy === 'high') return 1900
+    if (mode === 'smallText') return 1900
+    if (mode === 'screenshot') return 1700
+    return 1500
+  }
+
+  async function prepareImageForOcr(file, modeOverride) {
     const image = await loadImageFromFile(file)
-    const highAccuracy = accuracySelect?.value === 'high'
-    const maxWidth = highAccuracy ? 1800 : 1200
+    const accuracy = accuracySelect?.value || 'normal'
+    const mode = modeOverride || ocrModeSelect?.value || 'document'
+    const maxWidth = getOcrMaxWidth(mode, accuracy)
     const scale = Math.min(1, maxWidth / image.naturalWidth)
 
     const canvas = document.createElement('canvas')
@@ -824,7 +1023,6 @@ function initializeApp() {
     const context = canvas.getContext('2d', { willReadFrequently: true })
     context.drawImage(image, 0, 0, canvas.width, canvas.height)
 
-    const mode = ocrModeSelect?.value || 'document'
     if (mode === 'none') {
       return canvas
     }
@@ -833,16 +1031,37 @@ function initializeApp() {
     const data = imageData.data
 
     for (let i = 0; i < data.length; i += 4) {
-      const gray = data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114
+      const r = data[i]
+      const g = data[i + 1]
+      const b = data[i + 2]
+      const gray = r * 0.299 + g * 0.587 + b * 0.114
       let adjusted = gray
 
+      if (mode === 'grayscale') {
+        adjusted = gray
+      }
+
+      if (mode === 'screenshot') {
+        adjusted = clampByte((gray - 128) * 1.25 + 138)
+      }
+
       if (mode === 'contrast') {
-        adjusted = Math.max(0, Math.min(255, (gray - 128) * 1.55 + 128))
+        adjusted = clampByte((gray - 128) * 1.65 + 128)
+      }
+
+      if (mode === 'thinText') {
+        const brightened = gray + 22
+        adjusted = clampByte((brightened - 128) * 1.45 + 128)
+      }
+
+      if (mode === 'smallText') {
+        const contrast = clampByte((gray - 128) * 1.75 + 128)
+        adjusted = contrast > 165 ? 255 : clampByte(contrast - 18)
       }
 
       if (mode === 'document') {
-        const contrast = Math.max(0, Math.min(255, (gray - 128) * 1.35 + 128))
-        adjusted = contrast > 155 ? 255 : Math.max(0, contrast - 30)
+        const contrast = clampByte((gray - 128) * 1.4 + 128)
+        adjusted = contrast > 158 ? 255 : clampByte(contrast - 26)
       }
 
       data[i] = adjusted
@@ -901,10 +1120,53 @@ function initializeApp() {
 
   function cleanupOcrText(text) {
     return fixSeparatedDakuten(text)
+      .normalize('NFKC')
       .replaceAll('|', '｜')
-      .replace(/[ \t]+\n/g, '\n')
+      .replace(/[ \t　]+\n/g, '\n')
+      .replace(/([ぁ-んァ-ン一-龥々ー])\s+([ぁ-んァ-ン一-龥々ー])/g, '$1$2')
+      .replace(/([0-9０-９])\s+([0-9０-９])/g, '$1$2')
+      .replace(/[□■◆◇○●]/g, '')
       .replace(/\n{3,}/g, '\n\n')
+      .replace(/[ \t]{2,}/g, ' ')
       .trim()
+  }
+
+  function scoreOcrText(text, confidence) {
+    const cleaned = cleanupOcrText(text || '')
+    const japaneseCount = (cleaned.match(/[ぁ-んァ-ン一-龥々]/g) || []).length
+    const symbolNoise = (cleaned.match(/[~^_=`{}\[\]<>]/g) || []).length
+    const usableLength = cleaned.replace(/\s/g, '').length
+    return (Number(confidence) || 0) + japaneseCount * 0.9 + usableLength * 0.12 - symbolNoise * 2
+  }
+
+
+  function getOcrModeLabel(mode) {
+    const labels = {
+      document: '書類向け',
+      smallText: '小さい文字向け',
+      thinText: '薄い文字向け',
+      screenshot: '画面スクショ向け',
+      grayscale: 'グレー補正',
+      contrast: 'くっきり強め',
+      none: '補正なし',
+    }
+
+    return labels[mode] || '標準補正'
+  }
+
+  function getOcrPassModes() {
+    const selectedMode = ocrModeSelect?.value || 'document'
+    const accuracy = accuracySelect?.value || 'normal'
+
+    if (accuracy === 'best') {
+      return Array.from(new Set([selectedMode, 'document', 'smallText', 'thinText']))
+    }
+
+    if (accuracy === 'high') {
+      return Array.from(new Set([selectedMode, selectedMode === 'document' ? 'contrast' : 'document']))
+    }
+
+    return [selectedMode]
   }
 
   async function runOcr() {
@@ -918,7 +1180,6 @@ function initializeApp() {
       setProgress(0)
       setStatus('画像を読み取りやすく調整しています...')
 
-      const preparedImage = await prepareImageForOcr(selectedImageFile)
       const worker = await getOcrWorker()
 
       await worker.setParameters({
@@ -926,11 +1187,27 @@ function initializeApp() {
         preserve_interword_spaces: '1',
       })
 
-      setStatus('画像から文字を読み取り中です。画像読み取り機能です。')
-      setProgress(10)
+      const passModes = getOcrPassModes()
+      let bestText = ''
+      let bestScore = -Infinity
 
-      const result = await worker.recognize(preparedImage)
-      const text = cleanupOcrText(result?.data?.text || '')
+      for (let index = 0; index < passModes.length; index += 1) {
+        const passMode = passModes[index]
+        setStatus(`画像から文字を読み取り中です。${index + 1}/${passModes.length}回目: ${getOcrModeLabel(passMode)}`)
+        setProgress(10 + Math.round((index / Math.max(1, passModes.length)) * 70))
+
+        const preparedImage = await prepareImageForOcr(selectedImageFile, passMode)
+        const result = await worker.recognize(preparedImage)
+        const candidateText = cleanupOcrText(result?.data?.text || '')
+        const candidateScore = scoreOcrText(candidateText, result?.data?.confidence)
+
+        if (candidateScore > bestScore) {
+          bestScore = candidateScore
+          bestText = candidateText
+        }
+      }
+
+      const text = bestText
 
       if (!text) {
         setStatus('文字を読み取れませんでした。文字を大きく、明るく撮って再試行してください。')
@@ -941,7 +1218,7 @@ function initializeApp() {
       resultText.value = text
       updateTextCount()
       saveTextToHistory(text)
-      setStatus('画像から文字を読み取りました。必要なら修正してから読み上げてください。')
+      setStatus('画像から文字を読み取りました。精度を上げたい場合は別の画像補正や高精度も試せます。')
       setProgress(100)
       resultText.focus()
     } catch (error) {
@@ -1047,8 +1324,13 @@ function initializeApp() {
   clearButton.addEventListener('click', () => {
     resultText.value = ''
     updateTextCount()
+    speechState.isStopping = true
+    window.speechSynthesis.cancel()
+    resetSpeechProgress()
     setStatus('文章を消しました。')
-    setProgress(0)
+    window.setTimeout(() => {
+      speechState.isStopping = false
+    }, 300)
     resultText.focus()
   })
 
@@ -1070,14 +1352,20 @@ function initializeApp() {
   speakSelectedButton.addEventListener('click', () => speak('selected'))
 
   stopButton.addEventListener('click', () => {
+    speechState.isStopping = true
     window.speechSynthesis.cancel()
+    resetSpeechProgress()
     setStatus('読み上げを停止しました。')
-    setProgress(0)
+    window.setTimeout(() => {
+      speechState.isStopping = false
+    }, 300)
   })
 
   pauseButton.addEventListener('click', () => {
     if (window.speechSynthesis.speaking && !window.speechSynthesis.paused) {
       window.speechSynthesis.pause()
+      speechState.isPaused = true
+      speechState.pausedAt = Date.now()
       setStatus('読み上げを一時停止しました。')
     } else {
       setStatus('一時停止できる読み上げがありません。')
@@ -1087,10 +1375,27 @@ function initializeApp() {
   resumeButton.addEventListener('click', () => {
     if (window.speechSynthesis.paused) {
       window.speechSynthesis.resume()
+      if (speechState.pausedAt) {
+        speechState.pausedMs += Date.now() - speechState.pausedAt
+      }
+      speechState.pausedAt = 0
+      speechState.isPaused = false
       setStatus('読み上げを再開しました。')
     } else {
       setStatus('再開できる読み上げがありません。')
     }
+  })
+
+  speechSeekRange?.addEventListener('input', () => {
+    if (!speechState.cleanText) return
+    speechState.isSeeking = true
+    const seekIndex = getIndexFromSeekRange()
+    updateTimeDisplay(seekIndex)
+    speechState.isSeeking = false
+  })
+
+  speechSeekRange?.addEventListener('change', () => {
+    seekSpeechToCurrentRange()
   })
 
   refreshVoicesButton.addEventListener('click', () => {
@@ -1158,7 +1463,7 @@ function initializeApp() {
   loadVoices()
   renderHistory()
   updateTextCount()
-  setProgress(0)
+  resetSpeechProgress()
 }
 
 if (localStorage.getItem(AUTH_KEY) === 'ok' || sessionStorage.getItem(AUTH_KEY) === 'ok') {
