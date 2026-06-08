@@ -439,3 +439,23 @@ input[type="range"] {
 .hidden-auth {
   display: none !important;
 }
+
+
+.server-ocr-note {
+  margin-top: 14px;
+  padding: 14px;
+  border-radius: 16px;
+  background: rgba(109, 93, 252, 0.08);
+  color: #34384a;
+  line-height: 1.7;
+}
+
+.server-ocr-note strong {
+  display: block;
+  margin-bottom: 4px;
+  color: #4f43d3;
+}
+
+.server-ocr-note p {
+  margin: 0;
+}

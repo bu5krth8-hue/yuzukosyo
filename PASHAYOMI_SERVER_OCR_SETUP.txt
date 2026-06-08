@@ -1,0 +1,26 @@
+パシャ読み v201 サーバーOCR設定メモ
+
+この版は、ブラウザ内でTesseract.jsを動かす方式をやめて、Cloudflare Pages Functions から OpenAI API を呼び出してOCRします。
+
+公開後にOCRを使うには、Cloudflare Pages 側で環境変数を設定してください。
+
+必須：
+OPENAI_API_KEY
+
+任意：
+OPENAI_OCR_MODEL
+未設定の場合は gpt-4o-mini を使います。
+
+Cloudflare Pages の設定目安：
+1. Cloudflare Dashboard を開く
+2. Pages の yuzukosyo プロジェクトを開く
+3. Settings → Variables and Secrets を開く
+4. Add から OPENAI_API_KEY を追加
+5. Encrypt / Secret として保存
+6. 再デプロイ
+
+注意：
+- 写真は読み取り時だけサーバーOCRへ送信されます。
+- 読み取った文章と履歴はブラウザ側の localStorage に保存されます。
+- API利用料が発生する可能性があります。
+- APIキーをHTMLやJavaScriptに直接書かないでください。
