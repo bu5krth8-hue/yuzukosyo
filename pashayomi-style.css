@@ -248,6 +248,35 @@ h2 {
   transition: width 0.2s ease;
 }
 
+.ocr-status-box {
+  margin-top: 14px;
+  padding: 14px;
+  border-radius: 16px;
+  background: #f7f7fb;
+}
+
+#ocrStatusText {
+  margin: 0 0 10px;
+  color: #4c5060;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.ocr-progress-track {
+  overflow: hidden;
+  height: 10px;
+  border-radius: 999px;
+  background: #dddff0;
+}
+
+.ocr-progress-bar {
+  width: 0%;
+  height: 100%;
+  border-radius: inherit;
+  background: #6d5dfc;
+  transition: width 0.2s ease;
+}
+
 textarea {
   width: 100%;
   min-height: 260px;
@@ -538,6 +567,33 @@ input[type="range"] {
   background: rgba(255, 255, 255, 0.82);
 }
 
+.ocr-settings-panel {
+  margin-top: 14px;
+  margin-bottom: 14px;
+  border: 1px solid rgba(109, 93, 252, 0.16);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.86);
+}
+
+.ocr-settings-panel summary {
+  cursor: pointer;
+  padding: 13px 14px;
+  color: #4f43d3;
+  font-weight: 900;
+  line-height: 1.5;
+}
+
+.ocr-settings-body {
+  padding: 0 14px 14px;
+}
+
+.setting-summary-note {
+  margin: 0 0 12px;
+  color: #6c7080;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
 .time-row {
   display: flex;
   align-items: center;
@@ -570,4 +626,20 @@ input[type="range"] {
 
 .stop-bottom-button {
   min-height: 54px;
+}
+
+@supports (content-visibility: auto) {
+  #app .card {
+    content-visibility: auto;
+    contain-intrinsic-size: 1px 680px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.001ms !important;
+  }
 }

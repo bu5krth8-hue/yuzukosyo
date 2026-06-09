@@ -16,6 +16,8 @@ let selectedImageFile = null
 let currentImageUrl = null
 let ocrWorker = null
 let ocrWorkerKey = ''
+let tesseractLoadPromise = null
+const TESSERACT_SCRIPT_URL = 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js'
 
 async function sha256Hex(value) {
   const data = new TextEncoder().encode(value)
@@ -83,7 +85,7 @@ function renderApp() {
       </div>
 
       <p class="lead">
-        文章を入れて、流れを整えながら日本語音声で読み上げできます。画像から文字を読み取る機能も使えます。
+        文章を入れて、流れを整えながら日本語音声で読み上げできます。絵本・教科書の画像読み取りにも対応します。
       </p>
     </section>
 
@@ -105,8 +107,8 @@ function renderApp() {
           <summary>画像読み取りの補足を開く</summary>
           <div class="help-body">
             <p>OpenAI APIは使わず、ブラウザ内で画像の文字を読み取ります。画像が大きい場合は少し時間がかかることがあります。</p>
-            <p>精度を上げたい時は、明るい場所で文字を大きく撮り、「小さい文字向け」「薄い文字向け」「画面スクショ向け」を試してください。</p>
-            <p>高精度・最高精度は複数回読み取って良さそうな結果を採用するため、標準より時間がかかります。</p>
+            <p>絵本・教科書のように、イラストと小さめの文字が一緒に写る時は「絵本・教科書向け」と「下側の本文（絵本向け）」がおすすめです。文字だけの範囲を狙うほど読み取りやすくなります。</p>
+            <p>高精度・最高精度は複数回読み取って良さそうな結果を採用します。教科書・絵本では「日本語のみ」「横書き・文章」「最大・重め」を使うと、英数字の誤認識が混ざりにくくなります。</p>
           </div>
         </details>
 
@@ -126,52 +128,93 @@ function renderApp() {
           <img id="imagePreview" alt="選択した画像のプレビュー" />
         </div>
 
-        <div class="setting-grid compact-grid">
-          <div>
-            <label class="control-label" for="accuracySelect">読み取り精度</label>
-            <select id="accuracySelect">
-              <option value="normal" selected>標準</option>
-              <option value="high">高精度（2回読み取り）</option>
-              <option value="best">最高精度（3回読み取り・重め）</option>
-            </select>
-          </div>
+        <details class="ocr-settings-panel">
+          <summary>読み取り設定を開く</summary>
+          <div class="ocr-settings-body">
+            <p class="setting-summary-note">初期設定は絵本・教科書向けの高精度設定です。必要な時だけ開いて調整できます。</p>
 
-          <div>
-            <label class="control-label" for="ocrModeSelect">画像補正</label>
-            <select id="ocrModeSelect">
-              <option value="document" selected>書類向け</option>
-              <option value="smallText">小さい文字向け</option>
-              <option value="thinText">薄い文字向け</option>
-              <option value="screenshot">画面スクショ向け</option>
-              <option value="grayscale">グレー補正</option>
-              <option value="contrast">くっきり強め</option>
-              <option value="none">補正なし</option>
-            </select>
-          </div>
-        </div>
+            <div class="setting-grid compact-grid">
+              <div>
+                <label class="control-label" for="accuracySelect">読み取り精度</label>
+                <select id="accuracySelect">
+                  <option value="normal">標準</option>
+                  <option value="high">高精度（2回読み取り）</option>
+                  <option value="best" selected>最高精度（3回読み取り・重め）</option>
+                </select>
+              </div>
 
-        <div class="setting-grid compact-grid">
-          <div>
-            <label class="control-label" for="layoutSelect">文章の向き</label>
-            <select id="layoutSelect">
-              <option value="6" selected>横書き・文章</option>
-              <option value="11">短い文字・看板</option>
-              <option value="3">自動・重め</option>
-            </select>
-          </div>
+              <div>
+                <label class="control-label" for="ocrModeSelect">画像補正</label>
+                <select id="ocrModeSelect">
+                  <option value="storybook" selected>絵本・教科書向け</option>
+                  <option value="adaptive">文字くっきり自動</option>
+                  <option value="document">書類向け</option>
+                  <option value="smallText">小さい文字向け</option>
+                  <option value="thinText">薄い文字向け</option>
+                  <option value="screenshot">画面スクショ向け</option>
+                  <option value="inverted">白文字・暗い背景向け</option>
+                  <option value="grayscale">グレー補正</option>
+                  <option value="contrast">くっきり強め</option>
+                  <option value="none">補正なし</option>
+                </select>
+              </div>
+            </div>
 
-          <div>
-            <label class="control-label" for="languageSelect">読み取り言語</label>
-            <select id="languageSelect">
-              <option value="jpn" selected>日本語のみ</option>
-              <option value="jpn_eng">日本語＋英語・重め</option>
-            </select>
+            <div class="setting-grid compact-grid">
+              <div>
+                <label class="control-label" for="layoutSelect">文章の向き</label>
+                <select id="layoutSelect">
+                  <option value="6" selected>横書き・文章</option>
+                  <option value="11">短い文字・看板</option>
+                  <option value="3">自動・重め</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="control-label" for="languageSelect">読み取り言語</label>
+                <select id="languageSelect">
+                  <option value="jpn" selected>日本語のみ</option>
+                  <option value="jpn_eng">日本語＋英語・重め</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="setting-grid compact-grid">
+              <div>
+                <label class="control-label" for="ocrScaleSelect">文字の拡大</label>
+                <select id="ocrScaleSelect">
+                  <option value="auto">自動で大きく</option>
+                  <option value="strong">さらに大きく</option>
+                  <option value="max" selected>最大・重め</option>
+                  <option value="off">拡大なし</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="control-label" for="ocrCropSelect">読み取り範囲</label>
+                <select id="ocrCropSelect">
+                  <option value="bookText" selected>下側の本文（絵本向け）</option>
+                  <option value="lowerCenter">中央下の本文</option>
+                  <option value="all">画像全体</option>
+                  <option value="center">中央を大きく</option>
+                  <option value="top">上半分</option>
+                  <option value="bottom">下半分</option>
+                </select>
+              </div>
+            </div>
           </div>
-        </div>
+        </details>
 
         <button id="ocrButton" class="primary-button" type="button" disabled>
           画像から文字を読み取る
         </button>
+
+        <div id="ocrStatusBox" class="ocr-status-box hidden" aria-live="polite">
+          <p id="ocrStatusText">画像読み取りの準備中です。</p>
+          <div class="ocr-progress-track" aria-hidden="true">
+            <div id="ocrProgressBar" class="ocr-progress-bar"></div>
+          </div>
+        </div>
       </details>
 
       <textarea
@@ -357,7 +400,12 @@ function initializeApp() {
   const ocrModeSelect = document.querySelector('#ocrModeSelect')
   const layoutSelect = document.querySelector('#layoutSelect')
   const languageSelect = document.querySelector('#languageSelect')
+  const ocrScaleSelect = document.querySelector('#ocrScaleSelect')
+  const ocrCropSelect = document.querySelector('#ocrCropSelect')
   const ocrButton = document.querySelector('#ocrButton')
+  const ocrStatusBox = document.querySelector('#ocrStatusBox')
+  const ocrStatusText = document.querySelector('#ocrStatusText')
+  const ocrProgressBar = document.querySelector('#ocrProgressBar')
 
   const statusText = document.querySelector('#statusText')
   const progressBar = document.querySelector('#progressBar')
@@ -412,6 +460,36 @@ function initializeApp() {
     progressBar.style.width = `${safeValue}%`
     if (!speechState.isSeeking && speechSeekRange) {
       speechSeekRange.value = String(Math.round(safeValue * 10))
+    }
+  }
+
+  function showOcrStatus() {
+    if (ocrStatusBox) {
+      ocrStatusBox.classList.remove('hidden')
+    }
+  }
+
+  function setOcrStatus(message) {
+    showOcrStatus()
+    if (ocrStatusText) {
+      ocrStatusText.textContent = message
+    }
+  }
+
+  function setOcrProgress(value) {
+    showOcrStatus()
+    const safeValue = Math.max(0, Math.min(100, Number(value) || 0))
+    if (ocrProgressBar) {
+      ocrProgressBar.style.width = `${safeValue}%`
+    }
+  }
+
+  function resetOcrStatus(message = '画像を選ぶと読み取りを開始できます。') {
+    if (ocrStatusText) {
+      ocrStatusText.textContent = message
+    }
+    if (ocrProgressBar) {
+      ocrProgressBar.style.width = '0%'
     }
   }
 
@@ -961,7 +1039,7 @@ function initializeApp() {
     makeImagePreview(file)
     if (ocrButton) ocrButton.disabled = false
     setStatus('画像を選びました。「画像から文字を読み取る」を押してください。')
-    setProgress(0)
+    resetOcrStatus('画像を選びました。「画像から文字を読み取る」を押してください。')
   }
 
   function makeImagePreview(file) {
@@ -1001,27 +1079,156 @@ function initializeApp() {
     return Math.max(0, Math.min(255, Math.round(value)))
   }
 
-  function getOcrMaxWidth(mode, accuracy) {
-    if (accuracy === 'best') return 2200
-    if (accuracy === 'high') return 1900
-    if (mode === 'smallText') return 1900
-    if (mode === 'screenshot') return 1700
-    return 1500
+  function getOcrTargetWidth(mode, accuracy, scaleMode) {
+    if (scaleMode === 'off') {
+      if (accuracy === 'best') return 2200
+      if (accuracy === 'high') return 1900
+      if (mode === 'smallText') return 1900
+      if (mode === 'screenshot') return 1700
+      return 1500
+    }
+
+    if (mode === 'storybook') return 3000
+    if (scaleMode === 'max') return 2800
+    if (scaleMode === 'strong') return 2500
+    if (accuracy === 'best') return 2600
+    if (accuracy === 'high') return 2300
+    if (mode === 'smallText') return 2500
+    if (mode === 'thinText') return 2300
+    if (mode === 'screenshot') return 2200
+    return 2100
+  }
+
+  function getOcrMaxScale(mode, accuracy, scaleMode) {
+    if (scaleMode === 'off') return 1
+    if (mode === 'storybook') return 3.2
+    if (scaleMode === 'max') return 3
+    if (scaleMode === 'strong') return 2.4
+    if (accuracy === 'best') return 2.6
+    if (accuracy === 'high') return 2.2
+    if (mode === 'smallText') return 2.4
+    return 1.9
+  }
+
+  function getCropBox(width, height) {
+    const cropMode = ocrCropSelect?.value || 'all'
+
+    if (cropMode === 'bookText') {
+      const cropWidth = Math.round(width * 0.86)
+      const cropHeight = Math.round(height * 0.46)
+      return {
+        sx: Math.round(width * 0.07),
+        sy: Math.round(height * 0.40),
+        sw: cropWidth,
+        sh: cropHeight,
+      }
+    }
+
+    if (cropMode === 'lowerCenter') {
+      const cropWidth = Math.round(width * 0.78)
+      const cropHeight = Math.round(height * 0.52)
+      return {
+        sx: Math.round(width * 0.11),
+        sy: Math.round(height * 0.34),
+        sw: cropWidth,
+        sh: cropHeight,
+      }
+    }
+
+    if (cropMode === 'center') {
+      const cropWidth = Math.round(width * 0.82)
+      const cropHeight = Math.round(height * 0.82)
+      return {
+        sx: Math.round((width - cropWidth) / 2),
+        sy: Math.round((height - cropHeight) / 2),
+        sw: cropWidth,
+        sh: cropHeight,
+      }
+    }
+
+    if (cropMode === 'top') {
+      return { sx: 0, sy: 0, sw: width, sh: Math.round(height * 0.58) }
+    }
+
+    if (cropMode === 'bottom') {
+      const cropHeight = Math.round(height * 0.58)
+      return { sx: 0, sy: height - cropHeight, sw: width, sh: cropHeight }
+    }
+
+    return { sx: 0, sy: 0, sw: width, sh: height }
+  }
+
+  function getAdaptiveThreshold(data) {
+    let sum = 0
+    let count = 0
+
+    for (let i = 0; i < data.length; i += 4) {
+      const gray = data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114
+      sum += gray
+      count += 1
+    }
+
+    const average = count ? sum / count : 150
+    return Math.max(92, Math.min(188, average - 18))
+  }
+
+  function softenWhiteBackground(value) {
+    if (value > 235) return 255
+    if (value > 215) return 245
+    return value
+  }
+
+  function thickenDarkPixels(context, width, height) {
+    const imageData = context.getImageData(0, 0, width, height)
+    const data = imageData.data
+    const source = new Uint8ClampedArray(data)
+
+    for (let y = 1; y < height - 1; y += 1) {
+      for (let x = 1; x < width - 1; x += 1) {
+        const idx = (y * width + x) * 4
+        if (source[idx] < 32) continue
+
+        let hasDarkNeighbor = false
+        for (let dy = -1; dy <= 1 && !hasDarkNeighbor; dy += 1) {
+          for (let dx = -1; dx <= 1; dx += 1) {
+            if (dx === 0 && dy === 0) continue
+            const nidx = ((y + dy) * width + (x + dx)) * 4
+            if (source[nidx] < 45) {
+              hasDarkNeighbor = true
+              break
+            }
+          }
+        }
+
+        if (hasDarkNeighbor) {
+          data[idx] = 0
+          data[idx + 1] = 0
+          data[idx + 2] = 0
+        }
+      }
+    }
+
+    context.putImageData(imageData, 0, 0)
   }
 
   async function prepareImageForOcr(file, modeOverride) {
     const image = await loadImageFromFile(file)
     const accuracy = accuracySelect?.value || 'normal'
     const mode = modeOverride || ocrModeSelect?.value || 'document'
-    const maxWidth = getOcrMaxWidth(mode, accuracy)
-    const scale = Math.min(1, maxWidth / image.naturalWidth)
+    const scaleMode = ocrScaleSelect?.value || 'auto'
+    const crop = getCropBox(image.naturalWidth, image.naturalHeight)
+    const targetWidth = getOcrTargetWidth(mode, accuracy, scaleMode)
+    const maxScale = getOcrMaxScale(mode, accuracy, scaleMode)
+    const scale = Math.max(0.35, Math.min(maxScale, targetWidth / crop.sw))
 
     const canvas = document.createElement('canvas')
-    canvas.width = Math.max(1, Math.round(image.naturalWidth * scale))
-    canvas.height = Math.max(1, Math.round(image.naturalHeight * scale))
+    canvas.width = Math.max(1, Math.round(crop.sw * scale))
+    canvas.height = Math.max(1, Math.round(crop.sh * scale))
 
     const context = canvas.getContext('2d', { willReadFrequently: true })
-    context.drawImage(image, 0, 0, canvas.width, canvas.height)
+    context.imageSmoothingEnabled = true
+    context.imageSmoothingQuality = 'high'
+    context.drawImage(image, crop.sx, crop.sy, crop.sw, crop.sh, 0, 0, canvas.width, canvas.height)
 
     if (mode === 'none') {
       return canvas
@@ -1029,6 +1236,7 @@ function initializeApp() {
 
     const imageData = context.getImageData(0, 0, canvas.width, canvas.height)
     const data = imageData.data
+    const adaptiveThreshold = getAdaptiveThreshold(data)
 
     for (let i = 0; i < data.length; i += 4) {
       const r = data[i]
@@ -1038,30 +1246,47 @@ function initializeApp() {
       let adjusted = gray
 
       if (mode === 'grayscale') {
-        adjusted = gray
+        adjusted = softenWhiteBackground(gray)
       }
 
       if (mode === 'screenshot') {
-        adjusted = clampByte((gray - 128) * 1.25 + 138)
+        const contrasted = clampByte((gray - 128) * 1.38 + 138)
+        adjusted = contrasted > 222 ? 255 : contrasted
       }
 
       if (mode === 'contrast') {
-        adjusted = clampByte((gray - 128) * 1.65 + 128)
+        adjusted = clampByte((gray - 128) * 1.8 + 128)
       }
 
       if (mode === 'thinText') {
-        const brightened = gray + 22
-        adjusted = clampByte((brightened - 128) * 1.45 + 128)
+        const brightened = gray + 28
+        adjusted = clampByte((brightened - 128) * 1.55 + 128)
+        adjusted = adjusted > 226 ? 255 : adjusted
       }
 
       if (mode === 'smallText') {
-        const contrast = clampByte((gray - 128) * 1.75 + 128)
-        adjusted = contrast > 165 ? 255 : clampByte(contrast - 18)
+        const contrast = clampByte((gray - 128) * 1.9 + 128)
+        adjusted = contrast > 172 ? 255 : clampByte(contrast - 24)
+      }
+
+      if (mode === 'storybook') {
+        const contrast = clampByte((gray - 128) * 2.05 + 128)
+        const threshold = Math.max(138, Math.min(196, adaptiveThreshold + 8))
+        adjusted = contrast > threshold ? 255 : 0
+      }
+
+      if (mode === 'adaptive') {
+        adjusted = gray > adaptiveThreshold ? 255 : 0
+      }
+
+      if (mode === 'inverted') {
+        const inverted = 255 - gray
+        adjusted = inverted > adaptiveThreshold ? 255 : 0
       }
 
       if (mode === 'document') {
-        const contrast = clampByte((gray - 128) * 1.4 + 128)
-        adjusted = contrast > 158 ? 255 : clampByte(contrast - 26)
+        const contrast = clampByte((gray - 128) * 1.52 + 128)
+        adjusted = contrast > 164 ? 255 : clampByte(contrast - 30)
       }
 
       data[i] = adjusted
@@ -1070,7 +1295,47 @@ function initializeApp() {
     }
 
     context.putImageData(imageData, 0, 0)
+
+    if (mode === 'storybook') {
+      thickenDarkPixels(context, canvas.width, canvas.height)
+    }
+
     return canvas
+  }
+
+
+  function loadTesseractLibrary() {
+    if (window.Tesseract?.createWorker) {
+      return Promise.resolve()
+    }
+
+    if (tesseractLoadPromise) {
+      return tesseractLoadPromise
+    }
+
+    setOcrStatus('OCRライブラリを読み込み中です。初回だけ少し時間がかかります。')
+    setOcrProgress(3)
+
+    tesseractLoadPromise = new Promise((resolve, reject) => {
+      const existingScript = document.querySelector('script[data-pashayomi-tesseract="true"]')
+
+      if (existingScript) {
+        existingScript.addEventListener('load', () => resolve(), { once: true })
+        existingScript.addEventListener('error', () => reject(new Error('OCRライブラリの読み込みに失敗しました。通信環境を確認してから再読み込みしてください。')), { once: true })
+        return
+      }
+
+      const script = document.createElement('script')
+      script.src = TESSERACT_SCRIPT_URL
+      script.async = true
+      script.defer = true
+      script.dataset.pashayomiTesseract = 'true'
+      script.onload = () => resolve()
+      script.onerror = () => reject(new Error('OCRライブラリの読み込みに失敗しました。通信環境を確認してから再読み込みしてください。'))
+      document.head.appendChild(script)
+    })
+
+    return tesseractLoadPromise
   }
 
   function getOcrLanguages() {
@@ -1082,6 +1347,8 @@ function initializeApp() {
   }
 
   async function getOcrWorker() {
+    await loadTesseractLibrary()
+
     if (!window.Tesseract?.createWorker) {
       throw new Error('OCRライブラリを読み込めませんでした。通信環境を確認してページを再読み込みしてください。')
     }
@@ -1100,17 +1367,17 @@ function initializeApp() {
       ocrWorker = null
     }
 
-    setStatus(`OCR準備中です。初回だけ少し時間がかかります。使用言語: ${key}`)
-    setProgress(5)
+    setOcrStatus(`OCR準備中です。初回だけ少し時間がかかります。使用言語: ${key}`)
+    setOcrProgress(5)
 
     ocrWorker = await window.Tesseract.createWorker(languages, 1, {
       logger: (message) => {
         if (message.status === 'recognizing text') {
           const percent = Math.round((message.progress || 0) * 100)
-          setStatus(`画像読み取り中... ${percent}%`)
-          setProgress(percent)
+          setOcrStatus(`画像読み取り中... ${percent}%`)
+          setOcrProgress(percent)
         } else if (message.status) {
-          setStatus(`OCR準備中: ${message.status}`)
+          setOcrStatus(`OCR準備中: ${message.status}`)
         }
       },
     })
@@ -1118,16 +1385,43 @@ function initializeApp() {
     return ocrWorker
   }
 
+  function removeOcrNoiseLines(text) {
+    return text
+      .split('\n')
+      .map((line) => line.trim())
+      .filter((line) => {
+        if (!line) return false
+
+        const compact = line.replace(/\s/g, '')
+        const usefulCount = (compact.match(/[ぁ-んァ-ン一-龥々A-Za-z0-9０-９]/g) || []).length
+        const noiseCount = (compact.match(/[~^_=`{}\[\]<>｜|○●□■◆◇◎▲△▽▼※〓●]/g) || []).length
+
+        if (compact.length <= 1) return false
+        if (usefulCount === 0 && noiseCount > 0) return false
+        if (compact.length <= 3 && noiseCount >= usefulCount + 1) return false
+        if (noiseCount >= 5 && usefulCount <= 2) return false
+        return true
+      })
+      .join('\n')
+  }
+
   function cleanupOcrText(text) {
-    return fixSeparatedDakuten(text)
+    const normalized = fixSeparatedDakuten(text || '')
       .normalize('NFKC')
-      .replaceAll('|', '｜')
-      .replace(/[ \t　]+\n/g, '\n')
+      .replace(/[|]/g, '｜')
+      .replace(/[¬―‐‑‒–—−]/g, 'ー')
+      .replace(/[“”]/g, '"')
+      .replace(/[‘’]/g, "'")
+      .replace(/[ 	　]+\n/g, '\n')
       .replace(/([ぁ-んァ-ン一-龥々ー])\s+([ぁ-んァ-ン一-龥々ー])/g, '$1$2')
       .replace(/([0-9０-９])\s+([0-9０-９])/g, '$1$2')
-      .replace(/[□■◆◇○●]/g, '')
-      .replace(/\n{3,}/g, '\n\n')
+      .replace(/[□■◆◇○●◎▲△▽▼〓]/g, '')
       .replace(/[ \t]{2,}/g, ' ')
+      .replace(/\n{3,}/g, '\n\n')
+      .trim()
+
+    return removeOcrNoiseLines(normalized)
+      .replace(/\n{3,}/g, '\n\n')
       .trim()
   }
 
@@ -1142,10 +1436,13 @@ function initializeApp() {
 
   function getOcrModeLabel(mode) {
     const labels = {
+      storybook: '絵本・教科書向け',
       document: '書類向け',
       smallText: '小さい文字向け',
       thinText: '薄い文字向け',
       screenshot: '画面スクショ向け',
+      adaptive: '文字くっきり自動',
+      inverted: '白文字・暗い背景向け',
       grayscale: 'グレー補正',
       contrast: 'くっきり強め',
       none: '補正なし',
@@ -1159,11 +1456,14 @@ function initializeApp() {
     const accuracy = accuracySelect?.value || 'normal'
 
     if (accuracy === 'best') {
-      return Array.from(new Set([selectedMode, 'document', 'smallText', 'thinText']))
+      if (selectedMode === 'storybook') {
+        return ['storybook', 'adaptive', 'smallText']
+      }
+      return Array.from(new Set([selectedMode, 'adaptive', 'document'])).slice(0, 3)
     }
 
     if (accuracy === 'high') {
-      return Array.from(new Set([selectedMode, selectedMode === 'document' ? 'contrast' : 'document']))
+      return Array.from(new Set([selectedMode, selectedMode === 'document' ? 'adaptive' : 'document']))
     }
 
     return [selectedMode]
@@ -1171,14 +1471,14 @@ function initializeApp() {
 
   async function runOcr() {
     if (!selectedImageFile) {
-      setStatus('先に画像を選んでください。')
+      setOcrStatus('先に画像を選んでください。')
       return
     }
 
     try {
       setOcrLoading(true)
-      setProgress(0)
-      setStatus('画像を読み取りやすく調整しています...')
+      setOcrProgress(0)
+      setOcrStatus('画像を読み取りやすく調整しています...')
 
       const worker = await getOcrWorker()
 
@@ -1193,8 +1493,8 @@ function initializeApp() {
 
       for (let index = 0; index < passModes.length; index += 1) {
         const passMode = passModes[index]
-        setStatus(`画像から文字を読み取り中です。${index + 1}/${passModes.length}回目: ${getOcrModeLabel(passMode)}`)
-        setProgress(10 + Math.round((index / Math.max(1, passModes.length)) * 70))
+        setOcrStatus(`画像から文字を読み取り中です。${index + 1}/${passModes.length}回目: ${getOcrModeLabel(passMode)}`)
+        setOcrProgress(10 + Math.round((index / Math.max(1, passModes.length)) * 70))
 
         const preparedImage = await prepareImageForOcr(selectedImageFile, passMode)
         const result = await worker.recognize(preparedImage)
@@ -1210,21 +1510,22 @@ function initializeApp() {
       const text = bestText
 
       if (!text) {
-        setStatus('文字を読み取れませんでした。文字を大きく、明るく撮って再試行してください。')
-        setProgress(0)
+        setOcrStatus('文字を読み取れませんでした。文字を大きく、明るく撮って再試行してください。')
+        setOcrProgress(0)
         return
       }
 
       resultText.value = text
       updateTextCount()
       saveTextToHistory(text)
-      setStatus('画像から文字を読み取りました。精度を上げたい場合は別の画像補正や高精度も試せます。')
-      setProgress(100)
+      setOcrStatus('画像から文字を読み取りました。絵本・教科書は「下側の本文（絵本向け）」や「日本語のみ」が読みやすいです。')
+      setOcrProgress(100)
+      setStatus('画像から文字を読み取りました。文章欄に入れました。')
       resultText.focus()
     } catch (error) {
       console.error(error)
-      setStatus(error?.message || '画像読み取りでエラーが出ました。別の画像で試すか、写真アプリで文字コピーして貼り付けてください。')
-      setProgress(0)
+      setOcrStatus(error?.message || '画像読み取りでエラーが出ました。別の画像で試すか、写真アプリで文字コピーして貼り付けてください。')
+      setOcrProgress(0)
     } finally {
       setOcrLoading(false)
     }
