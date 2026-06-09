@@ -643,3 +643,56 @@ input[type="range"] {
   transition-duration: 0.001ms !important;
  }
 }
+
+.crop-controls {
+ display: grid;
+ grid-template-columns: 1fr 1fr;
+ gap: 12px;
+ margin-top: 12px;
+}
+
+.crop-help {
+ margin: 10px 0 0;
+ color: #6c7080;
+ font-size: 13px;
+ line-height: 1.6;
+}
+
+.preview-wrap {
+ position: relative;
+}
+
+.crop-overlay {
+ position: absolute;
+ inset: 0;
+ pointer-events: none;
+ z-index: 2;
+}
+
+.preview-wrap.crop-selecting .crop-overlay {
+ pointer-events: auto;
+ cursor: crosshair;
+ touch-action: none;
+ background: rgba(109, 93, 252, 0.08);
+}
+
+.crop-box {
+ position: absolute;
+ border: 3px solid #6d5dfc;
+ border-radius: 12px;
+ background: rgba(109, 93, 252, 0.16);
+ box-shadow:
+  0 0 0 9999px rgba(31, 35, 48, 0.18),
+  0 8px 24px rgba(44, 42, 92, 0.18);
+ z-index: 3;
+}
+
+@media (max-width: 560px) {
+ .crop-controls {
+  grid-template-columns: 1fr;
+ }
+
+ .crop-box {
+  border-width: 2px;
+ }
+}

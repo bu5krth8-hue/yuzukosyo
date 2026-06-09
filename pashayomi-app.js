@@ -14,6 +14,10 @@ let voices = []
 let lastCursorPosition = 0
 let selectedImageFile = null
 let currentImageUrl = null
+let manualCrop = null
+let cropDragState = null
+let cropSelectMode = false
+let cropPointerId = null
 let ocrWorker = null
 let ocrWorkerKey = ''
 let tesseractLoadPromise = null
@@ -126,7 +130,16 @@ function renderApp() {
 
     <div id="imagePreviewWrap" class="preview-wrap hidden">
      <img id="imagePreview" alt="選択した画像のプレビュー" />
+     <div id="cropOverlay" class="crop-overlay hidden" aria-hidden="true">
+      <div id="cropBox" class="crop-box hidden"></div>
+     </div>
     </div>
+
+    <div id="cropControls" class="crop-controls hidden">
+     <button id="enableCropButton" class="secondary-button" type="button">本文範囲を指定</button>
+     <button id="clearCropButton" class="secondary-button" type="button">範囲を解除</button>
+    </div>
+    <p id="cropHelpText" class="crop-help hidden">絵本や教科書でうまく読めない時は、本文だけを指で四角く囲んでから読み取れます。</p>
 
     <details class="ocr-settings-panel">
      <summary>読み取り設定を開く</summary>
@@ -193,6 +206,7 @@ function renderApp() {
        <div>
         <label class="control-label" for="ocrCropSelect">読み取り範囲</label>
         <select id="ocrCropSelect">
+         <option value="manual">本文範囲を手動指定</option>
          <option value="bookText" selected>下側の本文（絵本向け）</option>
          <option value="lowerCenter">中央下の本文</option>
          <option value="all">画像全体</option>
@@ -396,6 +410,12 @@ function initializeApp() {
  const cameraInput = document.querySelector('#cameraInput')
  const imagePreviewWrap = document.querySelector('#imagePreviewWrap')
  const imagePreview = document.querySelector('#imagePreview')
+ const cropOverlay = document.querySelector('#cropOverlay')
+ const cropBox = document.querySelector('#cropBox')
+ const cropControls = document.querySelector('#cropControls')
+ const enableCropButton = document.querySelector('#enableCropButton')
+ const clearCropButton = document.querySelector('#clearCropButton')
+ const cropHelpText = document.querySelector('#cropHelpText')
  const accuracySelect = document.querySelector('#accuracySelect')
  const ocrModeSelect = document.querySelector('#ocrModeSelect')
  const layoutSelect = document.querySelector('#layoutSelect')
@@ -1037,9 +1057,12 @@ function initializeApp() {
 
   selectedImageFile = file
   makeImagePreview(file)
+  resetManualCrop(false)
+  if (cropControls) cropControls.classList.remove('hidden')
+  if (cropHelpText) cropHelpText.classList.remove('hidden')
   if (ocrButton) ocrButton.disabled = false
-  setStatus('画像を選びました。「画像から文字を読み取る」を押してください。')
-  resetOcrStatus('画像を選びました。「画像から文字を読み取る」を押してください。')
+  setStatus('画像を選びました。「画像から文字を読み取る」を押してください。うまく読めない時は本文範囲を指定できます。')
+  resetOcrStatus('画像を選びました。「画像から文字を読み取る」を押してください。うまく読めない時は本文範囲を指定できます。')
  }
 
  function makeImagePreview(file) {
@@ -1110,8 +1133,159 @@ function initializeApp() {
   return 1.9
  }
 
+
+ function clampNumber(value, min, max) {
+  return Math.max(min, Math.min(max, value))
+ }
+
+ function getImageContentRect() {
+  if (!imagePreview || !imagePreview.naturalWidth || !imagePreview.naturalHeight) {
+   return null
+  }
+
+  const imageRect = imagePreview.getBoundingClientRect()
+  const naturalRatio = imagePreview.naturalWidth / imagePreview.naturalHeight
+  const elementRatio = imageRect.width / imageRect.height
+
+  let contentWidth = imageRect.width
+  let contentHeight = imageRect.height
+  let contentLeft = imageRect.left
+  let contentTop = imageRect.top
+
+  if (elementRatio > naturalRatio) {
+   contentWidth = imageRect.height * naturalRatio
+   contentLeft = imageRect.left + (imageRect.width - contentWidth) / 2
+  } else if (elementRatio < naturalRatio) {
+   contentHeight = imageRect.width / naturalRatio
+   contentTop = imageRect.top + (imageRect.height - contentHeight) / 2
+  }
+
+  return {
+   left: contentLeft,
+   top: contentTop,
+   width: contentWidth,
+   height: contentHeight,
+  }
+ }
+
+ function getPointerPositionInImage(event) {
+  const contentRect = getImageContentRect()
+  if (!contentRect) return null
+
+  return {
+   x: clampNumber((event.clientX - contentRect.left) / contentRect.width, 0, 1),
+   y: clampNumber((event.clientY - contentRect.top) / contentRect.height, 0, 1),
+  }
+ }
+
+ function updateCropBoxDisplay() {
+  if (!manualCrop || !cropBox || !imagePreviewWrap) {
+   cropBox?.classList.add('hidden')
+   return
+  }
+
+  const wrapRect = imagePreviewWrap.getBoundingClientRect()
+  const contentRect = getImageContentRect()
+  if (!contentRect) {
+   cropBox.classList.add('hidden')
+   return
+  }
+
+  cropBox.style.left = `${contentRect.left - wrapRect.left + manualCrop.x * contentRect.width}px`
+  cropBox.style.top = `${contentRect.top - wrapRect.top + manualCrop.y * contentRect.height}px`
+  cropBox.style.width = `${manualCrop.width * contentRect.width}px`
+  cropBox.style.height = `${manualCrop.height * contentRect.height}px`
+  cropBox.classList.remove('hidden')
+ }
+
+ function resetManualCrop(keepMode = false) {
+  manualCrop = null
+  cropDragState = null
+  cropSelectMode = false
+  cropPointerId = null
+  cropBox?.classList.add('hidden')
+  cropOverlay?.classList.add('hidden')
+  imagePreviewWrap?.classList.remove('crop-selecting')
+
+  if (!keepMode && ocrCropSelect?.value === 'manual') {
+   ocrCropSelect.value = 'bookText'
+  }
+ }
+
+ function startManualCropSelection() {
+  if (!selectedImageFile || !imagePreviewWrap || !cropOverlay) {
+   setOcrStatus('先に画像を選んでください。')
+   return
+  }
+
+  manualCrop = null
+  cropSelectMode = true
+  cropDragState = null
+  cropPointerId = null
+  cropBox?.classList.add('hidden')
+  cropOverlay.classList.remove('hidden')
+  imagePreviewWrap.classList.add('crop-selecting')
+  if (ocrCropSelect) ocrCropSelect.value = 'manual'
+  setOcrStatus('読みたい本文だけを指で四角く囲んでください。囲んだ後に画像から文字を読み取れます。')
+  setStatus('本文範囲指定中です。読みたい文字の部分だけを囲んでください。')
+ }
+
+ function finishManualCropSelection() {
+  cropSelectMode = false
+  cropDragState = null
+  cropPointerId = null
+  imagePreviewWrap?.classList.remove('crop-selecting')
+
+  if (!manualCrop || manualCrop.width < 0.04 || manualCrop.height < 0.04) {
+   manualCrop = null
+   cropBox?.classList.add('hidden')
+   setOcrStatus('範囲が小さすぎます。本文が入るように少し大きめに囲んでください。')
+   return
+  }
+
+  if (ocrCropSelect) ocrCropSelect.value = 'manual'
+  setOcrStatus('本文範囲を指定しました。「画像から文字を読み取る」を押してください。')
+  setStatus('本文範囲を指定しました。')
+ }
+
+ function updateManualCropFromDrag(start, current) {
+  const x1 = Math.min(start.x, current.x)
+  const y1 = Math.min(start.y, current.y)
+  const x2 = Math.max(start.x, current.x)
+  const y2 = Math.max(start.y, current.y)
+
+  manualCrop = {
+   x: x1,
+   y: y1,
+   width: Math.max(0.001, x2 - x1),
+   height: Math.max(0.001, y2 - y1),
+  }
+
+  updateCropBoxDisplay()
+ }
+
  function getCropBox(width, height) {
   const cropMode = ocrCropSelect?.value || 'all'
+
+  if (cropMode === 'manual' && manualCrop) {
+   return {
+    sx: Math.round(width * manualCrop.x),
+    sy: Math.round(height * manualCrop.y),
+    sw: Math.max(1, Math.round(width * manualCrop.width)),
+    sh: Math.max(1, Math.round(height * manualCrop.height)),
+   }
+  }
+
+  if (cropMode === 'manual' && !manualCrop) {
+   const cropWidth = Math.round(width * 0.86)
+   const cropHeight = Math.round(height * 0.46)
+   return {
+    sx: Math.round(width * 0.07),
+    sy: Math.round(height * 0.40),
+    sw: cropWidth,
+    sh: cropHeight,
+   }
+  }
 
   if (cropMode === 'bookText') {
    const cropWidth = Math.round(width * 0.86)
@@ -1475,6 +1649,11 @@ function initializeApp() {
    return
   }
 
+  if (ocrCropSelect?.value === 'manual' && !manualCrop) {
+   setOcrStatus('本文範囲を手動指定にしています。先に「本文範囲を指定」で読みたい文字部分を囲んでください。')
+   return
+  }
+
   try {
    setOcrLoading(true)
    setOcrProgress(0)
@@ -1602,6 +1781,53 @@ function initializeApp() {
  cameraInput?.addEventListener('change', () => {
   handleFileSelected(cameraInput.files?.[0])
  })
+
+ enableCropButton?.addEventListener('click', startManualCropSelection)
+
+ clearCropButton?.addEventListener('click', () => {
+  resetManualCrop(false)
+  setOcrStatus('本文範囲を解除しました。通常の読み取り範囲で読み取れます。')
+  setStatus('本文範囲を解除しました。')
+ })
+
+ ocrCropSelect?.addEventListener('change', () => {
+  if (ocrCropSelect.value === 'manual' && !manualCrop) {
+   setOcrStatus('本文範囲を手動指定にする場合は、「本文範囲を指定」で読みたい文字部分を囲んでください。')
+  }
+ })
+
+ cropOverlay?.addEventListener('pointerdown', (event) => {
+  if (!cropSelectMode) return
+  const point = getPointerPositionInImage(event)
+  if (!point) return
+  event.preventDefault()
+  cropPointerId = event.pointerId
+  cropOverlay.setPointerCapture?.(event.pointerId)
+  cropDragState = { start: point, current: point }
+  updateManualCropFromDrag(point, point)
+ })
+
+ cropOverlay?.addEventListener('pointermove', (event) => {
+  if (!cropSelectMode || !cropDragState || cropPointerId !== event.pointerId) return
+  const point = getPointerPositionInImage(event)
+  if (!point) return
+  event.preventDefault()
+  cropDragState.current = point
+  updateManualCropFromDrag(cropDragState.start, point)
+ })
+
+ cropOverlay?.addEventListener('pointerup', (event) => {
+  if (!cropSelectMode || cropPointerId !== event.pointerId) return
+  event.preventDefault()
+  cropOverlay.releasePointerCapture?.(event.pointerId)
+  finishManualCropSelection()
+ })
+
+ cropOverlay?.addEventListener('pointercancel', () => {
+  finishManualCropSelection()
+ })
+
+ window.addEventListener('resize', updateCropBoxDisplay)
 
  ocrButton?.addEventListener('click', runOcr)
 
