@@ -131,7 +131,13 @@ function renderApp() {
     <div id="imagePreviewWrap" class="preview-wrap hidden">
      <img id="imagePreview" alt="選択した画像のプレビュー" />
      <div id="cropOverlay" class="crop-overlay hidden" aria-hidden="true">
-      <div id="cropBox" class="crop-box hidden"></div>
+      <div id="cropBox" class="crop-box hidden" aria-label="本文範囲">
+       <span class="crop-box-label">本文範囲</span>
+       <span class="crop-handle crop-handle-nw" data-crop-handle="nw" aria-hidden="true"></span>
+       <span class="crop-handle crop-handle-ne" data-crop-handle="ne" aria-hidden="true"></span>
+       <span class="crop-handle crop-handle-sw" data-crop-handle="sw" aria-hidden="true"></span>
+       <span class="crop-handle crop-handle-se" data-crop-handle="se" aria-hidden="true"></span>
+      </div>
      </div>
     </div>
 
@@ -139,7 +145,7 @@ function renderApp() {
      <button id="enableCropButton" class="secondary-button" type="button">本文範囲を指定</button>
      <button id="clearCropButton" class="secondary-button" type="button">範囲を解除</button>
     </div>
-    <p id="cropHelpText" class="crop-help hidden">絵本や教科書でうまく読めない時は、本文だけを指で四角く囲んでから読み取れます。</p>
+    <p id="cropHelpText" class="crop-help hidden">絵本や教科書でうまく読めない時は、本文だけを四角く囲んでから読み取れます。選んだ後も、枠を動かしたり角を引っ張って修正できます。</p>
 
     <details class="ocr-settings-panel">
      <summary>読み取り設定を開く</summary>
@@ -160,6 +166,7 @@ function renderApp() {
         <label class="control-label" for="ocrModeSelect">画像補正</label>
         <select id="ocrModeSelect">
          <option value="storybook" selected>絵本・教科書向け</option>
+         <option value="storybookStrong">絵本・教科書向け・強め</option>
          <option value="adaptive">文字くっきり自動</option>
          <option value="document">書類向け</option>
          <option value="smallText">小さい文字向け</option>
@@ -426,6 +433,11 @@ function initializeApp() {
  const ocrStatusBox = document.querySelector('#ocrStatusBox')
  const ocrStatusText = document.querySelector('#ocrStatusText')
  const ocrProgressBar = document.querySelector('#ocrProgressBar')
+
+function updateCropButtonLabel() {
+ if (!enableCropButton) return
+ enableCropButton.textContent = manualCrop ? '本文範囲を修正' : '本文範囲を指定'
+}
 
  const statusText = document.querySelector('#statusText')
  const progressBar = document.querySelector('#progressBar')
@@ -1111,7 +1123,8 @@ function initializeApp() {
    return 1500
   }
 
-  if (mode === 'storybook') return 3000
+  if (mode === 'storybookStrong') return 3400
+  if (mode === 'storybook') return 3100
   if (scaleMode === 'max') return 2800
   if (scaleMode === 'strong') return 2500
   if (accuracy === 'best') return 2600
@@ -1124,7 +1137,8 @@ function initializeApp() {
 
  function getOcrMaxScale(mode, accuracy, scaleMode) {
   if (scaleMode === 'off') return 1
-  if (mode === 'storybook') return 3.2
+  if (mode === 'storybookStrong') return 3.5
+  if (mode === 'storybook') return 3.25
   if (scaleMode === 'max') return 3
   if (scaleMode === 'strong') return 2.4
   if (accuracy === 'best') return 2.6
@@ -1181,6 +1195,7 @@ function initializeApp() {
  function updateCropBoxDisplay() {
   if (!manualCrop || !cropBox || !imagePreviewWrap) {
    cropBox?.classList.add('hidden')
+   updateCropButtonLabel()
    return
   }
 
@@ -1188,6 +1203,7 @@ function initializeApp() {
   const contentRect = getImageContentRect()
   if (!contentRect) {
    cropBox.classList.add('hidden')
+   updateCropButtonLabel()
    return
   }
 
@@ -1196,6 +1212,19 @@ function initializeApp() {
   cropBox.style.width = `${manualCrop.width * contentRect.width}px`
   cropBox.style.height = `${manualCrop.height * contentRect.height}px`
   cropBox.classList.remove('hidden')
+  updateCropButtonLabel()
+ }
+
+ function setCropEditingEnabled(enabled) {
+  if (!imagePreviewWrap || !cropOverlay) return
+
+  if (enabled) {
+   cropOverlay.classList.remove('hidden')
+   imagePreviewWrap.classList.add('crop-editing')
+  } else {
+   cropOverlay.classList.add('hidden')
+   imagePreviewWrap.classList.remove('crop-editing')
+  }
  }
 
  function resetManualCrop(keepMode = false) {
@@ -1204,8 +1233,9 @@ function initializeApp() {
   cropSelectMode = false
   cropPointerId = null
   cropBox?.classList.add('hidden')
-  cropOverlay?.classList.add('hidden')
+  setCropEditingEnabled(false)
   imagePreviewWrap?.classList.remove('crop-selecting')
+  updateCropButtonLabel()
 
   if (!keepMode && ocrCropSelect?.value === 'manual') {
    ocrCropSelect.value = 'bookText'
@@ -1218,16 +1248,25 @@ function initializeApp() {
    return
   }
 
-  manualCrop = null
   cropSelectMode = true
   cropDragState = null
   cropPointerId = null
-  cropBox?.classList.add('hidden')
   cropOverlay.classList.remove('hidden')
   imagePreviewWrap.classList.add('crop-selecting')
+  imagePreviewWrap.classList.add('crop-editing')
+
+  if (!manualCrop) {
+   cropBox?.classList.add('hidden')
+   setOcrStatus('読みたい本文だけを指で四角く囲んでください。囲んだ後も枠を動かして修正できます。')
+   setStatus('本文範囲指定中です。読みたい文字の部分だけを囲んでください。')
+  } else {
+   updateCropBoxDisplay()
+   setOcrStatus('本文範囲を修正できます。枠の中を動かすと移動、角を引っ張ると大きさ変更、枠の外をなぞると選び直しできます。')
+   setStatus('本文範囲を修正できます。')
+  }
+
   if (ocrCropSelect) ocrCropSelect.value = 'manual'
-  setOcrStatus('読みたい本文だけを指で四角く囲んでください。囲んだ後に画像から文字を読み取れます。')
-  setStatus('本文範囲指定中です。読みたい文字の部分だけを囲んでください。')
+  updateCropButtonLabel()
  }
 
  function finishManualCropSelection() {
@@ -1239,13 +1278,32 @@ function initializeApp() {
   if (!manualCrop || manualCrop.width < 0.04 || manualCrop.height < 0.04) {
    manualCrop = null
    cropBox?.classList.add('hidden')
+   setCropEditingEnabled(false)
    setOcrStatus('範囲が小さすぎます。本文が入るように少し大きめに囲んでください。')
+   updateCropButtonLabel()
    return
   }
 
+  setCropEditingEnabled(true)
+  updateCropBoxDisplay()
   if (ocrCropSelect) ocrCropSelect.value = 'manual'
-  setOcrStatus('本文範囲を指定しました。「画像から文字を読み取る」を押してください。')
+  setOcrStatus('本文範囲を指定しました。枠はそのまま動かして修正できます。「画像から文字を読み取る」を押してください。')
   setStatus('本文範囲を指定しました。')
+ }
+
+ function normalizeCrop(crop) {
+  const minSize = 0.035
+  let x = clampNumber(crop.x, 0, 1)
+  let y = clampNumber(crop.y, 0, 1)
+  let width = Math.max(minSize, crop.width)
+  let height = Math.max(minSize, crop.height)
+
+  if (x + width > 1) x = Math.max(0, 1 - width)
+  if (y + height > 1) y = Math.max(0, 1 - height)
+  width = Math.min(width, 1 - x)
+  height = Math.min(height, 1 - y)
+
+  return { x, y, width, height }
  }
 
  function updateManualCropFromDrag(start, current) {
@@ -1254,14 +1312,59 @@ function initializeApp() {
   const x2 = Math.max(start.x, current.x)
   const y2 = Math.max(start.y, current.y)
 
-  manualCrop = {
+  manualCrop = normalizeCrop({
    x: x1,
    y: y1,
    width: Math.max(0.001, x2 - x1),
    height: Math.max(0.001, y2 - y1),
-  }
+  })
 
   updateCropBoxDisplay()
+ }
+
+ function moveManualCrop(start, current, original) {
+  const dx = current.x - start.x
+  const dy = current.y - start.y
+  manualCrop = normalizeCrop({
+   ...original,
+   x: original.x + dx,
+   y: original.y + dy,
+  })
+  updateCropBoxDisplay()
+ }
+
+ function resizeManualCrop(start, current, original, handle) {
+  let left = original.x
+  let top = original.y
+  let right = original.x + original.width
+  let bottom = original.y + original.height
+  const dx = current.x - start.x
+  const dy = current.y - start.y
+  const minSize = 0.035
+
+  if (handle.includes('w')) left = clampNumber(original.x + dx, 0, right - minSize)
+  if (handle.includes('e')) right = clampNumber(original.x + original.width + dx, left + minSize, 1)
+  if (handle.includes('n')) top = clampNumber(original.y + dy, 0, bottom - minSize)
+  if (handle.includes('s')) bottom = clampNumber(original.y + original.height + dy, top + minSize, 1)
+
+  manualCrop = normalizeCrop({
+   x: left,
+   y: top,
+   width: right - left,
+   height: bottom - top,
+  })
+  updateCropBoxDisplay()
+ }
+
+ function getCropDragMode(event) {
+  const handle = event.target?.dataset?.cropHandle || ''
+  if (handle) return { mode: 'resize', handle }
+
+  if (manualCrop && cropBox && (event.target === cropBox || cropBox.contains(event.target))) {
+   return { mode: 'move', handle: '' }
+  }
+
+  return { mode: 'draw', handle: '' }
  }
 
  function getCropBox(width, height) {
@@ -1449,6 +1552,12 @@ function initializeApp() {
     adjusted = contrast > threshold ? 255 : 0
    }
 
+   if (mode === 'storybookStrong') {
+    const contrast = clampByte((gray - 128) * 2.25 + 124)
+    const threshold = Math.max(130, Math.min(188, adaptiveThreshold + 2))
+    adjusted = contrast > threshold ? 255 : 0
+   }
+
    if (mode === 'adaptive') {
     adjusted = gray > adaptiveThreshold ? 255 : 0
    }
@@ -1470,7 +1579,7 @@ function initializeApp() {
 
   context.putImageData(imageData, 0, 0)
 
-  if (mode === 'storybook') {
+  if (mode === 'storybook' || mode === 'storybookStrong') {
    thickenDarkPixels(context, canvas.width, canvas.height)
   }
 
@@ -1611,6 +1720,7 @@ function initializeApp() {
  function getOcrModeLabel(mode) {
   const labels = {
    storybook: '絵本・教科書向け',
+   storybookStrong: '絵本・教科書向け・強め',
    document: '書類向け',
    smallText: '小さい文字向け',
    thinText: '薄い文字向け',
@@ -1631,7 +1741,10 @@ function initializeApp() {
 
   if (accuracy === 'best') {
    if (selectedMode === 'storybook') {
-    return ['storybook', 'adaptive', 'smallText']
+    return ['storybook', 'storybookStrong', 'adaptive']
+   }
+   if (selectedMode === 'storybookStrong') {
+    return ['storybookStrong', 'storybook', 'smallText']
    }
    return Array.from(new Set([selectedMode, 'adaptive', 'document'])).slice(0, 3)
   }
@@ -1697,7 +1810,7 @@ function initializeApp() {
    resultText.value = text
    updateTextCount()
    saveTextToHistory(text)
-   setOcrStatus('画像から文字を読み取りました。絵本・教科書は「下側の本文（絵本向け）」や「日本語のみ」が読みやすいです。')
+   setOcrStatus('画像から文字を読み取りました。絵本・教科書は本文だけを囲むと読みやすいです。精度が弱い時は「絵本・教科書向け・強め」も試せます。')
    setOcrProgress(100)
    setStatus('画像から文字を読み取りました。文章欄に入れました。')
    resultText.focus()
@@ -1797,33 +1910,65 @@ function initializeApp() {
  })
 
  cropOverlay?.addEventListener('pointerdown', (event) => {
-  if (!cropSelectMode) return
+  if (!selectedImageFile) return
+  if (!cropSelectMode && !imagePreviewWrap?.classList.contains('crop-editing')) return
+
   const point = getPointerPositionInImage(event)
   if (!point) return
+
   event.preventDefault()
   cropPointerId = event.pointerId
   cropOverlay.setPointerCapture?.(event.pointerId)
-  cropDragState = { start: point, current: point }
-  updateManualCropFromDrag(point, point)
+  const dragMode = getCropDragMode(event)
+
+  if (dragMode.mode === 'draw') {
+   cropDragState = { mode: 'draw', start: point, current: point }
+   updateManualCropFromDrag(point, point)
+  } else {
+   cropDragState = {
+    mode: dragMode.mode,
+    handle: dragMode.handle,
+    start: point,
+    original: { ...manualCrop },
+   }
+  }
+
+  if (ocrCropSelect) ocrCropSelect.value = 'manual'
+  imagePreviewWrap?.classList.add('crop-selecting')
  })
 
  cropOverlay?.addEventListener('pointermove', (event) => {
-  if (!cropSelectMode || !cropDragState || cropPointerId !== event.pointerId) return
+  if (!cropDragState || cropPointerId !== event.pointerId) return
   const point = getPointerPositionInImage(event)
   if (!point) return
+
   event.preventDefault()
-  cropDragState.current = point
-  updateManualCropFromDrag(cropDragState.start, point)
+
+  if (cropDragState.mode === 'draw') {
+   cropDragState.current = point
+   updateManualCropFromDrag(cropDragState.start, point)
+   return
+  }
+
+  if (cropDragState.mode === 'move') {
+   moveManualCrop(cropDragState.start, point, cropDragState.original)
+   return
+  }
+
+  if (cropDragState.mode === 'resize') {
+   resizeManualCrop(cropDragState.start, point, cropDragState.original, cropDragState.handle)
+  }
  })
 
  cropOverlay?.addEventListener('pointerup', (event) => {
-  if (!cropSelectMode || cropPointerId !== event.pointerId) return
+  if (!cropDragState || cropPointerId !== event.pointerId) return
   event.preventDefault()
   cropOverlay.releasePointerCapture?.(event.pointerId)
   finishManualCropSelection()
  })
 
  cropOverlay?.addEventListener('pointercancel', () => {
+  if (!cropDragState) return
   finishManualCropSelection()
  })
 
