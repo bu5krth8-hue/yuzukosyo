@@ -2567,12 +2567,40 @@ setupMobileShortcutMenu();
 })();
 
 
-/* === v225 秘密基地BGM：スマホ位置とメニュー同配色へ調整 === */
+/* === v226 秘密基地BGM：選曲機能を追加 === */
 (function () {
   'use strict';
 
-  var BGM_SRC = 'assets/bgm/himitsukichi-login-loop.wav?v=225';
+  var BGM_TRACKS = [
+    {
+      id: 'login-plus',
+      title: '秘密基地ログイン＋',
+      src: 'assets/bgm/01_himitsukichi_login_plus.mp3?v=226'
+    },
+    {
+      id: 'yuurei-light',
+      title: '幽霊と小さな灯り',
+      src: 'assets/bgm/02_yuurei_to_chiisai_akari.mp3?v=226'
+    },
+    {
+      id: 'tanuchan-meeting',
+      title: 'たぬちゃんの作戦会議',
+      src: 'assets/bgm/03_tanuchan_no_sakusenkaigi.mp3?v=226'
+    },
+    {
+      id: 'omikuji-time',
+      title: '今日のおみくじタイム',
+      src: 'assets/bgm/04_kyou_no_omikuji_time.mp3?v=226'
+    },
+    {
+      id: 'secret-room-key',
+      title: '秘密の部屋と月の鍵',
+      src: 'assets/bgm/05_secret_room_moon_key.mp3?v=226'
+    }
+  ];
+
   var STORAGE_VOLUME = 'yuzuSecretBaseBgmVolume';
+  var STORAGE_TRACK = 'yuzuSecretBaseBgmTrack';
   var LEGACY_STORAGE_ENABLED = 'yuzuSecretBaseBgmEnabled';
   var DEFAULT_VOLUME = 0.20;
 
@@ -2591,6 +2619,21 @@ setupMobileShortcutMenu();
     }
   }
 
+  function getTrackById(id) {
+    for (var i = 0; i < BGM_TRACKS.length; i += 1) {
+      if (BGM_TRACKS[i].id === id) return BGM_TRACKS[i];
+    }
+    return BGM_TRACKS[0];
+  }
+
+  function getSavedTrack() {
+    try {
+      return getTrackById(localStorage.getItem(STORAGE_TRACK));
+    } catch (error) {
+      return BGM_TRACKS[0];
+    }
+  }
+
   function setStatus(statusNode, text) {
     if (statusNode) statusNode.textContent = text;
   }
@@ -2601,11 +2644,22 @@ setupMobileShortcutMenu();
     } catch (error) {}
   }
 
+  function escapeHtml(text) {
+    return String(text).replace(/[&<>"]/g, function (ch) {
+      return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[ch] || ch;
+    });
+  }
+
   function initSecretBaseBgm() {
     if (document.querySelector('[data-yuzu-bgm-player]')) return;
     if (!document.body) return;
 
     clearLegacyAutoPlaySetting();
+
+    var savedTrack = getSavedTrack();
+    var trackOptions = BGM_TRACKS.map(function (track) {
+      return '<option value="' + escapeHtml(track.id) + '">' + escapeHtml(track.title) + '</option>';
+    }).join('');
 
     var player = document.createElement('section');
     player.className = 'yuzu-bgm-player is-collapsed';
@@ -2618,7 +2672,11 @@ setupMobileShortcutMenu();
       '    <strong>♪ 秘密基地BGM</strong>',
       '    <button class="yuzu-bgm-close" type="button" aria-label="BGM設定を閉じる">閉じる</button>',
       '  </div>',
-      '  <p class="yuzu-bgm-note">BGMボタンを押すと音が流れます。音量はこの端末に保存されます。</p>',
+      '  <p class="yuzu-bgm-note">好きな曲を選んで再生できます。音量と選曲はこの端末に保存されます。</p>',
+      '  <label class="yuzu-bgm-track-row">',
+      '    <span>曲</span>',
+      '    <select class="yuzu-bgm-track-select" aria-label="BGMの曲を選ぶ">' + trackOptions + '</select>',
+      '  </label>',
       '  <div class="yuzu-bgm-main-row">',
       '    <button class="yuzu-bgm-toggle" type="button" aria-pressed="false">再生する</button>',
       '    <button class="yuzu-bgm-stop" type="button" hidden>停止</button>',
@@ -2639,13 +2697,16 @@ setupMobileShortcutMenu();
     var toggleButton = player.querySelector('.yuzu-bgm-toggle');
     var stopButton = player.querySelector('.yuzu-bgm-stop');
     var volumeInput = player.querySelector('.yuzu-bgm-volume');
+    var trackSelect = player.querySelector('.yuzu-bgm-track-select');
     var statusNode = player.querySelector('.yuzu-bgm-status');
 
-    var audio = new Audio(BGM_SRC);
+    var currentTrack = savedTrack;
+    var audio = new Audio(currentTrack.src);
     audio.loop = true;
     audio.preload = 'none';
     audio.volume = getSavedVolume();
     volumeInput.value = String(audio.volume);
+    trackSelect.value = currentTrack.id;
 
     function setExpanded(expanded) {
       panel.hidden = !expanded;
@@ -2667,17 +2728,39 @@ setupMobileShortcutMenu();
       var playPromise = audio.play();
       if (!playPromise || typeof playPromise.then !== 'function') {
         updatePlayingView(true);
-        setStatus(statusNode, 'BGM再生中です。');
+        setStatus(statusNode, 'BGM再生中：' + currentTrack.title);
         return;
       }
 
       playPromise.then(function () {
         updatePlayingView(true);
-        setStatus(statusNode, 'BGM再生中です。');
+        setStatus(statusNode, 'BGM再生中：' + currentTrack.title);
       }).catch(function () {
         updatePlayingView(false);
         setStatus(statusNode, '再生できませんでした。もう一度押してください。');
       });
+    }
+
+    function changeTrack(trackId, shouldKeepPlaying) {
+      var nextTrack = getTrackById(trackId);
+      currentTrack = nextTrack;
+      try {
+        localStorage.setItem(STORAGE_TRACK, currentTrack.id);
+      } catch (error) {}
+
+      var wasPlaying = shouldKeepPlaying && !audio.paused;
+      audio.pause();
+      audio.src = currentTrack.src;
+      audio.loop = true;
+      audio.preload = 'none';
+      audio.volume = clampVolume(volumeInput.value);
+      updatePlayingView(false);
+
+      if (wasPlaying) {
+        playBgm();
+      } else {
+        setStatus(statusNode, '選択中：' + currentTrack.title);
+      }
     }
 
     fabButton.addEventListener('click', function () {
@@ -2717,6 +2800,10 @@ setupMobileShortcutMenu();
       setStatus(statusNode, 'BGMを停止しました。');
     });
 
+    trackSelect.addEventListener('change', function () {
+      changeTrack(trackSelect.value, true);
+    });
+
     volumeInput.addEventListener('input', function () {
       audio.volume = clampVolume(volumeInput.value);
       try {
@@ -2729,7 +2816,7 @@ setupMobileShortcutMenu();
 
     setExpanded(false);
     updatePlayingView(false);
-    setStatus(statusNode, 'BGMボタンを開いて再生できます。');
+    setStatus(statusNode, '選択中：' + currentTrack.title);
   }
 
   if (document.readyState === 'loading') {
