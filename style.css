@@ -158,26 +158,103 @@ body#top .omikuji-history-switch{margin-top:12px!important;margin-bottom:0!impor
 }
 
 
-/* === v219 秘密基地BGM追加 === */
+/* === v221 秘密基地BGM：小型展開UI＋自然ループ調整 === */
 .yuzu-bgm-player {
   position: fixed;
   left: 18px;
-  bottom: 18px;
+  top: 84px;
   z-index: 1800;
-  width: min(340px, calc(100vw - 36px));
-  padding: 12px 13px;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 18px;
-  background: rgba(13, 11, 24, 0.78);
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.42), 0 0 20px rgba(168, 85, 247, 0.22);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
   color: #fff;
-  font-size: 0.86rem;
+  font-size: 0.84rem;
+  pointer-events: none;
 }
 
 .yuzu-bgm-player * {
   box-sizing: border-box;
+}
+
+.yuzu-bgm-fab,
+.yuzu-bgm-toggle,
+.yuzu-bgm-stop,
+.yuzu-bgm-close {
+  font: inherit;
+}
+
+.yuzu-bgm-fab {
+  pointer-events: auto;
+  min-width: 78px;
+  min-height: 40px;
+  padding: 9px 13px;
+  border: 1px solid rgba(216, 180, 254, 0.42);
+  border-radius: 999px;
+  background: rgba(20, 8, 32, 0.82);
+  color: #f7ecff;
+  font-weight: 1000;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  box-shadow: 0 0 18px rgba(168, 85, 247, 0.25), inset 0 0 16px rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: transform 0.16s ease, filter 0.16s ease, box-shadow 0.16s ease;
+}
+
+.yuzu-bgm-fab:hover,
+.yuzu-bgm-fab:focus-visible {
+  transform: translateY(-1px);
+  filter: brightness(1.08);
+  box-shadow: 0 0 24px rgba(168, 85, 247, 0.42), inset 0 0 16px rgba(255, 255, 255, 0.05);
+}
+
+.yuzu-bgm-player.is-playing .yuzu-bgm-fab {
+  border-color: rgba(112, 214, 255, 0.62);
+  color: #d8f3ff;
+  box-shadow: 0 0 22px rgba(112, 214, 255, 0.34), inset 0 0 18px rgba(112, 214, 255, 0.08);
+}
+
+.yuzu-bgm-panel {
+  pointer-events: auto;
+  position: absolute;
+  left: 0;
+  top: calc(100% + 9px);
+  width: min(318px, calc(100vw - 36px));
+  padding: 12px 13px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 18px;
+  background: rgba(13, 11, 24, 0.88);
+  box-shadow: 0 18px 38px rgba(0, 0, 0, 0.44), 0 0 22px rgba(168, 85, 247, 0.22);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.yuzu-bgm-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.yuzu-bgm-panel-head strong {
+  font-size: 0.95rem;
+  line-height: 1.35;
+}
+
+.yuzu-bgm-close {
+  border: 1px solid rgba(255, 255, 255, 0.17);
+  border-radius: 999px;
+  min-height: 30px;
+  padding: 5px 10px;
+  background: rgba(255, 255, 255, 0.10);
+  color: rgba(255, 255, 255, 0.88);
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.yuzu-bgm-note {
+  margin: 0 0 10px;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.75rem;
+  line-height: 1.55;
 }
 
 .yuzu-bgm-main-row {
@@ -190,9 +267,9 @@ body#top .omikuji-history-switch{margin-top:12px!important;margin-bottom:0!impor
 .yuzu-bgm-stop {
   border: 0;
   border-radius: 999px;
-  min-height: 38px;
-  padding: 9px 13px;
-  font-weight: 800;
+  min-height: 36px;
+  padding: 8px 12px;
+  font-weight: 900;
   cursor: pointer;
   color: #fff;
   transition: transform 0.15s ease, filter 0.15s ease, opacity 0.15s ease;
@@ -201,7 +278,7 @@ body#top .omikuji-history-switch{margin-top:12px!important;margin-bottom:0!impor
 .yuzu-bgm-toggle {
   flex: 1;
   background: linear-gradient(135deg, rgba(168, 85, 247, 0.98), rgba(112, 214, 255, 0.9));
-  box-shadow: 0 8px 20px rgba(112, 214, 255, 0.16);
+  box-shadow: 0 8px 18px rgba(112, 214, 255, 0.14);
 }
 
 .yuzu-bgm-stop {
@@ -210,7 +287,8 @@ body#top .omikuji-history-switch{margin-top:12px!important;margin-bottom:0!impor
 }
 
 .yuzu-bgm-toggle:hover,
-.yuzu-bgm-stop:hover {
+.yuzu-bgm-stop:hover,
+.yuzu-bgm-close:hover {
   transform: translateY(-1px);
   filter: brightness(1.08);
 }
@@ -232,7 +310,7 @@ body#top .omikuji-history-switch{margin-top:12px!important;margin-bottom:0!impor
 
 .yuzu-bgm-volume-row span {
   white-space: nowrap;
-  font-weight: 700;
+  font-weight: 800;
   opacity: 0.9;
 }
 
@@ -242,35 +320,54 @@ body#top .omikuji-history-switch{margin-top:12px!important;margin-bottom:0!impor
 }
 
 .yuzu-bgm-status {
+  min-height: 1.35em;
   margin: 7px 2px 0;
   color: rgba(255, 255, 255, 0.66);
-  font-size: 0.76rem;
+  font-size: 0.73rem;
   line-height: 1.45;
 }
 
-.yuzu-bgm-player.is-playing {
-  border-color: rgba(112, 214, 255, 0.34);
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.42), 0 0 26px rgba(112, 214, 255, 0.28);
-}
-
-@media (max-width: 640px) {
+@media (max-width: 760px) {
   .yuzu-bgm-player {
-    left: 10px;
+    left: auto;
     right: 10px;
-    bottom: 10px;
-    width: auto;
-    padding: 10px;
+    top: auto;
+    bottom: calc(10px + env(safe-area-inset-bottom));
+    font-size: 0.80rem;
+  }
+
+  .yuzu-bgm-fab {
+    min-width: 70px;
+    min-height: 38px;
+    padding: 8px 11px;
+    border-radius: 15px;
+  }
+
+  .yuzu-bgm-panel {
+    left: auto;
+    right: 0;
+    top: auto;
+    bottom: calc(100% + 9px);
+    width: min(304px, calc(100vw - 20px));
+    padding: 11px;
     border-radius: 16px;
-    font-size: 0.82rem;
+  }
+
+  .yuzu-bgm-panel-head strong {
+    font-size: 0.90rem;
+  }
+
+  .yuzu-bgm-note {
+    font-size: 0.72rem;
   }
 
   .yuzu-bgm-toggle,
   .yuzu-bgm-stop {
-    min-height: 36px;
-    padding: 8px 11px;
+    min-height: 34px;
+    padding: 7px 10px;
   }
 
   .yuzu-bgm-status {
-    font-size: 0.72rem;
+    font-size: 0.70rem;
   }
 }
