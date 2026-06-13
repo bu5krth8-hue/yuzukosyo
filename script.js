@@ -2565,3 +2565,169 @@ setupMobileShortcutMenu();
   setupNovelReleaseGates();
  }
 })();
+
+
+/* === v219 秘密基地BGM追加 === */
+(function () {
+  'use strict';
+
+  var BGM_SRC = 'assets/bgm/himitsukichi-login-bgm.mp3?v=219';
+  var STORAGE_ENABLED = 'yuzuSecretBaseBgmEnabled';
+  var STORAGE_VOLUME = 'yuzuSecretBaseBgmVolume';
+  var DEFAULT_VOLUME = 0.22;
+  var AUTO_PLAY_DELAY = 650;
+
+  function clampVolume(value) {
+    var number = Number(value);
+    if (!Number.isFinite(number)) return DEFAULT_VOLUME;
+    return Math.min(0.8, Math.max(0, number));
+  }
+
+  function getSavedVolume() {
+    try {
+      return clampVolume(localStorage.getItem(STORAGE_VOLUME));
+    } catch (error) {
+      return DEFAULT_VOLUME;
+    }
+  }
+
+  function setStatus(statusNode, text) {
+    if (statusNode) statusNode.textContent = text;
+  }
+
+  function initSecretBaseBgm() {
+    if (document.querySelector('[data-yuzu-bgm-player]')) return;
+    if (!document.body) return;
+
+    var player = document.createElement('section');
+    player.className = 'yuzu-bgm-player';
+    player.setAttribute('data-yuzu-bgm-player', 'true');
+    player.setAttribute('aria-label', '秘密基地BGM');
+    player.innerHTML = [
+      '<div class="yuzu-bgm-main-row">',
+      '  <button class="yuzu-bgm-toggle" type="button" aria-pressed="false">♪ 秘密基地BGMを流す</button>',
+      '  <button class="yuzu-bgm-stop" type="button" hidden>停止</button>',
+      '</div>',
+      '<label class="yuzu-bgm-next-row">',
+      '  <input class="yuzu-bgm-remember" type="checkbox">',
+      '  <span>次回もBGMを流す</span>',
+      '</label>',
+      '<label class="yuzu-bgm-volume-row">',
+      '  <span>音量</span>',
+      '  <input class="yuzu-bgm-volume" type="range" min="0" max="0.8" step="0.01" aria-label="BGMの音量">',
+      '</label>',
+      '<p class="yuzu-bgm-status" aria-live="polite"></p>'
+    ].join('');
+
+    document.body.appendChild(player);
+
+    var toggleButton = player.querySelector('.yuzu-bgm-toggle');
+    var stopButton = player.querySelector('.yuzu-bgm-stop');
+    var rememberInput = player.querySelector('.yuzu-bgm-remember');
+    var volumeInput = player.querySelector('.yuzu-bgm-volume');
+    var statusNode = player.querySelector('.yuzu-bgm-status');
+
+    var audio = new Audio(BGM_SRC);
+    audio.loop = true;
+    audio.preload = 'none';
+    audio.volume = getSavedVolume();
+    volumeInput.value = String(audio.volume);
+
+    try {
+      rememberInput.checked = localStorage.getItem(STORAGE_ENABLED) === '1';
+    } catch (error) {
+      rememberInput.checked = false;
+    }
+
+    function updatePlayingView(isPlaying) {
+      toggleButton.setAttribute('aria-pressed', isPlaying ? 'true' : 'false');
+      toggleButton.textContent = isPlaying ? '一時停止' : '♪ 秘密基地BGMを流す';
+      stopButton.hidden = !isPlaying;
+      player.classList.toggle('is-playing', isPlaying);
+    }
+
+    function saveEnabled(enabled) {
+      try {
+        localStorage.setItem(STORAGE_ENABLED, enabled ? '1' : '0');
+      } catch (error) {}
+    }
+
+    function playBgm(isAutoAttempt) {
+      audio.volume = clampVolume(volumeInput.value);
+      var playPromise = audio.play();
+      if (!playPromise || typeof playPromise.then !== 'function') {
+        updatePlayingView(true);
+        setStatus(statusNode, 'BGM再生中です。');
+        return;
+      }
+
+      playPromise.then(function () {
+        updatePlayingView(true);
+        rememberInput.checked = true;
+        saveEnabled(true);
+        setStatus(statusNode, 'BGM再生中です。');
+      }).catch(function () {
+        updatePlayingView(false);
+        if (isAutoAttempt) {
+          setStatus(statusNode, '自動再生が止められました。ボタンを押すと再開できます。');
+          toggleButton.textContent = '♪ BGMを再開';
+        } else {
+          setStatus(statusNode, '再生できませんでした。もう一度押してください。');
+        }
+      });
+    }
+
+    toggleButton.addEventListener('click', function () {
+      if (audio.paused) {
+        playBgm(false);
+      } else {
+        audio.pause();
+        updatePlayingView(false);
+        setStatus(statusNode, 'BGMを一時停止しました。');
+      }
+    });
+
+    stopButton.addEventListener('click', function () {
+      audio.pause();
+      audio.currentTime = 0;
+      rememberInput.checked = false;
+      saveEnabled(false);
+      updatePlayingView(false);
+      setStatus(statusNode, 'BGMを停止しました。次回の自動再生もOFFにしました。');
+    });
+
+    rememberInput.addEventListener('change', function () {
+      saveEnabled(rememberInput.checked);
+      if (rememberInput.checked) {
+        setStatus(statusNode, '次回もBGMの自動再生を試します。');
+      } else {
+        setStatus(statusNode, '次回の自動再生をOFFにしました。');
+      }
+    });
+
+    volumeInput.addEventListener('input', function () {
+      audio.volume = clampVolume(volumeInput.value);
+      try {
+        localStorage.setItem(STORAGE_VOLUME, String(audio.volume));
+      } catch (error) {}
+    });
+
+    audio.addEventListener('play', function () { updatePlayingView(true); });
+    audio.addEventListener('pause', function () { updatePlayingView(false); });
+
+    if (rememberInput.checked) {
+      setStatus(statusNode, '前回ONだったため、自動再生を試します。');
+      window.setTimeout(function () {
+        playBgm(true);
+      }, AUTO_PLAY_DELAY);
+    } else {
+      setStatus(statusNode, 'ボタンを押すとBGMが流れます。');
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initSecretBaseBgm);
+  } else {
+    initSecretBaseBgm();
+  }
+})();

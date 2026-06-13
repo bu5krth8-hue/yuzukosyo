@@ -156,3 +156,121 @@ body#top .omikuji-history-switch{margin-top:12px!important;margin-bottom:0!impor
   height: 42px;
  }
 }
+
+
+/* === v219 秘密基地BGM追加 === */
+.yuzu-bgm-player {
+  position: fixed;
+  left: 18px;
+  bottom: 18px;
+  z-index: 1800;
+  width: min(340px, calc(100vw - 36px));
+  padding: 12px 13px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 18px;
+  background: rgba(13, 11, 24, 0.78);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.42), 0 0 20px rgba(168, 85, 247, 0.22);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  color: #fff;
+  font-size: 0.86rem;
+}
+
+.yuzu-bgm-player * {
+  box-sizing: border-box;
+}
+
+.yuzu-bgm-main-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.yuzu-bgm-toggle,
+.yuzu-bgm-stop {
+  border: 0;
+  border-radius: 999px;
+  min-height: 38px;
+  padding: 9px 13px;
+  font-weight: 800;
+  cursor: pointer;
+  color: #fff;
+  transition: transform 0.15s ease, filter 0.15s ease, opacity 0.15s ease;
+}
+
+.yuzu-bgm-toggle {
+  flex: 1;
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.98), rgba(112, 214, 255, 0.9));
+  box-shadow: 0 8px 20px rgba(112, 214, 255, 0.16);
+}
+
+.yuzu-bgm-stop {
+  background: rgba(255, 255, 255, 0.13);
+  border: 1px solid rgba(255, 255, 255, 0.17);
+}
+
+.yuzu-bgm-toggle:hover,
+.yuzu-bgm-stop:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.08);
+}
+
+.yuzu-bgm-next-row,
+.yuzu-bgm-volume-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 9px;
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.yuzu-bgm-next-row input {
+  width: 16px;
+  height: 16px;
+  accent-color: #a855f7;
+}
+
+.yuzu-bgm-volume-row span {
+  white-space: nowrap;
+  font-weight: 700;
+  opacity: 0.9;
+}
+
+.yuzu-bgm-volume {
+  width: 100%;
+  accent-color: #70d6ff;
+}
+
+.yuzu-bgm-status {
+  margin: 7px 2px 0;
+  color: rgba(255, 255, 255, 0.66);
+  font-size: 0.76rem;
+  line-height: 1.45;
+}
+
+.yuzu-bgm-player.is-playing {
+  border-color: rgba(112, 214, 255, 0.34);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.42), 0 0 26px rgba(112, 214, 255, 0.28);
+}
+
+@media (max-width: 640px) {
+  .yuzu-bgm-player {
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    width: auto;
+    padding: 10px;
+    border-radius: 16px;
+    font-size: 0.82rem;
+  }
+
+  .yuzu-bgm-toggle,
+  .yuzu-bgm-stop {
+    min-height: 36px;
+    padding: 8px 11px;
+  }
+
+  .yuzu-bgm-status {
+    font-size: 0.72rem;
+  }
+}
