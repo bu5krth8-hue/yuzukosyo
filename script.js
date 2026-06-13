@@ -2567,35 +2567,35 @@ setupMobileShortcutMenu();
 })();
 
 
-/* === v226 秘密基地BGM：選曲機能を追加 === */
+/* === v227 秘密基地BGM：曲名表示を調整 === */
 (function () {
   'use strict';
 
   var BGM_TRACKS = [
     {
-      id: 'login-plus',
-      title: '秘密基地ログイン＋',
-      src: 'assets/bgm/01_himitsukichi_login_plus.mp3?v=226'
+      id: 'himitsukichi-main',
+      title: '秘密基地メイン',
+      src: 'assets/bgm/01_himitsukichi_main.mp3?v=227'
     },
     {
       id: 'yuurei-light',
       title: '幽霊と小さな灯り',
-      src: 'assets/bgm/02_yuurei_to_chiisai_akari.mp3?v=226'
+      src: 'assets/bgm/02_yuurei_to_chiisai_akari.mp3?v=227'
     },
     {
       id: 'tanuchan-meeting',
       title: 'たぬちゃんの作戦会議',
-      src: 'assets/bgm/03_tanuchan_no_sakusenkaigi.mp3?v=226'
+      src: 'assets/bgm/03_tanuchan_no_sakusenkaigi.mp3?v=227'
     },
     {
       id: 'omikuji-time',
       title: '今日のおみくじタイム',
-      src: 'assets/bgm/04_kyou_no_omikuji_time.mp3?v=226'
+      src: 'assets/bgm/04_kyou_no_omikuji_time.mp3?v=227'
     },
     {
       id: 'secret-room-key',
       title: '秘密の部屋と月の鍵',
-      src: 'assets/bgm/05_secret_room_moon_key.mp3?v=226'
+      src: 'assets/bgm/05_secret_room_moon_key.mp3?v=227'
     }
   ];
 
