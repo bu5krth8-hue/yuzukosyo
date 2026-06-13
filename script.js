@@ -2567,11 +2567,11 @@ setupMobileShortcutMenu();
 })();
 
 
-/* === v224 秘密基地BGM：ボタン位置とデザイン調整 === */
+/* === v225 秘密基地BGM：スマホ位置とメニュー同配色へ調整 === */
 (function () {
   'use strict';
 
-  var BGM_SRC = 'assets/bgm/himitsukichi-login-loop.wav?v=224';
+  var BGM_SRC = 'assets/bgm/himitsukichi-login-loop.wav?v=225';
   var STORAGE_VOLUME = 'yuzuSecretBaseBgmVolume';
   var LEGACY_STORAGE_ENABLED = 'yuzuSecretBaseBgmEnabled';
   var DEFAULT_VOLUME = 0.20;
