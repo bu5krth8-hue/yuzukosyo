@@ -158,7 +158,7 @@ body#top .omikuji-history-switch{margin-top:12px!important;margin-bottom:0!impor
 }
 
 
-/* === v222 秘密基地BGM：自動再生設定削除＋右上スマホボタン調整 === */
+/* === v223 秘密基地BGM：ボタン位置とデザイン調整 === */
 .yuzu-bgm-player {
   position: fixed;
   left: 18px;
@@ -363,5 +363,87 @@ body#top .omikuji-history-switch{margin-top:12px!important;margin-bottom:0!impor
 
   .yuzu-bgm-status {
     font-size: 0.70rem;
+  }
+}
+
+
+/* === v223 秘密基地BGM：テーマ色ボタン＋スマホはメニュー右側へ調整 === */
+.yuzu-bgm-fab {
+  min-width: 92px !important;
+  min-height: 44px !important;
+  padding: 9px 15px !important;
+  border: 1px solid color-mix(in srgb, var(--theme-accent, var(--purple)) 62%, rgba(255, 255, 255, 0.38)) !important;
+  border-radius: 18px !important;
+  background:
+    radial-gradient(circle at 20% 18%, rgba(255, 255, 255, 0.26), transparent 34%),
+    linear-gradient(135deg, var(--theme-button1, var(--purple)) 0%, var(--theme-button2, var(--blue)) 100%) !important;
+  color: #fff !important;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.32), 0 0 10px rgba(255, 255, 255, 0.38) !important;
+  box-shadow:
+    0 0 18px color-mix(in srgb, var(--theme-accent, var(--purple)) 38%, transparent),
+    0 0 28px color-mix(in srgb, var(--theme-accent2, var(--blue)) 22%, transparent),
+    inset 0 0 16px rgba(255, 255, 255, 0.13) !important;
+}
+
+.yuzu-bgm-fab:hover,
+.yuzu-bgm-fab:focus-visible {
+  transform: translateY(-2px) scale(1.03) !important;
+  filter: brightness(1.09) saturate(1.08) !important;
+  box-shadow:
+    0 0 24px color-mix(in srgb, var(--theme-accent, var(--purple)) 54%, transparent),
+    0 0 34px color-mix(in srgb, var(--theme-accent2, var(--blue)) 30%, transparent),
+    inset 0 0 18px rgba(255, 255, 255, 0.16) !important;
+}
+
+.yuzu-bgm-player.is-playing .yuzu-bgm-fab {
+  border-color: color-mix(in srgb, var(--theme-accent2, var(--blue)) 76%, rgba(255, 255, 255, 0.5)) !important;
+  color: #fff !important;
+  box-shadow:
+    0 0 24px color-mix(in srgb, var(--theme-accent2, var(--blue)) 48%, transparent),
+    0 0 40px color-mix(in srgb, var(--theme-accent, var(--purple)) 28%, transparent),
+    inset 0 0 18px rgba(255, 255, 255, 0.16) !important;
+}
+
+@media (max-width: 760px) {
+  .yuzu-bgm-player {
+    left: 136px !important;
+    right: auto !important;
+    top: calc(10px + env(safe-area-inset-top)) !important;
+    bottom: auto !important;
+  }
+
+  .yuzu-bgm-fab {
+    min-width: 84px !important;
+    min-height: 42px !important;
+    padding: 9px 12px !important;
+    border-radius: 16px !important;
+    font-size: 12px !important;
+    line-height: 1 !important;
+  }
+
+  .yuzu-bgm-panel {
+    left: 0 !important;
+    right: auto !important;
+    top: calc(100% + 9px) !important;
+    bottom: auto !important;
+    transform: translateX(-126px) !important;
+    width: min(304px, calc(100vw - 20px)) !important;
+  }
+}
+
+@media (max-width: 360px) {
+  .yuzu-bgm-player {
+    left: 126px !important;
+  }
+
+  .yuzu-bgm-fab {
+    min-width: 78px !important;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+    font-size: 11.5px !important;
+  }
+
+  .yuzu-bgm-panel {
+    transform: translateX(-116px) !important;
   }
 }

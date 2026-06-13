@@ -2567,11 +2567,11 @@ setupMobileShortcutMenu();
 })();
 
 
-/* === v222 秘密基地BGM：自動再生設定削除＋右上スマホボタン調整 === */
+/* === v223 秘密基地BGM：ボタン位置とデザイン調整 === */
 (function () {
   'use strict';
 
-  var BGM_SRC = 'assets/bgm/himitsukichi-login-loop.wav?v=222';
+  var BGM_SRC = 'assets/bgm/himitsukichi-login-loop.wav?v=223';
   var STORAGE_VOLUME = 'yuzuSecretBaseBgmVolume';
   var LEGACY_STORAGE_ENABLED = 'yuzuSecretBaseBgmEnabled';
   var DEFAULT_VOLUME = 0.20;
@@ -2612,7 +2612,7 @@ setupMobileShortcutMenu();
     player.setAttribute('data-yuzu-bgm-player', 'true');
     player.setAttribute('aria-label', '秘密基地BGM');
     player.innerHTML = [
-      '<button class="yuzu-bgm-fab" type="button" aria-expanded="false" aria-controls="yuzuBgmPanel">BGM</button>',
+      '<button class="yuzu-bgm-fab" type="button" aria-expanded="false" aria-controls="yuzuBgmPanel">♪BGM♪</button>',
       '<div class="yuzu-bgm-panel" id="yuzuBgmPanel" hidden>',
       '  <div class="yuzu-bgm-panel-head">',
       '    <strong>♪ 秘密基地BGM</strong>',
@@ -2659,7 +2659,7 @@ setupMobileShortcutMenu();
       toggleButton.textContent = isPlaying ? '一時停止' : '再生する';
       stopButton.hidden = !isPlaying;
       player.classList.toggle('is-playing', isPlaying);
-      fabButton.textContent = 'BGM';
+      fabButton.textContent = '♪BGM♪';
     }
 
     function playBgm() {
