@@ -2567,15 +2567,14 @@ setupMobileShortcutMenu();
 })();
 
 
-/* === v221 秘密基地BGM：小型展開UI＋自然ループ調整 === */
+/* === v222 秘密基地BGM：自動再生設定削除＋右上スマホボタン調整 === */
 (function () {
   'use strict';
 
-  var BGM_SRC = 'assets/bgm/himitsukichi-login-loop.wav?v=221';
-  var STORAGE_ENABLED = 'yuzuSecretBaseBgmEnabled';
+  var BGM_SRC = 'assets/bgm/himitsukichi-login-loop.wav?v=222';
   var STORAGE_VOLUME = 'yuzuSecretBaseBgmVolume';
+  var LEGACY_STORAGE_ENABLED = 'yuzuSecretBaseBgmEnabled';
   var DEFAULT_VOLUME = 0.20;
-  var AUTO_PLAY_DELAY = 650;
 
   function clampVolume(value) {
     var number = Number(value);
@@ -2596,30 +2595,34 @@ setupMobileShortcutMenu();
     if (statusNode) statusNode.textContent = text;
   }
 
+  function clearLegacyAutoPlaySetting() {
+    try {
+      localStorage.removeItem(LEGACY_STORAGE_ENABLED);
+    } catch (error) {}
+  }
+
   function initSecretBaseBgm() {
     if (document.querySelector('[data-yuzu-bgm-player]')) return;
     if (!document.body) return;
+
+    clearLegacyAutoPlaySetting();
 
     var player = document.createElement('section');
     player.className = 'yuzu-bgm-player is-collapsed';
     player.setAttribute('data-yuzu-bgm-player', 'true');
     player.setAttribute('aria-label', '秘密基地BGM');
     player.innerHTML = [
-      '<button class="yuzu-bgm-fab" type="button" aria-expanded="false" aria-controls="yuzuBgmPanel">♪ BGM</button>',
+      '<button class="yuzu-bgm-fab" type="button" aria-expanded="false" aria-controls="yuzuBgmPanel">BGM</button>',
       '<div class="yuzu-bgm-panel" id="yuzuBgmPanel" hidden>',
       '  <div class="yuzu-bgm-panel-head">',
       '    <strong>♪ 秘密基地BGM</strong>',
       '    <button class="yuzu-bgm-close" type="button" aria-label="BGM設定を閉じる">閉じる</button>',
       '  </div>',
-      '  <p class="yuzu-bgm-note">ボタンを押した人だけ音が流れます。前回ONの人は次回も自動再生を試します。</p>',
+      '  <p class="yuzu-bgm-note">BGMボタンを押すと音が流れます。音量はこの端末に保存されます。</p>',
       '  <div class="yuzu-bgm-main-row">',
       '    <button class="yuzu-bgm-toggle" type="button" aria-pressed="false">再生する</button>',
       '    <button class="yuzu-bgm-stop" type="button" hidden>停止</button>',
       '  </div>',
-      '  <label class="yuzu-bgm-next-row">',
-      '    <input class="yuzu-bgm-remember" type="checkbox">',
-      '    <span>次回もBGMを流す</span>',
-      '  </label>',
       '  <label class="yuzu-bgm-volume-row">',
       '    <span>音量</span>',
       '    <input class="yuzu-bgm-volume" type="range" min="0" max="0.8" step="0.01" aria-label="BGMの音量">',
@@ -2635,7 +2638,6 @@ setupMobileShortcutMenu();
     var closeButton = player.querySelector('.yuzu-bgm-close');
     var toggleButton = player.querySelector('.yuzu-bgm-toggle');
     var stopButton = player.querySelector('.yuzu-bgm-stop');
-    var rememberInput = player.querySelector('.yuzu-bgm-remember');
     var volumeInput = player.querySelector('.yuzu-bgm-volume');
     var statusNode = player.querySelector('.yuzu-bgm-status');
 
@@ -2645,12 +2647,6 @@ setupMobileShortcutMenu();
     audio.volume = getSavedVolume();
     volumeInput.value = String(audio.volume);
 
-    try {
-      rememberInput.checked = localStorage.getItem(STORAGE_ENABLED) === '1';
-    } catch (error) {
-      rememberInput.checked = false;
-    }
-
     function setExpanded(expanded) {
       panel.hidden = !expanded;
       player.classList.toggle('is-expanded', expanded);
@@ -2658,44 +2654,29 @@ setupMobileShortcutMenu();
       fabButton.setAttribute('aria-expanded', expanded ? 'true' : 'false');
     }
 
-    function saveEnabled(enabled) {
-      try {
-        localStorage.setItem(STORAGE_ENABLED, enabled ? '1' : '0');
-      } catch (error) {}
-    }
-
     function updatePlayingView(isPlaying) {
       toggleButton.setAttribute('aria-pressed', isPlaying ? 'true' : 'false');
       toggleButton.textContent = isPlaying ? '一時停止' : '再生する';
       stopButton.hidden = !isPlaying;
       player.classList.toggle('is-playing', isPlaying);
-      fabButton.textContent = isPlaying ? '♪ 再生中' : '♪ BGM';
+      fabButton.textContent = 'BGM';
     }
 
-    function playBgm(isAutoAttempt) {
+    function playBgm() {
       audio.volume = clampVolume(volumeInput.value);
       var playPromise = audio.play();
       if (!playPromise || typeof playPromise.then !== 'function') {
         updatePlayingView(true);
-        rememberInput.checked = true;
-        saveEnabled(true);
         setStatus(statusNode, 'BGM再生中です。');
         return;
       }
 
       playPromise.then(function () {
         updatePlayingView(true);
-        rememberInput.checked = true;
-        saveEnabled(true);
         setStatus(statusNode, 'BGM再生中です。');
       }).catch(function () {
         updatePlayingView(false);
-        if (isAutoAttempt) {
-          setStatus(statusNode, '自動再生が止められました。BGMボタンを開いて再生できます。');
-          fabButton.textContent = '♪ 再開';
-        } else {
-          setStatus(statusNode, '再生できませんでした。もう一度押してください。');
-        }
+        setStatus(statusNode, '再生できませんでした。もう一度押してください。');
       });
     }
 
@@ -2721,7 +2702,7 @@ setupMobileShortcutMenu();
 
     toggleButton.addEventListener('click', function () {
       if (audio.paused) {
-        playBgm(false);
+        playBgm();
       } else {
         audio.pause();
         updatePlayingView(false);
@@ -2732,19 +2713,8 @@ setupMobileShortcutMenu();
     stopButton.addEventListener('click', function () {
       audio.pause();
       try { audio.currentTime = 0; } catch (error) {}
-      rememberInput.checked = false;
-      saveEnabled(false);
       updatePlayingView(false);
-      setStatus(statusNode, 'BGMを停止しました。次回の自動再生もOFFにしました。');
-    });
-
-    rememberInput.addEventListener('change', function () {
-      saveEnabled(rememberInput.checked);
-      if (rememberInput.checked) {
-        setStatus(statusNode, '次回もBGMの自動再生を試します。');
-      } else {
-        setStatus(statusNode, '次回の自動再生をOFFにしました。');
-      }
+      setStatus(statusNode, 'BGMを停止しました。');
     });
 
     volumeInput.addEventListener('input', function () {
@@ -2759,15 +2729,7 @@ setupMobileShortcutMenu();
 
     setExpanded(false);
     updatePlayingView(false);
-
-    if (rememberInput.checked) {
-      setStatus(statusNode, '前回ONだったため、自動再生を試します。');
-      window.setTimeout(function () {
-        playBgm(true);
-      }, AUTO_PLAY_DELAY);
-    } else {
-      setStatus(statusNode, 'BGMボタンを開いて再生できます。');
-    }
+    setStatus(statusNode, 'BGMボタンを開いて再生できます。');
   }
 
   if (document.readyState === 'loading') {
