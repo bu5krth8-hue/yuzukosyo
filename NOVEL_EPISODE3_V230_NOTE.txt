@@ -1,0 +1,10 @@
+柚胡椒の秘密基地 v230 変更メモ
+
+- novel.html に第3話「幽霊、はじめてのクリック」を追加。
+- 公開日を 2026/06/30 に設定し、既存の novel-release-gate 方式で予約公開。
+- 最新採用挿絵を4分割し、本文の流れに合わせて4箇所へ配置。
+- 追加画像: assets/novel-episode3-illustration-01.webp ～ 04.webp
+- index.html の小説案内と更新履歴を更新。
+- キャッシュ番号を v230 に更新。
+
+基準ZIP: yuzukosyo-site-v229-secret-reward-quality-priority.zip
