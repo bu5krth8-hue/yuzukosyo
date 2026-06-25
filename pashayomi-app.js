@@ -165,8 +165,7 @@ function renderApp() {
        <div>
         <label class="control-label" for="ocrModeSelect">画像補正</label>
         <select id="ocrModeSelect">
-         <option value="textOnly" selected>文字だけ優先（絵・背景を弱める）</option>
-         <option value="storybook">絵本・教科書向け</option>
+         <option value="storybook" selected>絵本・教科書向け</option>
          <option value="storybookStrong">絵本・教科書向け・強め</option>
          <option value="adaptive">文字くっきり自動</option>
          <option value="document">書類向け</option>
@@ -1125,7 +1124,6 @@ function updateCropButtonLabel() {
   }
 
   if (mode === 'storybookStrong') return 3400
-  if (mode === 'textOnly') return 3300
   if (mode === 'storybook') return 3100
   if (scaleMode === 'max') return 2800
   if (scaleMode === 'strong') return 2500
@@ -1140,7 +1138,6 @@ function updateCropButtonLabel() {
  function getOcrMaxScale(mode, accuracy, scaleMode) {
   if (scaleMode === 'off') return 1
   if (mode === 'storybookStrong') return 3.5
-  if (mode === 'textOnly') return 3.4
   if (mode === 'storybook') return 3.25
   if (scaleMode === 'max') return 3
   if (scaleMode === 'strong') return 2.4
@@ -1488,152 +1485,6 @@ function updateCropButtonLabel() {
    }
   }
 
- context.putImageData(imageData, 0, 0)
- }
-
- function isolateTextInk(context, width, height, strict = false) {
-  const imageData = context.getImageData(0, 0, width, height)
-  const data = imageData.data
-  const totalPixels = width * height
-  const visited = new Uint8Array(totalPixels)
-  const kept = new Uint8Array(totalPixels)
-  const stack = new Int32Array(totalPixels)
-  const componentPixels = new Int32Array(totalPixels)
-  let originalInk = 0
-  let keptInk = 0
-
-  for (let i = 0; i < totalPixels; i += 1) {
-   if (data[i * 4] < 128) {
-    originalInk += 1
-   }
-  }
-
-  const maxAreaRatio = strict ? 0.010 : 0.018
-  const maxWidthRatio = strict ? 0.18 : 0.28
-  const maxHeightRatio = strict ? 0.20 : 0.30
-  const minInkArea = strict ? 2 : 1
-
-  for (let start = 0; start < totalPixels; start += 1) {
-   if (visited[start] || data[start * 4] >= 128) continue
-
-   let stackSize = 0
-   let area = 0
-   let minX = width
-   let maxX = 0
-   let minY = height
-   let maxY = 0
-   stack[stackSize] = start
-   stackSize += 1
-   visited[start] = 1
-
-   while (stackSize > 0) {
-    stackSize -= 1
-    const index = stack[stackSize]
-    const x = index % width
-    const y = Math.floor(index / width)
-    componentPixels[area] = index
-    area += 1
-    if (x < minX) minX = x
-    if (x > maxX) maxX = x
-    if (y < minY) minY = y
-    if (y > maxY) maxY = y
-
-    for (let dy = -1; dy <= 1; dy += 1) {
-     for (let dx = -1; dx <= 1; dx += 1) {
-      if (dx === 0 && dy === 0) continue
-      const nx = x + dx
-      const ny = y + dy
-      if (nx < 0 || nx >= width || ny < 0 || ny >= height) continue
-      const nextIndex = ny * width + nx
-      if (visited[nextIndex] || data[nextIndex * 4] >= 128) continue
-      visited[nextIndex] = 1
-      stack[stackSize] = nextIndex
-      stackSize += 1
-     }
-    }
-   }
-
-   const boxWidth = maxX - minX + 1
-   const boxHeight = maxY - minY + 1
-   const density = area / Math.max(1, boxWidth * boxHeight)
-   const tooTiny = area < minInkArea || (boxWidth <= 1 && boxHeight <= 1)
-   const tooLarge = area > totalPixels * maxAreaRatio || boxWidth > width * maxWidthRatio || boxHeight > height * maxHeightRatio
-   const tooLineLike = (boxWidth > width * 0.16 && boxHeight <= Math.max(3, height * 0.008)) || (boxHeight > height * 0.20 && boxWidth <= 3)
-   const tooBlockLike = density > 0.72 && area > 90 && (boxWidth > 12 || boxHeight > 12)
-   const tooPictureLike = strict && boxWidth > width * 0.11 && boxHeight > height * 0.08 && area > totalPixels * 0.0025
-   const keepComponent = !tooTiny && !tooLarge && !tooLineLike && !tooBlockLike && !tooPictureLike
-
-   if (keepComponent) {
-    for (let i = 0; i < area; i += 1) {
-     kept[componentPixels[i]] = 1
-     keptInk += 1
-    }
-   }
-  }
-
-  if (keptInk < Math.max(24, originalInk * 0.012)) {
-   return
-  }
-
-  if (strict) {
-   const componentKept = new Uint8Array(kept)
-   const rowInk = new Uint16Array(height)
-   for (let y = 0; y < height; y += 1) {
-    let count = 0
-    const rowOffset = y * width
-    for (let x = 0; x < width; x += 1) {
-     if (kept[rowOffset + x]) count += 1
-    }
-    rowInk[y] = count
-   }
-
-   const textRows = new Uint8Array(height)
-   const minRowInk = Math.max(2, Math.round(width * 0.0025))
-   let y = 0
-   while (y < height) {
-    while (y < height && rowInk[y] < minRowInk) y += 1
-    const startY = y
-    let peak = 0
-    let groupInk = 0
-    while (y < height && rowInk[y] >= minRowInk) {
-     peak = Math.max(peak, rowInk[y])
-     groupInk += rowInk[y]
-     y += 1
-    }
-    const endY = y - 1
-    const groupHeight = endY - startY + 1
-    const validLine = groupHeight >= 3 && groupHeight <= Math.max(42, height * 0.22) && peak <= width * 0.55 && groupInk >= minRowInk * groupHeight
-    if (validLine) {
-     const pad = Math.max(2, Math.round(groupHeight * 0.18))
-     for (let row = Math.max(0, startY - pad); row <= Math.min(height - 1, endY + pad); row += 1) {
-      textRows[row] = 1
-     }
-    }
-   }
-
-   let rowFilteredInk = 0
-   for (let index = 0; index < totalPixels; index += 1) {
-    if (kept[index] && textRows[Math.floor(index / width)]) {
-     rowFilteredInk += 1
-    } else {
-     kept[index] = 0
-    }
-   }
-
-   if (rowFilteredInk < Math.max(18, keptInk * 0.18)) {
-    kept.set(componentKept)
-   }
-  }
-
-  for (let index = 0; index < totalPixels; index += 1) {
-   const offset = index * 4
-   const value = kept[index] ? 0 : 255
-   data[offset] = value
-   data[offset + 1] = value
-   data[offset + 2] = value
-   data[offset + 3] = 255
-  }
-
   context.putImageData(imageData, 0, 0)
  }
 
@@ -1695,12 +1546,6 @@ function updateCropButtonLabel() {
     adjusted = contrast > 172 ? 255 : clampByte(contrast - 24)
    }
 
-   if (mode === 'textOnly') {
-    const contrast = clampByte((gray - 128) * 2.28 + 132)
-    const threshold = Math.max(148, Math.min(204, adaptiveThreshold + 18))
-    adjusted = contrast > threshold ? 255 : 0
-   }
-
    if (mode === 'storybook') {
     const contrast = clampByte((gray - 128) * 2.05 + 128)
     const threshold = Math.max(138, Math.min(196, adaptiveThreshold + 8))
@@ -1734,13 +1579,7 @@ function updateCropButtonLabel() {
 
   context.putImageData(imageData, 0, 0)
 
-  if (mode === 'textOnly') {
-   isolateTextInk(context, canvas.width, canvas.height, true)
-   thickenDarkPixels(context, canvas.width, canvas.height)
-  }
-
   if (mode === 'storybook' || mode === 'storybookStrong') {
-   isolateTextInk(context, canvas.width, canvas.height, false)
    thickenDarkPixels(context, canvas.width, canvas.height)
   }
 
@@ -1849,34 +1688,6 @@ function updateCropButtonLabel() {
    .join('\n')
  }
 
- function countLikelyTextChars(value) {
-  return (String(value || '').match(/[\u3040-\u30ff\u3400-\u9fff\u3005\u3006\u30fc\u3001-\u303f0-9\uff10-\uff19A-Za-z\uff21-\uff3a\uff41-\uff5a]/g) || []).length
- }
-
- function countOcrNoiseChars(value) {
-  return (String(value || '').match(/[~^_=`{}\[\]<>|\\/@#$%&*+=■□◆◇▲△▼▽●○◎★☆※〓�]/g) || []).length
- }
-
- function keepLikelyTextLines(text) {
-  return String(text || '')
-   .split('\n')
-   .map((line) => line.trim())
-   .filter((line) => {
-    if (!line) return false
-    const compact = line.replace(/\s/g, '')
-    const textCount = countLikelyTextChars(compact)
-    const noiseCount = countOcrNoiseChars(compact)
-    const asciiCount = (compact.match(/[A-Za-z0-9]/g) || []).length
-    if (compact.length <= 1) return false
-    if (textCount === 0) return false
-    if (compact.length <= 3 && textCount < 2) return false
-    if (noiseCount > Math.max(2, textCount * 0.45)) return false
-    if (languageSelect?.value !== 'jpn_eng' && asciiCount > textCount && textCount < 5) return false
-    return true
-   })
-   .join('\n')
- }
-
  function cleanupOcrText(text) {
   const normalized = fixSeparatedDakuten(text || '')
    .normalize('NFKC')
@@ -1892,28 +1703,22 @@ function updateCropButtonLabel() {
    .replace(/\n{3,}/g, '\n\n')
    .trim()
 
-  return keepLikelyTextLines(removeOcrNoiseLines(normalized))
+  return removeOcrNoiseLines(normalized)
    .replace(/\n{3,}/g, '\n\n')
    .trim()
  }
 
  function scoreOcrText(text, confidence) {
   const cleaned = cleanupOcrText(text || '')
-  const textCharCount = countLikelyTextChars(cleaned)
-  const kanaCount = (cleaned.match(/[\u3040-\u30ff]/g) || []).length
-  const symbolNoise = countOcrNoiseChars(cleaned)
+  const japaneseCount = (cleaned.match(/[ぁ-んァ-ン一-龥々]/g) || []).length
+  const symbolNoise = (cleaned.match(/[~^_=`{}\[\]<>]/g) || []).length
   const usableLength = cleaned.replace(/\s/g, '').length
-  const shortLinePenalty = cleaned
-   .split('\n')
-   .filter((line) => line.trim() && countLikelyTextChars(line) < 3)
-   .length * 1.6
-  return (Number(confidence) || 0) + textCharCount * 1.15 + kanaCount * 0.35 + usableLength * 0.08 - symbolNoise * 4 - shortLinePenalty
+  return (Number(confidence) || 0) + japaneseCount * 0.9 + usableLength * 0.12 - symbolNoise * 2
  }
 
 
  function getOcrModeLabel(mode) {
   const labels = {
-   textOnly: '文字だけ優先',
    storybook: '絵本・教科書向け',
    storybookStrong: '絵本・教科書向け・強め',
    document: '書類向け',
@@ -1935,25 +1740,16 @@ function updateCropButtonLabel() {
   const accuracy = accuracySelect?.value || 'normal'
 
   if (accuracy === 'best') {
-   if (selectedMode === 'textOnly') {
-    return ['textOnly', 'storybook', 'storybookStrong']
-   }
    if (selectedMode === 'storybook') {
-    return ['textOnly', 'storybook', 'storybookStrong']
+    return ['storybook', 'storybookStrong', 'adaptive']
    }
    if (selectedMode === 'storybookStrong') {
-    return ['textOnly', 'storybookStrong', 'storybook']
+    return ['storybookStrong', 'storybook', 'smallText']
    }
    return Array.from(new Set([selectedMode, 'adaptive', 'document'])).slice(0, 3)
   }
 
   if (accuracy === 'high') {
-   if (selectedMode === 'textOnly') {
-    return ['textOnly', 'storybook']
-   }
-   if (selectedMode === 'storybook' || selectedMode === 'storybookStrong') {
-    return Array.from(new Set(['textOnly', selectedMode]))
-   }
    return Array.from(new Set([selectedMode, selectedMode === 'document' ? 'adaptive' : 'document']))
   }
 
@@ -1981,12 +1777,6 @@ function updateCropButtonLabel() {
    await worker.setParameters({
     tessedit_pageseg_mode: layoutSelect?.value || '6',
     preserve_interword_spaces: '1',
-    tessedit_do_invert: '0',
-    tessedit_char_blacklist: '~^_=`{}[]<>|\\/@#$%&*+=■□◆◇▲△▼▽●○◎★☆※〓',
-    textord_heavy_nr: '1',
-    textord_noise_rejwords: '1',
-    textord_noise_rejrows: '1',
-    user_defined_dpi: '300',
    })
 
    const passModes = getOcrPassModes()
