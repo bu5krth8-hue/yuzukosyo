@@ -1,0 +1,37 @@
+/* v234 additions inherit the current weekday palette. */
+body .topbar .topbar-actions.is-open #shortcutMenuLinks { display:grid !important; }
+html body .topbar .topbar-actions #shortcutMenuLinks [hidden],
+html body#top .topbar .topbar-actions #shortcutMenuLinks [hidden] { display:none !important; }
+.destination-search, .destination-extra-links, .destination-search-status { grid-column:1 / -1; min-width:0; width:100%; }
+.destination-search { margin:0 0 4px; }
+.destination-search label { display:block; margin:0 0 8px; color:var(--text); font-weight:800; font-size:14px; }
+.destination-search-row { display:flex; gap:6px; }
+.destination-search input { min-width:0; width:100%; min-height:46px; padding:10px; border:1px solid var(--line); border-radius:12px; font:inherit; font-size:16px; background:rgba(0,0,0,.6); color:var(--text); }
+.destination-search input::placeholder { color:var(--muted); opacity:1; font-size:12px; }
+.destination-search button { flex-shrink:0; min-height:46px; padding:8px; color:var(--text); background:var(--panel); border:1px solid var(--line); border-radius:12px; cursor:pointer; }
+.destination-extra-links { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+body .topbar #shortcutMenuLinks .destination-extra-links a { display:flex !important; align-items:center; justify-content:center; min-height:46px; padding:10px 8px; font-size:12px; font-weight:800; text-align:center; color:var(--text); background:var(--panel); border:1px solid var(--line); border-radius:14px; text-decoration:none; line-height:1.5; }
+.destination-search-status { margin:4px 0 0; color:var(--muted); line-height:1.6; font-size:13px; }
+.destination-search input:focus-visible, .destination-search button:focus-visible, .novel-reader-controls button:focus-visible, .upgrade-action-button:focus-visible { outline:3px solid var(--theme-accent2,var(--blue)); outline-offset:2px; }
+.novel-reader-controls { margin:16px auto 24px; padding:20px; max-width:920px; border:1px solid var(--line); border-radius:20px; background:var(--panel); }
+.novel-reader-controls h2 { margin:0 0 12px; font-size:20px; }
+.novel-reader-controls p { line-height:1.7; color:var(--muted); font-size:14px; }
+.novel-size-row { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+.novel-reader-controls button, .upgrade-action-button { cursor:pointer; min-height:46px; padding:10px 16px; border:1px solid var(--line); border-radius:14px; font:inherit; font-weight:800; color:var(--text); background:var(--panel2); }
+.novel-reader-controls button[aria-pressed="true"] { outline:2px solid var(--theme-accent2,var(--blue)); outline-offset:2px; }
+.novel-resume-button { margin-top:14px; }
+.novel-page[data-reader-size="large"] .novel-body p { font-size:20px !important; line-height:2 !important; }
+.novel-page[data-reader-size="extra"] .novel-body p { font-size:24px !important; line-height:2 !important; }
+.novel-episode-panel > summary { scroll-margin-top:110px; }
+.upgrade-action-button { display:block; margin:14px auto 0; }
+.upgrade-action-button:disabled { opacity:.6; cursor:wait; }
+@media(max-width:760px) { .novel-reader-controls { padding:18px 14px; } .novel-size-row { gap:8px; } .novel-size-row button { flex:1; } .novel-resume-button { width:100%; } }
+.novel-publication-plan { max-width:920px; margin:16px auto; padding:20px; border:1px solid var(--line); border-radius:20px; background:var(--panel); }
+.novel-publication-plan h2 { margin:0 0 12px; font-size:22px; }
+.novel-publication-plan p { color:var(--muted); line-height:1.8; }
+.novel-publication-plan ol { list-style:none; margin:14px 0; padding:0; display:grid; gap:12px; }
+.novel-publication-plan li { display:grid; grid-template-columns:110px minmax(0,1fr) auto; align-items:center; gap:12px; padding:12px; border:1px solid var(--line); border-radius:14px; line-height:1.7; }
+.novel-publication-plan time { font-weight:800; }
+.novel-publication-plan strong { font-size:12px; padding:4px 8px; border:1px solid var(--line); border-radius:12px; white-space:nowrap; color:var(--muted); }
+.novel-publication-plan .is-published strong { color:var(--text); border-color:var(--theme-accent2,var(--blue)); }
+@media(max-width:760px) { .novel-publication-plan { padding:18px 14px; } .novel-publication-plan h2 { font-size:20px; } .novel-publication-plan li { grid-template-columns:1fr auto; gap:6px; } .novel-publication-plan li > span { grid-column:1 / -1; grid-row:2; } }

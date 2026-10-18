@@ -32,7 +32,7 @@ function getSavedYuzuThemeOverride() {
   }
   return { theme, expiresAt };
  } catch (error) {
-  localStorage.removeItem(YUZU_THEME_OVERRIDE_KEY);
+  try { localStorage.removeItem(YUZU_THEME_OVERRIDE_KEY); } catch (_) {}
   return null;
  }
 }
@@ -101,8 +101,19 @@ function formatYuzuThemeExpiry(expiresAt) {
   updateThemePage();
   document.querySelectorAll("[data-theme-pick]").forEach((button) => {
    button.addEventListener("click", () => {
-    setYuzuThemeOverride(button.dataset.themePick);
-    updateThemePage();
+    try {
+     setYuzuThemeOverride(button.dataset.themePick);
+     updateThemePage();
+    } catch (_) {
+     const status = document.getElementById("themeOverrideStatus");
+     if (status) status.textContent = "テーマ設定を保存できません。このブラウザのサイトデータ保存設定を確認してください。";
+    }
+   });
+  });
+  document.querySelectorAll("[data-theme-reset]").forEach((button) => {
+   button.addEventListener("click", () => {
+    try { localStorage.removeItem(YUZU_THEME_OVERRIDE_KEY); updateThemePage(); }
+    catch (_) { const status = document.getElementById("themeOverrideStatus"); if (status) status.textContent = "テーマ設定を戻せませんでした。時間をおいてもう一度お試しください。"; }
    });
   });
   document.addEventListener("visibilitychange", () => {
@@ -116,16 +127,34 @@ function formatYuzuThemeExpiry(expiresAt) {
  }
 })();
 const TWITCH_FUNCTION_URL = "/api/twitch";
+let twitchRequestInFlight = false;
 async function checkLiveStatus() {
+ if (!document.getElementById("liveBadge") && !document.getElementById("scheduleStatus")) return;
+ if (twitchRequestInFlight) return;
+ twitchRequestInFlight = true;
+ const refreshButton = document.getElementById("liveRefreshButton");
+ if (refreshButton) { refreshButton.disabled = true; refreshButton.textContent = "配信情報を確認中…"; }
+ const controller = new AbortController();
+ const timeout = window.setTimeout(() => controller.abort(), 12000);
  try {
-  const response = await fetch(TWITCH_FUNCTION_URL, { cache: "no-store" });
+  const response = await fetch(TWITCH_FUNCTION_URL, { cache: "no-store", signal: controller.signal });
+  if (!response.ok) throw new Error("Twitch情報の取得に失敗しました");
   const data = await response.json();
+  if (data.configured === false || data.error) {
+   showLiveError();
+   updateScheduleArea(data);
+   return;
+  }
   updateLiveArea(data);
   updateScheduleArea(data);
  } catch (error) {
   console.error("Twitch取得エラー:", error);
   showLiveError();
   showScheduleError();
+ } finally {
+  window.clearTimeout(timeout);
+  twitchRequestInFlight = false;
+  if (refreshButton) { refreshButton.disabled = false; refreshButton.textContent = "🔄 配信情報を再確認"; }
  }
 }
 function updateLiveArea(data) {
@@ -231,16 +260,20 @@ function updateScheduleArea(data) {
   "予定変更はTwitch・X・Discordで確認してね。";
 }
 function showLiveError() {
+ const liveBadge = document.getElementById("liveBadge");
+ if (liveBadge) liveBadge.classList.remove("is-checking", "is-live", "is-offline");
+ document.querySelector(".schedule-btn")?.classList.remove("is-live");
+ document.getElementById("twitchSwitch")?.classList.remove("is-live");
  const liveBadgeText = document.getElementById("liveBadgeText");
  const liveDetail = document.getElementById("liveDetail");
  const todayGame = document.getElementById("todayGame");
  const twitchSwitchText = document.getElementById("twitchSwitchText");
  const liveThumb = document.getElementById("liveThumb");
  if (liveBadgeText)
-  liveBadgeText.innerText = "⚠️ 確認失敗";
+  liveBadgeText.innerText = "Twitchで確認 ↗";
  if (liveDetail)
   liveDetail.innerText =
-   "Twitchの配信状態を取得できませんでした";
+   "配信状態を確認できません。上のボタンからTwitchを開けます。";
  if (todayGame)
   todayGame.innerHTML =
    "🎮 今日のゲーム：確認失敗";
@@ -338,6 +371,7 @@ const tanuFaces = [
 ];
 let faceIndex = 0;
 function rotateMascots() {
+ if (document.hidden || document.documentElement.dataset.lightMode === "on") return;
  if (
   !ghostMascot ||
   !tanuMascot ||
@@ -1574,9 +1608,9 @@ function setupStampBackupButtons() {
    try {
     await copyTextToClipboard(url);
     button.textContent = "コピーしました";
-    if (status) status.textContent = "PC・スマホで履歴削除する前に、コピーしたリンクをメモ・LINE・自分宛メールなどに保存してください。消えた後はそのリンクから復元できます。";
+    if (status) status.textContent = "PC・スマホでサイトデータを消す前に、コピーしたリンクをメモ・LINE・自分宛メールなどに保存してください。消えた後はそのリンクから復元できます。";
     if (typeof showSecretToast === "function") {
-     showSecretToast("復元リンクをコピーしました", "検索履歴やサイトデータを消す前に、メモ・LINE・自分宛メールなどへ保存してください。", false);
+     showSecretToast("復元リンクをコピーしました", "サイトデータを消す前に、メモ・LINE・自分宛メールなどへ保存してください。", false);
     }
    } catch (error) {
     button.textContent = originalText;
@@ -2292,6 +2326,7 @@ function setupCursorParticles() {
   }
  };
  window.addEventListener("mousemove", (event) => {
+  if (document.hidden || document.documentElement.dataset.lightMode === "on") return;
   cursorX = event.clientX;
   cursorY = event.clientY;
   if (cursorLight && !cursorFrame) {
@@ -2407,10 +2442,12 @@ setupUpdateHistoryMore();
 function setupStableShortcutJumps() {
  const nav = document.querySelector(".topbar-actions");
  if (!nav) return;
- const anchorMap = new Set(["#top", "#socialLinks", "#visitStamp", "#schedule", "#omikuji", "#themeColors", "#novel", "#apps", "#updates", "#stream-gear"]);
+ const anchorMap = new Set(["#top", "#lineStamps", "#appSales", "#mainContent", "#stampHistoryPage", "#omikujiHistoryPage", "#socialLinks", "#visitStamp", "#schedule", "#omikuji", "#themeColors", "#novel", "#apps", "#updates", "#stream-gear"]);
  const jumpPrepareTargets = [
   ".social-anchor",
   ".social-switches",
+  ".shop-switches",
+  ".site-guide",
   ".visit-stamp-section",
   ".mascot-area",
   ".beginner-section",
@@ -2437,22 +2474,9 @@ function setupStableShortcutJumps() {
  }
  function getShortcutOffset(hash) {
   if (hash === "#top") return 0;
-  const width = window.innerWidth || document.documentElement.clientWidth || 0;
-  if (width <= 760) {
-   const toggle = document.querySelector(".mobile-shortcut-toggle");
-   const topbar = document.querySelector(".topbar");
-   const toggleHeight = toggle ? Math.ceil(toggle.getBoundingClientRect().height) : 42;
-   const topbarTop = topbar ? Math.max(0, Math.round(topbar.getBoundingClientRect().top)) : 16;
-   return Math.max(76, topbarTop + toggleHeight + 18);
-  }
-  const actions = document.querySelector(".topbar-actions");
-  const navHeight = actions ? Math.ceil(actions.getBoundingClientRect().height) : 0;
-  if (hash === "#stream-gear" || hash === "#updates" || hash === "#visitStamp" || hash === "#themeColors" || hash === "#novel" || hash === "#apps" || hash === "#socialLinks") {
-   if (width <= 900) return Math.max(188, navHeight + 16);
-   return 210;
-  }
-  if (width <= 900) return Math.max(132, navHeight + 14);
-  return 170;
+  const toggle = document.querySelector(".mobile-shortcut-toggle");
+  const bottom = toggle ? toggle.getBoundingClientRect().bottom : 58;
+  return Math.max(80, Math.ceil(bottom) + 18);
  }
  function getTargetTop(hash) {
   if (hash === "#top") return 0;
@@ -2470,32 +2494,41 @@ function setupStableShortcutJumps() {
   });
  }
  function performStableJump(hash, shouldUpdateHash) {
-  if (!anchorMap.has(hash)) return;
+  if (!anchorMap.has(hash) || !document.querySelector(hash)) return;
   prepareShortcutLayoutOnce();
   window.requestAnimationFrame(() => {
    scrollToShortcutTarget(hash);
-   if (shouldUpdateHash && history.pushState) {
+   if (shouldUpdateHash) {
+    const destination = document.querySelector(hash);
+    if (destination) {
+     if (!destination.matches("a, button, input, select, textarea, [tabindex]")) destination.setAttribute("tabindex", "-1");
+     destination.focus({ preventScroll: true });
+    }
+   }
+   if (shouldUpdateHash && location.hash !== hash && history.pushState) {
     history.pushState(null, "", hash);
    }
   });
  }
- nav.addEventListener("click", (event) => {
+ document.addEventListener("click", (event) => {
+  if (event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
   const target = event.target instanceof Element ? event.target : event.target && event.target.parentElement;
   const link = target ? target.closest('a[href^="#"]') : null;
   if (!link) return;
   const hash = link.hash;
-  if (!anchorMap.has(hash)) return;
+  if (!anchorMap.has(hash) || !document.querySelector(hash)) return;
   event.preventDefault();
   performStableJump(hash, true);
   const mobileToggle = document.querySelector(".mobile-shortcut-toggle");
-  const isMobile = (window.innerWidth || document.documentElement.clientWidth || 0) <= 760;
-  if (isMobile && nav.classList.contains("is-open")) {
+  if (nav.classList.contains("is-open")) {
    window.requestAnimationFrame(() => {
     nav.classList.remove("is-open");
     if (mobileToggle) mobileToggle.setAttribute("aria-expanded", "false");
    });
   }
  });
+ window.addEventListener("popstate", () => performStableJump(window.location.hash || "#top", false));
+ window.addEventListener("hashchange", () => performStableJump(window.location.hash || "#top", false));
  function runInitialShortcutJump() {
   const initialHash = window.location.hash;
   if (!initialHash || !anchorMap.has(initialHash)) return;
@@ -2514,14 +2547,27 @@ function setupMobileShortcutMenu() {
  const actions = document.querySelector(".topbar-actions");
  const toggle = document.querySelector(".mobile-shortcut-toggle");
  if (!actions || !toggle) return;
- function closeMenu() {
+ document.documentElement.classList.add("navigation-ready");
+ function closeMenu(returnFocus = false) {
   actions.classList.remove("is-open");
   toggle.setAttribute("aria-expanded", "false");
+  if (returnFocus) toggle.focus({ preventScroll: true });
  }
  function openMenu() {
   actions.classList.add("is-open");
   toggle.setAttribute("aria-expanded", "true");
  }
+ actions.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && actions.classList.contains("is-open")) {
+   event.preventDefault(); closeMenu(true);
+  }
+ });
+ actions.addEventListener("focusout", () => {
+  window.requestAnimationFrame(() => { if (!actions.contains(document.activeElement)) closeMenu(); });
+ });
+ actions.addEventListener("click", (event) => {
+  if (event.target.closest("a")) closeMenu();
+ });
  toggle.addEventListener("click", (event) => {
   event.preventDefault();
   event.stopPropagation();
@@ -2539,17 +2585,17 @@ function setupMobileShortcutMenu() {
  });
 }
 setupMobileShortcutMenu();
+function getNovelReleaseDateKey(date = new Date()) {
+ const parts = new Intl.DateTimeFormat("en", {timeZone:"Asia/Tokyo",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(date);
+ const values = Object.fromEntries(parts.map(part => [part.type,part.value]));
+ return `${values.year}-${values.month}-${values.day}`;
+}
 (function(){
- function yuzuLocalDateKey(d){
-  var y=d.getFullYear();
-  var m=String(d.getMonth()+1).padStart(2,"0");
-  var day=String(d.getDate()).padStart(2,"0");
-  return y+"-"+m+"-"+day;
- }
+ var releaseTimer = null;
  function setupNovelReleaseGates(){
   var gates=document.querySelectorAll(".novel-release-gate[data-release-date]");
-  if(!gates.length){return;}
-  var today=yuzuLocalDateKey(new Date());
+  if(!gates.length && !document.getElementById("novelPublicationStatus")){return;}
+  var today=getNovelReleaseDateKey();
   gates.forEach(function(gate){
    var release=(gate.getAttribute("data-release-date")||"").trim();
    if(release && today>=release){
@@ -2558,7 +2604,13 @@ setupMobileShortcutMenu();
     gate.classList.remove("is-unlocked");
    }
   });
+  document.dispatchEvent(new CustomEvent("yuzu:novel-release-update"));
+  if(releaseTimer) window.clearTimeout(releaseTimer);
+  var untilMidnight = 86400000 - ((Date.now() + 32400000) % 86400000) + 100;
+  releaseTimer = window.setTimeout(setupNovelReleaseGates, Math.max(1000, untilMidnight));
  }
+ document.addEventListener("visibilitychange", function(){if(!document.hidden) setupNovelReleaseGates();});
+ window.addEventListener("pageshow",setupNovelReleaseGates);
  if(document.readyState==="loading"){
   document.addEventListener("DOMContentLoaded",setupNovelReleaseGates);
  }else{
@@ -2575,27 +2627,27 @@ setupMobileShortcutMenu();
     {
       id: 'himitsukichi-main',
       title: '秘密基地メイン',
-      src: 'assets/bgm/01_himitsukichi_main.mp3?v=232'
+      src: 'assets/bgm/01_himitsukichi_main.mp3?v=235'
     },
     {
       id: 'yuurei-light',
       title: '幽霊と小さな灯り',
-      src: 'assets/bgm/02_yuurei_to_chiisai_akari.mp3?v=232'
+      src: 'assets/bgm/02_yuurei_to_chiisai_akari.mp3?v=235'
     },
     {
       id: 'tanuchan-meeting',
       title: 'たぬちゃんの作戦会議',
-      src: 'assets/bgm/03_tanuchan_no_sakusenkaigi.mp3?v=232'
+      src: 'assets/bgm/03_tanuchan_no_sakusenkaigi.mp3?v=235'
     },
     {
       id: 'omikuji-time',
       title: '今日のおみくじタイム',
-      src: 'assets/bgm/04_kyou_no_omikuji_time.mp3?v=232'
+      src: 'assets/bgm/04_kyou_no_omikuji_time.mp3?v=235'
     },
     {
       id: 'secret-room-key',
       title: '秘密の部屋と月の鍵',
-      src: 'assets/bgm/05_secret_room_moon_key.mp3?v=232'
+      src: 'assets/bgm/05_secret_room_moon_key.mp3?v=235'
     }
   ];
 
