@@ -1,94 +1,752 @@
-<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><script>(function(){var days=['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];var theme=days[new Date().getDay()]||'monday';try{var raw=localStorage.getItem('yuzuThemeOverride');if(raw){var saved=JSON.parse(raw);if(saved&&saved.themeKey&&saved.expiresAt&&Date.now()<Number(saved.expiresAt)){theme=saved.themeKey}else{localStorage.removeItem('yuzuThemeOverride')}}}catch(e){}document.documentElement.setAttribute('data-yuzu-theme',theme);})();</script><link rel="stylesheet" href="style.css?v=232"><title>小説 秘密の話｜柚胡椒の秘密基地</title><meta name="description" content="柚胡椒の秘密基地の小説置き場。幽霊とたぬちゃんの物語を作品ごと、話数ごとに読めるページです。"><link rel="canonical" href="https://yuzukosyo.pages.dev/novel.html"><meta name="robots" content="index, follow"><meta property="og:type" content="article"><meta property="og:site_name" content="柚胡椒の秘密基地"><meta property="og:title" content="小説 秘密の話｜柚胡椒の秘密基地"><meta property="og:description" content="幽霊とたぬちゃんの物語を、作品名と話数を開いて読める小説置き場です。"><meta property="og:url" content="https://yuzukosyo.pages.dev/novel.html"><meta name="twitter:card" content="summary"><link rel="prefetch" href="index.html" as="document"></head><body><div class="cursor-light" id="cursorLight"></div><div class="bg-glow glow-a"></div><div class="bg-glow glow-b"></div><div class="stars" aria-hidden="true"></div><div class="shooting-stars" aria-hidden="true"><span></span><span></span><span></span></div><div class="particle-layer" id="particleLayer" aria-hidden="true"></div><header class="topbar"><div class="topbar-actions" aria-label="ホームへのショートカット"><button class="mobile-shortcut-toggle" type="button" aria-expanded="false" aria-controls="shortcutMenuLinks">🌙 メニュー</button><div class="shortcut-menu-links" id="shortcutMenuLinks"><a class="top-jump-btn" href="index.html#top" aria-label="ホームの一番上へ移動">⬆ TOPへ戻る</a><a class="social-jump-btn theme-jump-btn" href="index.html#socialLinks" aria-label="ホームの各SNSリンクへ移動">📱 各SNS</a><a class="line-stamp-jump-btn theme-jump-btn" href="https://store.line.me/stickershop/author/3180349/ja" target="_blank" rel="noopener" aria-label="LINEスタンプ販売ページを開く">💬 LINEスタンプ</a><a class="app-sales-jump-btn theme-jump-btn" href="https://yuzukosyo07.booth.pm/" target="_blank" rel="noopener" aria-label="アプリ販売ページを開く">🛍️ アプリ販売</a><a class="stamp-jump-btn" href="index.html#visitStamp" aria-label="ホームの来場スタンプカードへ移動">📮 スタンプカード</a><a class="schedule-btn" href="index.html#schedule">🔔 配信予定</a><a class="omikuji-jump-btn" href="index.html#omikuji" aria-label="ホームの今日の柚胡椒くじへ移動">🔮 柚胡椒くじ</a><a class="theme-jump-btn" href="index.html#themeColors" aria-label="ホームのテーマカラー変更へ移動">🎨 テーマカラー変更</a><a class="novel-jump-btn theme-jump-btn" href="index.html#novel" aria-label="ホームの小説 秘密の話欄へ移動">📖 小説 秘密の話</a><a class="updates-jump-btn" href="index.html#updates" aria-label="ホームの更新履歴へ移動">📝 更新履歴</a><a class="theme-jump-btn" href="apps.html" aria-label="アプリ関係の部屋へ移動">🧩 アプリ関係</a><a class="floating-gear-jump" href="index.html#stream-gear" aria-label="ホームの配信で使ってるものへ移動">🎮 配信で使ってるもの</a></div></div></header><main class="page sub-page novel-page"><section class="hero sub-hero novel-hero"><p class="eyebrow">- SECRET BASE NOVEL -</p><h1 class="sub-page-title">📖 小説 秘密の話</h1><p class="catchcopy novel-catchcopy">幽霊とたぬちゃんの物語を、ここに少しずつ置いていきます。</p></section><section class="cards novel-bookshelf-section"><article class="card novel-bookshelf-card"><p class="section-kicker">小説置き場</p><h2>秘密基地の物語一覧</h2><p class="novel-guide-text">ここは、秘密基地にまつわる小説をまとめていく場所です。今後追加する小説も、このページから読めるようにしていきます。</p><p class="novel-guide-text">作品名を押すと話数一覧が開き、話数を押すと本文が開きます。</p><div class="novel-accordion-list" aria-label="小説一覧"><details class="novel-accordion novel-series-panel"><summary class="novel-accordion-button novel-series-button"><span class="novel-button-kicker">小説①</span><span class="novel-button-title">幽霊とたぬちゃん、配信者になる</span><span class="novel-button-mark" aria-hidden="true">＋</span></summary><div class="novel-series-content"><p class="novel-series-note">人間世界から落ちてきた高性能ゲーミングPCをきっかけに、幽霊とたぬちゃんがゲームと配信に出会っていく物語です。</p><details class="novel-accordion novel-episode-panel"><summary class="novel-accordion-button novel-episode-button"><span class="novel-button-kicker">第1話</span><span class="novel-button-title">人間世界から落ちてきた箱</span><span class="novel-button-mark" aria-hidden="true">＋</span></summary><article class="novel-episode-content"><p class="novel-body-label">第1話 本編</p><div class="novel-body"><p>紫色のネオンが、夜の秘密基地をぼんやり照らしていた。</p><p>そこは、人間世界から少しだけ外れた場所にある、不思議な小さな隠れ家だった。</p><p>古い木の扉。<br>
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1"><script>(function(){var days=['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];var theme=days[new Date().getDay()]||'monday';try{var raw=localStorage.getItem('yuzuThemeOverride');if(raw){var saved=JSON.parse(raw);if(saved&&saved.themeKey&&saved.expiresAt&&Date.now()<Number(saved.expiresAt)){theme=saved.themeKey}else{localStorage.removeItem('yuzuThemeOverride')}}}catch(e){}document.documentElement.setAttribute('data-yuzu-theme',theme);})();</script><link rel="stylesheet" href="style.css?v=235">
+<title>小説 秘密の話｜柚胡椒の秘密基地</title>
+<meta name="description" content="柚胡椒の秘密基地の小説置き場。幽霊とたぬちゃんの物語を作品ごと、話数ごとに読めるページです。">
+<link rel="canonical" href="https://yuzukosyo.pages.dev/novel.html">
+<meta name="robots" content="index, follow">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="柚胡椒の秘密基地">
+<meta property="og:title" content="小説 秘密の話｜柚胡椒の秘密基地">
+<meta property="og:description" content="幽霊とたぬちゃんの物語を、作品名と話数を開いて読める小説置き場です。">
+<meta property="og:url" content="https://yuzukosyo.pages.dev/novel.html">
+<meta name="twitter:card" content="summary">
+<link rel="prefetch" href="index.html" as="document">
+<link rel="stylesheet" href="navigation-v233.css?v=235">
+<link rel="stylesheet" href="upgrades-v234.css?v=235">
+<link rel="stylesheet" href="daily-v235.css?v=235">
+<script>try{document.documentElement.dataset.lightMode=localStorage.getItem("yuzuLightModeV1")==="true"?"on":"off"}catch(e){}</script>
+</head>
+<body>
+<div class="cursor-light" id="cursorLight">
+</div>
+<div class="bg-glow glow-a">
+</div>
+<div class="bg-glow glow-b">
+</div>
+<div class="stars" aria-hidden="true">
+</div>
+<div class="shooting-stars" aria-hidden="true"><span></span><span></span><span></span>
+</div>
+<div class="particle-layer" id="particleLayer" aria-hidden="true">
+</div>
+<header class="topbar">
+<div class="topbar-actions" aria-label="ホームへのショートカット"><button class="mobile-shortcut-toggle" type="button" aria-expanded="false" aria-controls="shortcutMenuLinks">🌙 メニュー</button>
+<nav class="shortcut-menu-links" id="shortcutMenuLinks" aria-label="ホームの各コーナー"><a class="top-jump-btn" href="index.html#top" aria-label="ホームの一番上へ移動">⬆ TOPへ戻る</a><a class="social-jump-btn theme-jump-btn" href="index.html#socialLinks" aria-label="ホームの各SNSリンクへ移動">📱 各SNS</a><a class="line-stamp-jump-btn theme-jump-btn" href="index.html#lineStamps" aria-label="ホームのLINEスタンプ紹介欄へ移動">💬 LINEスタンプ</a><a class="app-sales-jump-btn theme-jump-btn" href="index.html#appSales" aria-label="ホームのアプリ販売紹介欄へ移動">🛍️ アプリ販売</a><a class="stamp-jump-btn" href="index.html#visitStamp" aria-label="ホームの来場スタンプカードへ移動">📮 スタンプカード</a><a class="schedule-btn" href="index.html#schedule">🔔 配信予定</a><a class="omikuji-jump-btn" href="index.html#omikuji" aria-label="ホームの今日の柚胡椒くじへ移動">🔮 柚胡椒くじ</a><a class="theme-jump-btn" href="index.html#themeColors" aria-label="ホームのテーマカラー変更へ移動">🎨 テーマカラー変更</a><a class="novel-jump-btn theme-jump-btn" href="index.html#novel" aria-label="ホームの小説 秘密の話欄へ移動">📖 小説 秘密の話</a><a class="theme-jump-btn" href="index.html#apps" aria-label="ホームのアプリ紹介欄へ移動">🧩 アプリ関係</a><a class="floating-gear-jump" href="index.html#stream-gear" aria-label="ホームの配信で使ってるものへ移動">🎮 配信で使ってるもの</a><a class="updates-jump-btn" href="index.html#updates" aria-label="ホームの更新履歴へ移動">📝 更新履歴</a></nav>
+</div>
+</header>
+<a class="skip-link" href="#mainContent">本文へ移動</a><main id="mainContent" tabindex="-1" class="page sub-page novel-page"><nav class="site-breadcrumbs" aria-label="現在地"><a href="index.html">🏠 ホーム</a><span aria-hidden="true">›</span><span aria-current="page">📖 小説 秘密の話</span></nav>
+<section class="hero sub-hero novel-hero">
+<p class="eyebrow">- SECRET BASE NOVEL -</p>
+<h1 class="sub-page-title">📖 小説 秘密の話</h1>
+<p class="catchcopy novel-catchcopy">幽霊とたぬちゃんの物語を、ここに少しずつ置いていきます。</p>
+</section>
+<section class="novel-publication-plan" aria-label="小説の公開予定"><h2>📅 全6話・公開スケジュール</h2><p>第1〜3話は公開中。第4話からは1週間ごとに続きます。</p><ol><li data-novel-release="2026-10-18"><time datetime="2026-10-18">2026/10/18</time><span>第4話「秘密基地、配信準備中」</span><strong data-novel-release-label>公開予定</strong></li><li data-novel-release="2026-10-25"><time datetime="2026-10-25">2026/10/25</time><span>第5話「はじめての配信」</span><strong data-novel-release-label>公開予定</strong></li><li data-novel-release="2026-11-01"><time datetime="2026-11-01">2026/11/01</time><span>第6話（最終話）「柚胡椒の秘密基地」</span><strong data-novel-release-label>公開予定</strong></li></ol><p class="novel-publication-note">公開日の0:00（日本時間）に本文が開きます。</p></section>
+<section class="novel-reader-controls" id="novelReaderControls" aria-labelledby="novelReaderTitle">
+<h2 id="novelReaderTitle">📖 読みやすさ設定</h2>
+<div class="novel-size-row" role="group" aria-label="本文の文字サイズ"><button type="button" data-reader-size="normal" aria-pressed="true">標準</button><button type="button" data-reader-size="large" aria-pressed="false">大きめ</button><button type="button" data-reader-size="extra" aria-pressed="false">特大</button></div>
+<button type="button" class="novel-resume-button" id="novelResumeButton" hidden>前回開いた話から読む</button>
+<p id="novelReaderStatus" role="status">本文を読んだ位置を自動でしおりに保存します。文字サイズとしおりはこのブラウザに記録します。</p>
+</section>
+<section class="cards novel-bookshelf-section">
+<article class="card novel-bookshelf-card">
+<p class="section-kicker">小説置き場</p>
+<h2>秘密基地の物語一覧</h2>
+<p class="novel-guide-text">ここは、秘密基地にまつわる小説をまとめていく場所です。今後追加する小説も、このページから読めるようにしていきます。</p>
+<p class="novel-guide-text">作品名を押すと話数一覧が開き、話数を押すと本文が開きます。</p>
+<div class="novel-accordion-list" aria-label="小説一覧"><details class="novel-accordion novel-series-panel"><summary class="novel-accordion-button novel-series-button"><span class="novel-button-kicker">小説①</span><span class="novel-button-title">幽霊とたぬちゃん、配信者になる</span><span class="novel-button-mark" aria-hidden="true">＋</span></summary>
+<div class="novel-series-content">
+<p class="novel-series-note">人間世界から落ちてきた高性能ゲーミングPCをきっかけに、幽霊とたぬちゃんがゲームと配信に出会っていく物語です。</p><details class="novel-accordion novel-episode-panel" id="novel-episode-1"><summary class="novel-accordion-button novel-episode-button"><span class="novel-button-kicker">第1話</span><span class="novel-button-title">人間世界から落ちてきた箱</span><span class="novel-button-mark" aria-hidden="true">＋</span></summary>
+<article class="novel-episode-content">
+<p class="novel-body-label">第1話 本編</p>
+<div class="novel-body">
+<p>紫色のネオンが、夜の秘密基地をぼんやり照らしていた。</p>
+<p>そこは、人間世界から少しだけ外れた場所にある、不思議な小さな隠れ家だった。</p>
+<p>古い木の扉。<br>
 月明かりに光る看板。<br>
 壁に貼られた、誰かの落書きみたいな迷言。<br>
-そして、奥の部屋には、毎日こっそり押される来場スタンプの台帳が置いてある。</p><p>その秘密基地には、幽霊とたぬちゃんが住んでいた。</p><p>幽霊は、ふわふわと浮かびながら、今日も部屋の灯りを整えていた。<br>
+そして、奥の部屋には、毎日こっそり押される来場スタンプの台帳が置いてある。</p>
+<p>その秘密基地には、幽霊とたぬちゃんが住んでいた。</p>
+<p>幽霊は、ふわふわと浮かびながら、今日も部屋の灯りを整えていた。<br>
 怖い幽霊ではない。<br>
-少し不思議で、少し静かで、でも誰かが迷い込んできたら、ちゃんと「いらっしゃい」と言ってくれる幽霊だった。</p><p>「今日も静かだね」</p><p>幽霊がそうつぶやくと、床の上で丸くなっていたたぬちゃんが、ぴくっと耳を動かした。</p><p>「静かなのも悪くないぽん。でも、ちょっと退屈だぽん」</p><p>たぬちゃんは、のんびり屋だけど好奇心だけは人一倍強い。<br>
-面白そうなものを見つけると、すぐに近づいてしまう。</p><p>幽霊は小さく笑った。</p><p>「退屈って言ってる時ほど、たぬちゃんは何か見つけてくるよね」</p><p>「それは才能だぽん」</p><p>たぬちゃんが胸を張った、その時だった。</p><p class="novel-emphasis">――ドスン。</p><p>秘密基地の外で、大きな音がした。</p><p>二人は同時に振り向いた。</p><figure class="novel-illustration"><img src="assets/novel-episode1-illustration-01.webp" alt="秘密基地の中で大きな音に気づいて扉の方を見る幽霊とたぬちゃん" loading="lazy" decoding="async" width="1280" height="960" fetchpriority="low" sizes="(max-width: 760px) 100vw, 720px"></figure><p>「……今の、聞こえた？」</p><p>「聞こえたぽん。すごく聞こえたぽん」</p><p>幽霊は少しだけ眉をひそめた。<br>
+少し不思議で、少し静かで、でも誰かが迷い込んできたら、ちゃんと「いらっしゃい」と言ってくれる幽霊だった。</p>
+<p>「今日も静かだね」</p>
+<p>幽霊がそうつぶやくと、床の上で丸くなっていたたぬちゃんが、ぴくっと耳を動かした。</p>
+<p>「静かなのも悪くないぽん。でも、ちょっと退屈だぽん」</p>
+<p>たぬちゃんは、のんびり屋だけど好奇心だけは人一倍強い。<br>
+面白そうなものを見つけると、すぐに近づいてしまう。</p>
+<p>幽霊は小さく笑った。</p>
+<p>「退屈って言ってる時ほど、たぬちゃんは何か見つけてくるよね」</p>
+<p>「それは才能だぽん」</p>
+<p>たぬちゃんが胸を張った、その時だった。</p>
+<p class="novel-emphasis">――ドスン。</p>
+<p>秘密基地の外で、大きな音がした。</p>
+<p>二人は同時に振り向いた。</p><figure class="novel-illustration"><img src="assets/novel-episode1-illustration-01.webp" alt="秘密基地の中で大きな音に気づいて扉の方を見る幽霊とたぬちゃん" loading="lazy" decoding="async" width="1280" height="960" fetchpriority="low" sizes="(max-width: 760px) 100vw, 720px"></figure>
+<p>「……今の、聞こえた？」</p>
+<p>「聞こえたぽん。すごく聞こえたぽん」</p>
+<p>幽霊は少しだけ眉をひそめた。<br>
 秘密基地の周りは、ふつう何も落ちてこない。<br>
 風が吹くことはある。<br>
 迷い込んだ紙切れが飛んでくることもある。<br>
-でも、今の音はそんな軽いものではなかった。</p><p>たぬちゃんは、もう扉の前まで走っていた。</p><p>「見に行くぽん！」</p><p>「待って。危ないものかもしれないよ」</p><p>「でも、見ないと分からないぽん」</p><p>たぬちゃんは扉を開けた。</p><p>外には、夜の森が広がっていた。<br>
+でも、今の音はそんな軽いものではなかった。</p>
+<p>たぬちゃんは、もう扉の前まで走っていた。</p>
+<p>「見に行くぽん！」</p>
+<p>「待って。危ないものかもしれないよ」</p>
+<p>「でも、見ないと分からないぽん」</p>
+<p>たぬちゃんは扉を開けた。</p>
+<p>外には、夜の森が広がっていた。<br>
 木々の間から、紫色の光が細く漏れている。<br>
-その光の先、秘密基地の裏庭に、見慣れない大きな箱が落ちていた。</p><p>箱には、人間世界の文字でこう書かれていた。</p><p class="novel-emphasis">高性能ゲーミングPC</p><figure class="novel-illustration"><img src="assets/novel-episode1-illustration-02.webp" alt="秘密基地の外に落ちていた高性能ゲーミングPCの箱を見つけた幽霊とたぬちゃん" loading="lazy" decoding="async" width="1280" height="960" fetchpriority="low" sizes="(max-width: 760px) 100vw, 720px"></figure><p>たぬちゃんは首をかしげた。</p><p>「げーみんぐ……ぴーしー？」</p><p>幽霊は箱の周りをふわりと回った。</p><p>「人間世界の機械みたいだね」</p><p>「食べ物ではないぽん？」</p><p>「たぶん違うね」</p><p>たぬちゃんは少し残念そうな顔をしたが、すぐに目を輝かせた。</p><p>「じゃあ、遊び道具だぽん！」</p><p>「決めるの早いなあ」</p><p>二人は箱を秘密基地の中へ運ぶことにした。</p><figure class="novel-illustration"><img src="assets/novel-episode1-illustration-03.webp" alt="高性能ゲーミングPCの箱を秘密基地の中へ運び込もうとする幽霊とたぬちゃん" loading="lazy" decoding="async" width="1280" height="960" fetchpriority="low" sizes="(max-width: 760px) 100vw, 720px"></figure><p>とはいえ、箱はかなり重かった。<br>
-たぬちゃんが押して、幽霊が浮かせようとして、何度も向きがずれて、扉にぶつかりそうになった。</p><p>「右、右だよ」</p><p>「右ってどっちぽん？」</p><p>「たぬちゃんのしっぽがある方じゃないよ」</p><p>「じゃあ反対ぽん！」</p><p>そんなやり取りをしながら、なんとか箱は秘密基地の真ん中に置かれた。</p><p>箱を開けると、中には黒く光る大きな機械と、画面、キーボード、マウス、たくさんのコードが入っていた。</p><figure class="novel-illustration"><img src="assets/novel-episode1-illustration-04.webp" alt="箱を開けてゲーミングPCやモニター、キーボードなどを見つけた幽霊とたぬちゃん" loading="lazy" decoding="async" width="1280" height="960" fetchpriority="low" sizes="(max-width: 760px) 100vw, 720px"></figure><p>たぬちゃんはキーボードを見つめた。</p><p>「ボタンがいっぱいだぽん」</p><p>幽霊は説明書らしき紙を手に取った。</p><p>「これをつなげば、動くみたい」</p><p>「幽霊、こういうの分かるぽん？」</p><p>「分からないけど、説明書は読めるよ」</p><p>「じゃあ勝ったぽん」</p><p>「何に？」</p><p>二人は説明書を見ながら、少しずつコードをつないでいった。</p><p>画面。<br>
+その光の先、秘密基地の裏庭に、見慣れない大きな箱が落ちていた。</p>
+<p>箱には、人間世界の文字でこう書かれていた。</p>
+<p class="novel-emphasis">高性能ゲーミングPC</p><figure class="novel-illustration"><img src="assets/novel-episode1-illustration-02.webp" alt="秘密基地の外に落ちていた高性能ゲーミングPCの箱を見つけた幽霊とたぬちゃん" loading="lazy" decoding="async" width="1280" height="960" fetchpriority="low" sizes="(max-width: 760px) 100vw, 720px"></figure>
+<p>たぬちゃんは首をかしげた。</p>
+<p>「げーみんぐ……ぴーしー？」</p>
+<p>幽霊は箱の周りをふわりと回った。</p>
+<p>「人間世界の機械みたいだね」</p>
+<p>「食べ物ではないぽん？」</p>
+<p>「たぶん違うね」</p>
+<p>たぬちゃんは少し残念そうな顔をしたが、すぐに目を輝かせた。</p>
+<p>「じゃあ、遊び道具だぽん！」</p>
+<p>「決めるの早いなあ」</p>
+<p>二人は箱を秘密基地の中へ運ぶことにした。</p><figure class="novel-illustration"><img src="assets/novel-episode1-illustration-03.webp" alt="高性能ゲーミングPCの箱を秘密基地の中へ運び込もうとする幽霊とたぬちゃん" loading="lazy" decoding="async" width="1280" height="960" fetchpriority="low" sizes="(max-width: 760px) 100vw, 720px"></figure>
+<p>とはいえ、箱はかなり重かった。<br>
+たぬちゃんが押して、幽霊が浮かせようとして、何度も向きがずれて、扉にぶつかりそうになった。</p>
+<p>「右、右だよ」</p>
+<p>「右ってどっちぽん？」</p>
+<p>「たぬちゃんのしっぽがある方じゃないよ」</p>
+<p>「じゃあ反対ぽん！」</p>
+<p>そんなやり取りをしながら、なんとか箱は秘密基地の真ん中に置かれた。</p>
+<p>箱を開けると、中には黒く光る大きな機械と、画面、キーボード、マウス、たくさんのコードが入っていた。</p><figure class="novel-illustration"><img src="assets/novel-episode1-illustration-04.webp" alt="箱を開けてゲーミングPCやモニター、キーボードなどを見つけた幽霊とたぬちゃん" loading="lazy" decoding="async" width="1280" height="960" fetchpriority="low" sizes="(max-width: 760px) 100vw, 720px"></figure>
+<p>たぬちゃんはキーボードを見つめた。</p>
+<p>「ボタンがいっぱいだぽん」</p>
+<p>幽霊は説明書らしき紙を手に取った。</p>
+<p>「これをつなげば、動くみたい」</p>
+<p>「幽霊、こういうの分かるぽん？」</p>
+<p>「分からないけど、説明書は読めるよ」</p>
+<p>「じゃあ勝ったぽん」</p>
+<p>「何に？」</p>
+<p>二人は説明書を見ながら、少しずつコードをつないでいった。</p>
+<p>画面。<br>
 電源。<br>
 キーボード。<br>
 マウス。<br>
 よく分からない線。<br>
-もっとよく分からない線。</p><figure class="novel-illustration"><img src="assets/novel-episode1-illustration-05.webp" alt="コードをつなぐ途中で絡まりながらゲーミングPCを組み立てるたぬちゃんと説明書を読む幽霊" loading="lazy" decoding="async" width="1280" height="960" fetchpriority="low" sizes="(max-width: 760px) 100vw, 720px"></figure><p>途中でたぬちゃんがコードに絡まり、幽霊がほどいた。<br>
-途中で幽霊が電源ボタンを見失い、たぬちゃんが鼻で見つけた。</p><p>そして、最後に電源ボタンを押すと――</p><p class="novel-emphasis">ブゥン。</p><p>静かだった秘密基地に、低い機械音が響いた。</p><p>画面が光った。</p><p>紫色のネオンとは違う、まぶしい人間世界の光だった。</p><p>たぬちゃんは飛び上がった。</p><p>「ついたぽん！ 生きてるぽん！」</p><p>「生き物ではないと思うけど……すごいね」</p><p>画面には、いくつものアイコンが並んでいた。</p><p>その中に、ひときわ目立つものがあった。</p><p class="novel-emphasis">GAME</p><figure class="novel-illustration"><img src="assets/novel-episode1-illustration-06.webp" alt="GAMEと表示された画面を見て目を輝かせる幽霊とたぬちゃん" loading="lazy" decoding="async" width="1280" height="960" fetchpriority="low" sizes="(max-width: 760px) 100vw, 720px"></figure><p>たぬちゃんはそれを見逃さなかった。</p><p>「これ、押していいぽん？」</p><p>幽霊は少し考えた。</p><p>この箱がどこから来たのか。<br>
+もっとよく分からない線。</p><figure class="novel-illustration"><img src="assets/novel-episode1-illustration-05.webp" alt="コードをつなぐ途中で絡まりながらゲーミングPCを組み立てるたぬちゃんと説明書を読む幽霊" loading="lazy" decoding="async" width="1280" height="960" fetchpriority="low" sizes="(max-width: 760px) 100vw, 720px"></figure>
+<p>途中でたぬちゃんがコードに絡まり、幽霊がほどいた。<br>
+途中で幽霊が電源ボタンを見失い、たぬちゃんが鼻で見つけた。</p>
+<p>そして、最後に電源ボタンを押すと――</p>
+<p class="novel-emphasis">ブゥン。</p>
+<p>静かだった秘密基地に、低い機械音が響いた。</p>
+<p>画面が光った。</p>
+<p>紫色のネオンとは違う、まぶしい人間世界の光だった。</p>
+<p>たぬちゃんは飛び上がった。</p>
+<p>「ついたぽん！ 生きてるぽん！」</p>
+<p>「生き物ではないと思うけど……すごいね」</p>
+<p>画面には、いくつものアイコンが並んでいた。</p>
+<p>その中に、ひときわ目立つものがあった。</p>
+<p class="novel-emphasis">GAME</p><figure class="novel-illustration"><img src="assets/novel-episode1-illustration-06.webp" alt="GAMEと表示された画面を見て目を輝かせる幽霊とたぬちゃん" loading="lazy" decoding="async" width="1280" height="960" fetchpriority="low" sizes="(max-width: 760px) 100vw, 720px"></figure>
+<p>たぬちゃんはそれを見逃さなかった。</p>
+<p>「これ、押していいぽん？」</p>
+<p>幽霊は少し考えた。</p>
+<p>この箱がどこから来たのか。<br>
 誰のものなのか。<br>
-なぜ秘密基地に落ちてきたのか。</p><p>分からないことはたくさんあった。</p><p>でも、たぬちゃんの目はきらきらしていた。<br>
-そして幽霊自身も、ほんの少しだけ気になっていた。</p><p>人間世界のゲーム。<br>
+なぜ秘密基地に落ちてきたのか。</p>
+<p>分からないことはたくさんあった。</p>
+<p>でも、たぬちゃんの目はきらきらしていた。<br>
+そして幽霊自身も、ほんの少しだけ気になっていた。</p>
+<p>人間世界のゲーム。<br>
 人間たちが夢中になる遊び。<br>
-それはいったい、どんなものなのだろう。</p><p>幽霊は小さく息をついた。</p><p>「少しだけだよ」</p><p>「やったぽん！」</p><p>たぬちゃんがマウスを押した。</p><p>画面が切り替わる。<br>
+それはいったい、どんなものなのだろう。</p>
+<p>幽霊は小さく息をついた。</p>
+<p>「少しだけだよ」</p>
+<p>「やったぽん！」</p>
+<p>たぬちゃんがマウスを押した。</p>
+<p>画面が切り替わる。<br>
 音楽が流れる。<br>
-知らない世界が画面の向こうに広がっていく。</p><p>森でもない。<br>
+知らない世界が画面の向こうに広がっていく。</p>
+<p>森でもない。<br>
 秘密基地でもない。<br>
-人間世界でもない。</p><p>画面の中には、二人がまだ見たことのない冒険が待っていた。</p><p>幽霊は画面を見つめたまま、ぽつりと言った。</p><p>「……なんだか、不思議だね」</p><p>たぬちゃんは隣で、しっぽをぶんぶん振っていた。</p><p>「これは絶対、面白いやつだぽん」</p><p>その夜、秘密基地に新しい音が加わった。</p><p>キーボードを押す音。<br>
+人間世界でもない。</p>
+<p>画面の中には、二人がまだ見たことのない冒険が待っていた。</p>
+<p>幽霊は画面を見つめたまま、ぽつりと言った。</p>
+<p>「……なんだか、不思議だね」</p>
+<p>たぬちゃんは隣で、しっぽをぶんぶん振っていた。</p>
+<p>「これは絶対、面白いやつだぽん」</p>
+<p>その夜、秘密基地に新しい音が加わった。</p>
+<p>キーボードを押す音。<br>
 マウスを動かす音。<br>
 たぬちゃんの楽しそうな声。<br>
-そして、幽霊の小さな笑い声。</p><p>二人はまだ知らなかった。</p><p>この高性能パソコンが、秘密基地を少しずつ変えていくことを。</p><p>ただの遊びだったゲームが、やがて誰かとつながる場所になることを。</p><p>そしていつか、この秘密基地にたくさんの来場者がふらっとのぞきに来るようになることを。</p><p>その始まりは、ひょんなことから落ちてきた一つの箱だった。</p></div></article></details><details class="novel-accordion novel-episode-panel novel-release-gate" data-release-date="2026-06-10"><summary class="novel-accordion-button novel-episode-button"><span class="novel-button-kicker">第2話</span><span class="novel-button-title">はじめてのゲーム</span><span class="novel-release-badge">2026/06/10 解放</span><span class="novel-button-mark" aria-hidden="true">＋</span></summary><div class="novel-release-locked" aria-live="polite"><p>第2話「はじめてのゲーム」は、2026/06/10に解放されます。</p></div><article class="novel-episode-content novel-release-content"><p class="novel-body-label">第2話 本編</p><div class="novel-body"><p>高性能パソコンの画面に、紫色の光が広がっていた。</p><p>秘密基地の中は、いつもより少しだけ明るかった。<br>
+そして、幽霊の小さな笑い声。</p>
+<p>二人はまだ知らなかった。</p>
+<p>この高性能パソコンが、秘密基地を少しずつ変えていくことを。</p>
+<p>ただの遊びだったゲームが、やがて誰かとつながる場所になることを。</p>
+<p>そしていつか、この秘密基地にたくさんの来場者がふらっとのぞきに来るようになることを。</p>
+<p>その始まりは、ひょんなことから落ちてきた一つの箱だった。</p>
+</div>
+</article></details><details class="novel-accordion novel-episode-panel novel-release-gate" id="novel-episode-2" data-release-date="2026-06-10"><summary class="novel-accordion-button novel-episode-button"><span class="novel-button-kicker">第2話</span><span class="novel-button-title">はじめてのゲーム</span><span class="novel-release-badge">2026/06/10 解放</span><span class="novel-button-mark" aria-hidden="true">＋</span></summary>
+<div class="novel-release-locked" aria-live="polite">
+<p>第2話「はじめてのゲーム」は、2026/06/10に解放されます。</p>
+</div>
+<article class="novel-episode-content novel-release-content">
+<p class="novel-body-label">第2話 本編</p>
+<div class="novel-body">
+<p>高性能パソコンの画面に、紫色の光が広がっていた。</p>
+<p>秘密基地の中は、いつもより少しだけ明るかった。<br>
 棚に置かれた小さなランタン。<br>
 壁に光る幽霊とたぬちゃんのネオンサイン。<br>
 机の上に開かれた来場スタンプの台帳。<br>
-そして、その真ん中で、できたばかりのゲーミングPCが静かに光っている。</p><p>たぬちゃんは、画面の前で両手をぎゅっと握っていた。</p><p>「すごいぽん……。なんか、もう始まりそうだぽん」</p><p>幽霊は、ふわふわと隣に浮かびながら画面を見つめた。</p><p>「まだ何も押してないけどね」</p><p>画面には、大きな文字が出ていた。</p><p class="novel-emphasis">GAME</p><p>その下には、小さくこう書かれている。</p><p class="novel-emphasis">START</p><figure class="novel-illustration"><img src="assets/novel-episode2-illustration-01.webp" alt="ゲームのスタート画面を前に目を輝かせる幽霊とたぬちゃん" loading="lazy" decoding="async" fetchpriority="low" width="1280" height="960" sizes="(max-width: 760px) 100vw, 720px"></figure><p>たぬちゃんは、マウスを見た。<br>
+そして、その真ん中で、できたばかりのゲーミングPCが静かに光っている。</p>
+<p>たぬちゃんは、画面の前で両手をぎゅっと握っていた。</p>
+<p>「すごいぽん……。なんか、もう始まりそうだぽん」</p>
+<p>幽霊は、ふわふわと隣に浮かびながら画面を見つめた。</p>
+<p>「まだ何も押してないけどね」</p>
+<p>画面には、大きな文字が出ていた。</p>
+<p class="novel-emphasis">GAME</p>
+<p>その下には、小さくこう書かれている。</p>
+<p class="novel-emphasis">START</p><figure class="novel-illustration"><img src="assets/novel-episode2-illustration-01.webp" alt="ゲームのスタート画面を前に目を輝かせる幽霊とたぬちゃん" loading="lazy" decoding="async" fetchpriority="low" width="1280" height="960" sizes="(max-width: 760px) 100vw, 720px"></figure>
+<p>たぬちゃんは、マウスを見た。<br>
 それからキーボードを見た。<br>
-それから、なぜか自分のしっぽを見た。</p><p>「どれを押せばいいぽん？」</p><p>「たぶん、マウスで押すんだと思う」</p><p>「この黒い小さいやつぽん？」</p><p>「うん。そっとね」</p><p>たぬちゃんは、マウスに前足を乗せた。</p><p class="novel-emphasis">カチッ。</p><p>その瞬間、画面がぱっと切り替わった。</p><p>紫の星空。<br>
+それから、なぜか自分のしっぽを見た。</p>
+<p>「どれを押せばいいぽん？」</p>
+<p>「たぶん、マウスで押すんだと思う」</p>
+<p>「この黒い小さいやつぽん？」</p>
+<p>「うん。そっとね」</p>
+<p>たぬちゃんは、マウスに前足を乗せた。</p>
+<p class="novel-emphasis">カチッ。</p>
+<p>その瞬間、画面がぱっと切り替わった。</p>
+<p>紫の星空。<br>
 浮かぶ島。<br>
 遠くに見えるお城。<br>
-きらきら光る小道。</p><p>画面の中に、秘密基地とはまったく違う世界が広がっていた。</p><p>たぬちゃんは目を丸くした。</p><p>「入ったぽん！」</p><p>「画面の中にね」</p><p>「すごいぽん！ ここ行けるぽん？」</p><p>幽霊は少し笑った。</p><p>「ゲームだから、動かせば行けるんじゃないかな」</p><p>画面の中央には、小さなキャラクターが立っていた。<br>
-丸い帽子をかぶった冒険者で、手には小さな剣を持っている。</p><p>その上に、説明が表示された。</p><p class="novel-emphasis">W A S D で移動</p><p>たぬちゃんは、キーボードをじっと見た。</p><p>「わ、あ、す、で……？」</p><p>「たぶん、この文字のキーを押すんだよ」</p><p>「よし、任せるぽん」</p><p>たぬちゃんは自信満々に、キーボードへ前足を置いた。</p><p>そして、全部まとめて押した。</p><figure class="novel-illustration"><img src="assets/novel-episode2-illustration-02.webp" alt="WASD操作を覚えようとしてキーボードに慌てるたぬちゃんと見守る幽霊" loading="lazy" decoding="async" fetchpriority="low" width="1280" height="960" sizes="(max-width: 760px) 100vw, 720px"></figure><p>キャラクターは突然ぐるぐる回りながら、木にぶつかった。</p><p>「止まらないぽん！」</p><p>「押しすぎだよ。ひとつずつ、ひとつずつ」</p><p>「ひとつずつが難しいぽん！」</p><p>キャラクターは木の根元で、右へ左へ小刻みに動いている。<br>
+きらきら光る小道。</p>
+<p>画面の中に、秘密基地とはまったく違う世界が広がっていた。</p>
+<p>たぬちゃんは目を丸くした。</p>
+<p>「入ったぽん！」</p>
+<p>「画面の中にね」</p>
+<p>「すごいぽん！ ここ行けるぽん？」</p>
+<p>幽霊は少し笑った。</p>
+<p>「ゲームだから、動かせば行けるんじゃないかな」</p>
+<p>画面の中央には、小さなキャラクターが立っていた。<br>
+丸い帽子をかぶった冒険者で、手には小さな剣を持っている。</p>
+<p>その上に、説明が表示された。</p>
+<p class="novel-emphasis">W A S D で移動</p>
+<p>たぬちゃんは、キーボードをじっと見た。</p>
+<p>「わ、あ、す、で……？」</p>
+<p>「たぶん、この文字のキーを押すんだよ」</p>
+<p>「よし、任せるぽん」</p>
+<p>たぬちゃんは自信満々に、キーボードへ前足を置いた。</p>
+<p>そして、全部まとめて押した。</p><figure class="novel-illustration"><img src="assets/novel-episode2-illustration-02.webp" alt="WASD操作を覚えようとしてキーボードに慌てるたぬちゃんと見守る幽霊" loading="lazy" decoding="async" fetchpriority="low" width="1280" height="960" sizes="(max-width: 760px) 100vw, 720px"></figure>
+<p>キャラクターは突然ぐるぐる回りながら、木にぶつかった。</p>
+<p>「止まらないぽん！」</p>
+<p>「押しすぎだよ。ひとつずつ、ひとつずつ」</p>
+<p>「ひとつずつが難しいぽん！」</p>
+<p>キャラクターは木の根元で、右へ左へ小刻みに動いている。<br>
 たぬちゃんは真剣だった。<br>
-真剣すぎて、口が少し開いていた。</p><p>幽霊は画面の横で、説明書を読みながら言った。</p><p>「まずは前に進む。Wだけ押して」</p><p>「だぶりゅー……これぽん！」</p><p>たぬちゃんがWキーを押す。</p><p>キャラクターが一歩、前へ進んだ。</p><p>「動いたぽん！」</p><p>「うん。今のは上手だった」</p><p>「もう一回ぽん！」</p><p>キャラクターはまた一歩進んだ。</p><p>その先に、小さな光る石があった。</p><p class="novel-emphasis">E で調べる</p><p>幽霊が指さした。</p><p>「あれ、調べられるみたい」</p><p>「調べるって、食べられるってことぽん？」</p><p>「違うと思う」</p><p>たぬちゃんはEキーを押した。</p><p>画面の中で光る石がふわっと浮かび、冒険者の周りに小さな星が舞った。</p><p class="novel-emphasis">はじまりの結晶を手に入れた</p><p>たぬちゃんは息をのんだ。</p><p>「もらえたぽん……！」</p><p>幽霊も少しだけ目を輝かせた。</p><p>「きれいだね」</p><p>「これ集めるやつだぽん。たぶん全部集めるやつだぽん」</p><p>「まだ一個目だけど、もう全部集める気なんだ」</p><p>「もちろんぽん」</p><p>その後、二人は少しずつ操作を覚えていった。</p><p>前に進む。<br>
+真剣すぎて、口が少し開いていた。</p>
+<p>幽霊は画面の横で、説明書を読みながら言った。</p>
+<p>「まずは前に進む。Wだけ押して」</p>
+<p>「だぶりゅー……これぽん！」</p>
+<p>たぬちゃんがWキーを押す。</p>
+<p>キャラクターが一歩、前へ進んだ。</p>
+<p>「動いたぽん！」</p>
+<p>「うん。今のは上手だった」</p>
+<p>「もう一回ぽん！」</p>
+<p>キャラクターはまた一歩進んだ。</p>
+<p>その先に、小さな光る石があった。</p>
+<p class="novel-emphasis">E で調べる</p>
+<p>幽霊が指さした。</p>
+<p>「あれ、調べられるみたい」</p>
+<p>「調べるって、食べられるってことぽん？」</p>
+<p>「違うと思う」</p>
+<p>たぬちゃんはEキーを押した。</p>
+<p>画面の中で光る石がふわっと浮かび、冒険者の周りに小さな星が舞った。</p>
+<p class="novel-emphasis">はじまりの結晶を手に入れた</p>
+<p>たぬちゃんは息をのんだ。</p>
+<p>「もらえたぽん……！」</p>
+<p>幽霊も少しだけ目を輝かせた。</p>
+<p>「きれいだね」</p>
+<p>「これ集めるやつだぽん。たぶん全部集めるやつだぽん」</p>
+<p>「まだ一個目だけど、もう全部集める気なんだ」</p>
+<p>「もちろんぽん」</p>
+<p>その後、二人は少しずつ操作を覚えていった。</p>
+<p>前に進む。<br>
 後ろに下がる。<br>
 横に歩く。<br>
 視点を動かす。<br>
-ジャンプする。</p><p>ただ、ジャンプだけは少し大変だった。</p><p>「スペースキーだって」</p><p>「すぺーす……どれぽん？」</p><p>「これ。一番長いやつ」</p><p>たぬちゃんがスペースキーを押す。</p><p>冒険者がぴょんと飛んだ。</p><p>「飛んだぽん！」</p><p>もう一度押す。<br>
-また飛ぶ。</p><p>さらに押す。<br>
-何度も飛ぶ。</p><p>冒険者は、何もない場所でずっとぴょんぴょん跳ね続けた。</p><p>「楽しいぽん！」</p><p>「進んでないよ」</p><p>「でも楽しいぽん！」</p><p>幽霊は小さく笑った。</p><p>秘密基地には、今まで聞いたことのない音が響いていた。<br>
+ジャンプする。</p>
+<p>ただ、ジャンプだけは少し大変だった。</p>
+<p>「スペースキーだって」</p>
+<p>「すぺーす……どれぽん？」</p>
+<p>「これ。一番長いやつ」</p>
+<p>たぬちゃんがスペースキーを押す。</p>
+<p>冒険者がぴょんと飛んだ。</p>
+<p>「飛んだぽん！」</p>
+<p>もう一度押す。<br>
+また飛ぶ。</p>
+<p>さらに押す。<br>
+何度も飛ぶ。</p>
+<p>冒険者は、何もない場所でずっとぴょんぴょん跳ね続けた。</p>
+<p>「楽しいぽん！」</p>
+<p>「進んでないよ」</p>
+<p>「でも楽しいぽん！」</p>
+<p>幽霊は小さく笑った。</p>
+<p>秘密基地には、今まで聞いたことのない音が響いていた。<br>
 キーボードを押す音。<br>
 マウスを動かす音。<br>
 ゲームの中から流れる音楽。<br>
-たぬちゃんの楽しそうな声。</p><p>それは、ただの機械の音ではなかった。<br>
-二人だけの秘密基地に、新しい遊びが生まれた音だった。</p><p>しばらく進むと、画面の中に小さな敵が現れた。<br>
-丸くて、とげとげしていて、ぷかぷか浮いている。</p><p>たぬちゃんの耳がぴんと立った。</p><p>「なんか来たぽん」</p><p>「敵かな」</p><p>「敵ぽん！？ どうするぽん！？」</p><p>画面には新しい説明が出た。</p><p class="novel-emphasis">左クリックで攻撃</p><p>幽霊が読んだ。</p><p>「マウスを押すみたい」</p><p>「これぽんね！」</p><p>たぬちゃんは勢いよくクリックした。</p><p>冒険者が剣を振る。<br>
-しかし、敵には届かなかった。</p><figure class="novel-illustration"><img src="assets/novel-episode2-illustration-03.webp" alt="ゲーム内の敵に挑んで驚くたぬちゃんと応援する幽霊" loading="lazy" decoding="async" fetchpriority="low" width="1280" height="960" sizes="(max-width: 760px) 100vw, 720px"></figure><p>「当たらないぽん！」</p><p>「近づいてからだね」</p><p>「近づくの怖いぽん！」</p><p>「ゲームだから大丈夫だよ」</p><p>「ゲームでも怖いものは怖いぽん！」</p><p>それでも、たぬちゃんは少しずつ近づいた。<br>
+たぬちゃんの楽しそうな声。</p>
+<p>それは、ただの機械の音ではなかった。<br>
+二人だけの秘密基地に、新しい遊びが生まれた音だった。</p>
+<p>しばらく進むと、画面の中に小さな敵が現れた。<br>
+丸くて、とげとげしていて、ぷかぷか浮いている。</p>
+<p>たぬちゃんの耳がぴんと立った。</p>
+<p>「なんか来たぽん」</p>
+<p>「敵かな」</p>
+<p>「敵ぽん！？ どうするぽん！？」</p>
+<p>画面には新しい説明が出た。</p>
+<p class="novel-emphasis">左クリックで攻撃</p>
+<p>幽霊が読んだ。</p>
+<p>「マウスを押すみたい」</p>
+<p>「これぽんね！」</p>
+<p>たぬちゃんは勢いよくクリックした。</p>
+<p>冒険者が剣を振る。<br>
+しかし、敵には届かなかった。</p><figure class="novel-illustration"><img src="assets/novel-episode2-illustration-03.webp" alt="ゲーム内の敵に挑んで驚くたぬちゃんと応援する幽霊" loading="lazy" decoding="async" fetchpriority="low" width="1280" height="960" sizes="(max-width: 760px) 100vw, 720px"></figure>
+<p>「当たらないぽん！」</p>
+<p>「近づいてからだね」</p>
+<p>「近づくの怖いぽん！」</p>
+<p>「ゲームだから大丈夫だよ」</p>
+<p>「ゲームでも怖いものは怖いぽん！」</p>
+<p>それでも、たぬちゃんは少しずつ近づいた。<br>
 敵がふわふわ動く。<br>
-冒険者が剣を振る。</p><p>一回目は空振り。<br>
+冒険者が剣を振る。</p>
+<p>一回目は空振り。<br>
 二回目も空振り。<br>
-三回目で、やっと当たった。</p><p>ポン、と明るい音がして、敵が小さな星になって消えた。</p><p>たぬちゃんは固まった。</p><p>それから、ゆっくり幽霊を見た。</p><p>「……勝ったぽん？」</p><p>「勝ったね」</p><p>「勝ったぽん！」</p><p>たぬちゃんはその場でぴょんぴょん跳ねた。<br>
-画面の中の冒険者も、なぜか一緒にぴょんぴょん跳ねていた。</p><p>幽霊は笑いながら、たぬちゃんの隣に浮かんだ。</p><p>「最初の敵に勝っただけで、そんなに喜ぶんだ」</p><p>「最初だから大事なんだぽん！」</p><p>「それは、たしかにそうかも」</p><p>ゲームの中では、道の先に小さなお城が見えていた。<br>
-紫の空に星が浮かび、光る結晶が道を照らしている。</p><figure class="novel-illustration"><img src="assets/novel-episode2-illustration-04.webp" alt="ゲームの中のお城へ続く道を前にわくわくする幽霊とたぬちゃん" loading="lazy" decoding="async" fetchpriority="low" width="1280" height="960" sizes="(max-width: 760px) 100vw, 720px"></figure><p>たぬちゃんは、もうすっかり画面に夢中だった。</p><p>「次はあのお城に行くぽん」</p><p>「今日は少しだけって言ったけど」</p><p>「少しだけ行くぽん。お城の前までぽん」</p><p>「それ、着いたら中も見たくなるやつだよね」</p><p>「ちょっとだけ中を見るぽん」</p><p>幽霊は困ったように笑った。</p><p>でも、その目はたぬちゃんと同じくらい、画面の世界に引き込まれていた。</p><p>秘密基地の外では、夜の森が静かに揺れている。<br>
-でも、部屋の中だけは、まるで小さな冒険の入口みたいだった。</p><p>「ねえ、たぬちゃん」</p><p>幽霊が言った。</p><p>「なにぽん？」</p><p>「ゲームって、思ってたより不思議だね」</p><p>たぬちゃんは画面を見たまま、うなずいた。</p><p>「うん。不思議で、忙しくて、ちょっと怖くて……でも、すごく楽しいぽん」</p><p>「そうだね」</p><p>幽霊は、画面の中の星空を見つめた。</p><p>この世界には、まだ知らない道がある。<br>
+三回目で、やっと当たった。</p>
+<p>ポン、と明るい音がして、敵が小さな星になって消えた。</p>
+<p>たぬちゃんは固まった。</p>
+<p>それから、ゆっくり幽霊を見た。</p>
+<p>「……勝ったぽん？」</p>
+<p>「勝ったね」</p>
+<p>「勝ったぽん！」</p>
+<p>たぬちゃんはその場でぴょんぴょん跳ねた。<br>
+画面の中の冒険者も、なぜか一緒にぴょんぴょん跳ねていた。</p>
+<p>幽霊は笑いながら、たぬちゃんの隣に浮かんだ。</p>
+<p>「最初の敵に勝っただけで、そんなに喜ぶんだ」</p>
+<p>「最初だから大事なんだぽん！」</p>
+<p>「それは、たしかにそうかも」</p>
+<p>ゲームの中では、道の先に小さなお城が見えていた。<br>
+紫の空に星が浮かび、光る結晶が道を照らしている。</p><figure class="novel-illustration"><img src="assets/novel-episode2-illustration-04.webp" alt="ゲームの中のお城へ続く道を前にわくわくする幽霊とたぬちゃん" loading="lazy" decoding="async" fetchpriority="low" width="1280" height="960" sizes="(max-width: 760px) 100vw, 720px"></figure>
+<p>たぬちゃんは、もうすっかり画面に夢中だった。</p>
+<p>「次はあのお城に行くぽん」</p>
+<p>「今日は少しだけって言ったけど」</p>
+<p>「少しだけ行くぽん。お城の前までぽん」</p>
+<p>「それ、着いたら中も見たくなるやつだよね」</p>
+<p>「ちょっとだけ中を見るぽん」</p>
+<p>幽霊は困ったように笑った。</p>
+<p>でも、その目はたぬちゃんと同じくらい、画面の世界に引き込まれていた。</p>
+<p>秘密基地の外では、夜の森が静かに揺れている。<br>
+でも、部屋の中だけは、まるで小さな冒険の入口みたいだった。</p>
+<p>「ねえ、たぬちゃん」</p>
+<p>幽霊が言った。</p>
+<p>「なにぽん？」</p>
+<p>「ゲームって、思ってたより不思議だね」</p>
+<p>たぬちゃんは画面を見たまま、うなずいた。</p>
+<p>「うん。不思議で、忙しくて、ちょっと怖くて……でも、すごく楽しいぽん」</p>
+<p>「そうだね」</p>
+<p>幽霊は、画面の中の星空を見つめた。</p>
+<p>この世界には、まだ知らない道がある。<br>
 まだ見たことのない場所がある。<br>
-まだ出会っていない何かがある。</p><p>そして、その隣には、わくわくしすぎて前のめりになっている友達がいる。</p><p>それだけで、なんだか少し楽しかった。</p><p>「じゃあ、お城の前までね」</p><p>幽霊がそう言うと、たぬちゃんはぱっと顔を輝かせた。</p><p>「やったぽん！」</p><p>たぬちゃんはWキーを押した。<br>
+まだ出会っていない何かがある。</p>
+<p>そして、その隣には、わくわくしすぎて前のめりになっている友達がいる。</p>
+<p>それだけで、なんだか少し楽しかった。</p>
+<p>「じゃあ、お城の前までね」</p>
+<p>幽霊がそう言うと、たぬちゃんはぱっと顔を輝かせた。</p>
+<p>「やったぽん！」</p>
+<p>たぬちゃんはWキーを押した。<br>
 冒険者が前に進む。<br>
-紫の光る道を、ゆっくり歩いていく。</p><p>その先に何があるのか、二人はまだ知らない。</p><p>けれど、この夜、幽霊とたぬちゃんは知ってしまった。</p><p>ゲームの世界には、終わりの時間を忘れさせる力があることを。</p><p>そして、秘密基地の夜は、これまでより少しだけ長く、少しだけにぎやかになった。</p></div></article></details><details class="novel-accordion novel-episode-panel novel-release-gate" data-release-date="2026-06-30"><summary class="novel-accordion-button novel-episode-button"><span class="novel-button-kicker">第3話</span><span class="novel-button-title">幽霊、はじめてのクリック</span><span class="novel-release-badge">2026/06/30 解放</span><span class="novel-button-mark" aria-hidden="true">＋</span></summary><div class="novel-release-locked" aria-live="polite"><p>第3話「幽霊、はじめてのクリック」は、2026/06/30に解放されます。</p></div><article class="novel-episode-content novel-release-content"><p class="novel-body-label">第3話 本編</p><div class="novel-body"><p>ゲームの画面には、夜の森が広がっていた。</p><p>紫色の月明かりに照らされた木々。<br>
+紫の光る道を、ゆっくり歩いていく。</p>
+<p>その先に何があるのか、二人はまだ知らない。</p>
+<p>けれど、この夜、幽霊とたぬちゃんは知ってしまった。</p>
+<p>ゲームの世界には、終わりの時間を忘れさせる力があることを。</p>
+<p>そして、秘密基地の夜は、これまでより少しだけ長く、少しだけにぎやかになった。</p>
+</div>
+</article></details><details class="novel-accordion novel-episode-panel novel-release-gate" id="novel-episode-3" data-release-date="2026-06-30"><summary class="novel-accordion-button novel-episode-button"><span class="novel-button-kicker">第3話</span><span class="novel-button-title">幽霊、はじめてのクリック</span><span class="novel-release-badge">2026/06/30 解放</span><span class="novel-button-mark" aria-hidden="true">＋</span></summary>
+<div class="novel-release-locked" aria-live="polite">
+<p>第3話「幽霊、はじめてのクリック」は、2026/06/30に解放されます。</p>
+</div>
+<article class="novel-episode-content novel-release-content">
+<p class="novel-body-label">第3話 本編</p>
+<div class="novel-body">
+<p>ゲームの画面には、夜の森が広がっていた。</p>
+<p>紫色の月明かりに照らされた木々。<br>
 遠くには、星の光をまとったお城。<br>
-その手前に、小さな橋と、ゆらゆら揺れるランタンが見える。</p><p>たぬちゃんは、キーボードの上に両手を置いたまま、目をきらきらさせていた。</p><p>「行くぽん……！ あのお城まで行くぽん！」</p><p>「その前に、右の茂みに敵がいる」</p><p>幽霊が静かに言った。</p><p>たぬちゃんは、びくっと肩を跳ねさせた。</p><p>「えっ、どこぽん！？」</p><p>「画面の右。葉っぱが少し動いてる」</p><p>「ほんとだぽん！」</p><p>たぬちゃんは慌ててマウスを動かした。<br>
-けれど、カーソルは行きすぎて、画面の端をぐるんと向いてしまう。</p><p>「わ、わ、見えないぽん！ 空しか見えないぽん！」</p><p>「落ち着いて。マウスを少しだけ戻して」</p><p>「少しだけって難しいぽん！」</p><p>幽霊は、たぬちゃんの横でふわりと浮かびながら、画面を見つめた。<br>
+その手前に、小さな橋と、ゆらゆら揺れるランタンが見える。</p>
+<p>たぬちゃんは、キーボードの上に両手を置いたまま、目をきらきらさせていた。</p>
+<p>「行くぽん……！ あのお城まで行くぽん！」</p>
+<p>「その前に、右の茂みに敵がいる」</p>
+<p>幽霊が静かに言った。</p>
+<p>たぬちゃんは、びくっと肩を跳ねさせた。</p>
+<p>「えっ、どこぽん！？」</p>
+<p>「画面の右。葉っぱが少し動いてる」</p>
+<p>「ほんとだぽん！」</p>
+<p>たぬちゃんは慌ててマウスを動かした。<br>
+けれど、カーソルは行きすぎて、画面の端をぐるんと向いてしまう。</p>
+<p>「わ、わ、見えないぽん！ 空しか見えないぽん！」</p>
+<p>「落ち着いて。マウスを少しだけ戻して」</p>
+<p>「少しだけって難しいぽん！」</p>
+<p>幽霊は、たぬちゃんの横でふわりと浮かびながら、画面を見つめた。<br>
 たぬちゃんは一生懸命だった。<br>
-でも、敵はどんどん近づいてくる。</p><p>画面の中のキャラクターが、森の道で立ち止まった。</p><p>「たぬちゃん、左に避けて」</p><p>「左ってどっちぽん！？」</p><p>「キーボードのA」</p><p>「Aぽんね！」</p><p>たぬちゃんがAキーを押す。<br>
+でも、敵はどんどん近づいてくる。</p>
+<p>画面の中のキャラクターが、森の道で立ち止まった。</p>
+<p>「たぬちゃん、左に避けて」</p>
+<p>「左ってどっちぽん！？」</p>
+<p>「キーボードのA」</p>
+<p>「Aぽんね！」</p>
+<p>たぬちゃんがAキーを押す。<br>
 キャラクターは横に動いた。<br>
-そのすぐ横を、黒い影のような敵がすり抜けていった。</p><p>「よけたぽん！」</p><p>「今。攻撃」</p><p>「攻撃ってどれぽん！？」</p><p>「マウスの左クリック」</p><p>「これぽん！」</p><p class="novel-emphasis">カチッ。</p><p>小さな光の弾が飛び、敵に当たった。<br>
-画面に星のような光がぱっと散る。</p><p>たぬちゃんは椅子の上で跳ねた。</p><p>「当たったぽん！ 今の見たぽん！？」</p><p>「見てた。ちゃんと当たってた」</p><p>「たぬちゃん、才能あるぽん？」</p><p>「今のは半分くらい案内のおかげ」</p><p>「じゃあ二人の才能ぽん！」</p><p>幽霊は少しだけ黙った。<br>
-そして、小さく笑った。</p><p>「それなら、そうかもね」</p><p>その時、画面の下に新しい表示が出た。</p><p class="novel-emphasis">ASSIST MODE</p><p>たぬちゃんが首をかしげる。</p><p>「アシストモードって何ぽん？」</p><p>「たぶん、二人で操作できる設定」</p><p>「二人でぽん？」</p><p>画面には説明が出ていた。<br>
+そのすぐ横を、黒い影のような敵がすり抜けていった。</p>
+<p>「よけたぽん！」</p>
+<p>「今。攻撃」</p>
+<p>「攻撃ってどれぽん！？」</p>
+<p>「マウスの左クリック」</p>
+<p>「これぽん！」</p>
+<p class="novel-emphasis">カチッ。</p>
+<p>小さな光の弾が飛び、敵に当たった。<br>
+画面に星のような光がぱっと散る。</p>
+<p>たぬちゃんは椅子の上で跳ねた。</p>
+<p>「当たったぽん！ 今の見たぽん！？」</p>
+<p>「見てた。ちゃんと当たってた」</p>
+<p>「たぬちゃん、才能あるぽん？」</p>
+<p>「今のは半分くらい案内のおかげ」</p>
+<p>「じゃあ二人の才能ぽん！」</p>
+<p>幽霊は少しだけ黙った。<br>
+そして、小さく笑った。</p>
+<p>「それなら、そうかもね」</p>
+<p>その時、画面の下に新しい表示が出た。</p>
+<p class="novel-emphasis">ASSIST MODE</p>
+<p>たぬちゃんが首をかしげる。</p>
+<p>「アシストモードって何ぽん？」</p>
+<p>「たぶん、二人で操作できる設定」</p>
+<p>「二人でぽん？」</p>
+<p>画面には説明が出ていた。<br>
 一人が移動。<br>
-もう一人が照準やアイテムを補助できるらしい。</p><p>たぬちゃんは、ぱっと幽霊を見た。</p><p>「幽霊もやるぽん！」</p><p>「僕は見てるだけでいい」</p><p>「さっきから見てるだけじゃないぽん。めちゃくちゃ助けてるぽん」</p><p>幽霊は、ゲーミングPCの光を見つめた。<br>
+もう一人が照準やアイテムを補助できるらしい。</p>
+<p>たぬちゃんは、ぱっと幽霊を見た。</p>
+<p>「幽霊もやるぽん！」</p>
+<p>「僕は見てるだけでいい」</p>
+<p>「さっきから見てるだけじゃないぽん。めちゃくちゃ助けてるぽん」</p>
+<p>幽霊は、ゲーミングPCの光を見つめた。<br>
 キーボード。<br>
 マウス。<br>
 画面の中の森。<br>
-そして、隣でわくわくしているたぬちゃん。</p><p>「……少しだけなら」</p><p>「やったぽん！」</p><p>たぬちゃんは、マウスを幽霊のほうへ少し寄せた。<br>
+そして、隣でわくわくしているたぬちゃん。</p>
+<p>「……少しだけなら」</p>
+<p>「やったぽん！」</p>
+<p>たぬちゃんは、マウスを幽霊のほうへ少し寄せた。<br>
 幽霊は体を机に近づけ、透き通った両手をそっと伸ばした。<br>
-片方の手はマウスに、もう片方の手はキーボードの近くに置かれる。</p><figure class="novel-illustration"><img src="assets/novel-episode3-illustration-01.webp" alt="幽霊が体を机に寄せて短い両手でマウスとキーボードにそっと触れようとする場面" loading="lazy" decoding="async" fetchpriority="low" width="768" height="512" sizes="(max-width: 760px) 100vw, 720px"></figure><p>マウスが、ほんの少し光った。</p><p>「動くかな」</p><p>幽霊が小さくつぶやく。</p><p>画面の照準が、すっと動いた。<br>
-ぶれることなく、森の奥のランタンにぴたりと合う。</p><p>たぬちゃんは目を丸くした。</p><p>「うまいぽん」</p><p>「たまたま」</p><p>「絶対たまたまじゃないぽん」</p><p>次の瞬間、茂みの奥から新しい敵が飛び出してきた。<br>
-たぬちゃんは声を上げる。</p><p>「来たぽん！」</p><p>「右に避けて。そのあと、僕が狙う」</p><p>「わかったぽん！」</p><p>たぬちゃんがDキーを押す。<br>
+片方の手はマウスに、もう片方の手はキーボードの近くに置かれる。</p><figure class="novel-illustration"><img src="assets/novel-episode3-illustration-01.webp" alt="幽霊が体を机に寄せて短い両手でマウスとキーボードにそっと触れようとする場面" loading="lazy" decoding="async" fetchpriority="low" width="768" height="512" sizes="(max-width: 760px) 100vw, 720px"></figure>
+<p>マウスが、ほんの少し光った。</p>
+<p>「動くかな」</p>
+<p>幽霊が小さくつぶやく。</p>
+<p>画面の照準が、すっと動いた。<br>
+ぶれることなく、森の奥のランタンにぴたりと合う。</p>
+<p>たぬちゃんは目を丸くした。</p>
+<p>「うまいぽん」</p>
+<p>「たまたま」</p>
+<p>「絶対たまたまじゃないぽん」</p>
+<p>次の瞬間、茂みの奥から新しい敵が飛び出してきた。<br>
+たぬちゃんは声を上げる。</p>
+<p>「来たぽん！」</p>
+<p>「右に避けて。そのあと、僕が狙う」</p>
+<p>「わかったぽん！」</p>
+<p>たぬちゃんがDキーを押す。<br>
 キャラクターが横へ跳ぶ。<br>
 幽霊がマウスを動かす。<br>
-照準が敵を追い、ぴたりと止まる。</p><figure class="novel-illustration"><img src="assets/novel-episode3-illustration-02.webp" alt="たぬちゃんがキーボードで大慌てで移動し、幽霊が短い両手で冷静にマウス操作して照準を合わせる場面" loading="lazy" decoding="async" fetchpriority="low" width="768" height="512" sizes="(max-width: 760px) 100vw, 720px"></figure><p class="novel-emphasis">カチッ。</p><p>光の弾がまっすぐ飛んだ。</p><p>敵は星の粒になって消えた。</p><p>秘密基地の中が、一瞬しんと静かになった。</p><p>たぬちゃんが、ゆっくり幽霊を見上げる。</p><p>「……幽霊、めちゃくちゃうまいぽん」</p><p>「そんなことない」</p><p>「うまいぽん」</p><p>「まだ一回だけ」</p><p>「一回でわかるぽん」</p><p>幽霊は少し照れたように、画面のほうを向いた。</p><p>「じゃあ、次もちゃんと見る。敵の位置と、進む道」</p><p>「たぬちゃんが動くぽん！」</p><p>「僕が狙う」</p><p>「二人でお城まで行くぽん！」</p><figure class="novel-illustration"><img src="assets/novel-episode3-illustration-03.webp" alt="敵を倒したモニターから紫と金色の星の光が広がり、たぬちゃんが大喜びして幽霊が少し照れる場面" loading="lazy" decoding="async" fetchpriority="low" width="768" height="512" sizes="(max-width: 760px) 100vw, 720px"></figure><p>画面の奥で、星明かりのお城がまたたいた。<br>
+照準が敵を追い、ぴたりと止まる。</p><figure class="novel-illustration"><img src="assets/novel-episode3-illustration-02.webp" alt="たぬちゃんがキーボードで大慌てで移動し、幽霊が短い両手で冷静にマウス操作して照準を合わせる場面" loading="lazy" decoding="async" fetchpriority="low" width="768" height="512" sizes="(max-width: 760px) 100vw, 720px"></figure>
+<p class="novel-emphasis">カチッ。</p>
+<p>光の弾がまっすぐ飛んだ。</p>
+<p>敵は星の粒になって消えた。</p>
+<p>秘密基地の中が、一瞬しんと静かになった。</p>
+<p>たぬちゃんが、ゆっくり幽霊を見上げる。</p>
+<p>「……幽霊、めちゃくちゃうまいぽん」</p>
+<p>「そんなことない」</p>
+<p>「うまいぽん」</p>
+<p>「まだ一回だけ」</p>
+<p>「一回でわかるぽん」</p>
+<p>幽霊は少し照れたように、画面のほうを向いた。</p>
+<p>「じゃあ、次もちゃんと見る。敵の位置と、進む道」</p>
+<p>「たぬちゃんが動くぽん！」</p>
+<p>「僕が狙う」</p>
+<p>「二人でお城まで行くぽん！」</p><figure class="novel-illustration"><img src="assets/novel-episode3-illustration-03.webp" alt="敵を倒したモニターから紫と金色の星の光が広がり、たぬちゃんが大喜びして幽霊が少し照れる場面" loading="lazy" decoding="async" fetchpriority="low" width="768" height="512" sizes="(max-width: 760px) 100vw, 720px"></figure>
+<p>画面の奥で、星明かりのお城がまたたいた。<br>
 森の道は、まだ長い。<br>
-でも、たぬちゃんはもう怖がっていなかった。</p><p>幽霊も、ただ見ているだけではなかった。</p><p>秘密基地の机の上で、キーボードとマウスが紫色に光る。<br>
-ランタンの灯りがゆれて、ネオンの幽霊とたぬちゃんも、まるで応援しているみたいに光っていた。</p><figure class="novel-illustration"><img src="assets/novel-episode3-illustration-04.webp" alt="モニターに星明かりのお城が映り、幽霊とたぬちゃんが並んでキーボードとマウスの前で画面を見る場面" loading="lazy" decoding="async" fetchpriority="low" width="768" height="512" sizes="(max-width: 760px) 100vw, 720px"></figure><p>二人の冒険は、少しだけ形を変えた。</p><p>ひとりで遊ぶゲームから、<br>
-ふたりで進むゲームへ。</p><p>そしてその夜、たぬちゃんは何度も言った。</p><p>「もう一回ぽん！」</p><p>幽霊はそのたびに、少しだけ笑って答えた。</p><p>「次は、もっと静かに避けて」</p><p>「それは無理ぽん！」</p><p>森の奥へ、二人の笑い声が響いていった。</p></div></article></details></div></details></div><div class="novel-home-row"><a class="mini-btn" href="index.html#novel">秘密基地の小説欄に戻る →</a></div></article></section></main><footer><p>© 2026 柚胡椒の秘密基地 All Rights Reserved.</p></footer><script src="script.js?v=232" defer></script></body></html>
+でも、たぬちゃんはもう怖がっていなかった。</p>
+<p>幽霊も、ただ見ているだけではなかった。</p>
+<p>秘密基地の机の上で、キーボードとマウスが紫色に光る。<br>
+ランタンの灯りがゆれて、ネオンの幽霊とたぬちゃんも、まるで応援しているみたいに光っていた。</p><figure class="novel-illustration"><img src="assets/novel-episode3-illustration-04.webp" alt="モニターに星明かりのお城が映り、幽霊とたぬちゃんが並んでキーボードとマウスの前で画面を見る場面" loading="lazy" decoding="async" fetchpriority="low" width="768" height="512" sizes="(max-width: 760px) 100vw, 720px"></figure>
+<p>二人の冒険は、少しだけ形を変えた。</p>
+<p>ひとりで遊ぶゲームから、<br>
+ふたりで進むゲームへ。</p>
+<p>そしてその夜、たぬちゃんは何度も言った。</p>
+<p>「もう一回ぽん！」</p>
+<p>幽霊はそのたびに、少しだけ笑って答えた。</p>
+<p>「次は、もっと静かに避けて」</p>
+<p>「それは無理ぽん！」</p>
+<p>森の奥へ、二人の笑い声が響いていった。</p>
+</div>
+</article></details>
+<details class="novel-accordion novel-episode-panel novel-release-gate" id="novel-episode-4" data-release-date="2026-10-18">
+<summary class="novel-accordion-button novel-episode-button"><span class="novel-button-kicker">第4話</span><span class="novel-button-title">秘密基地、配信準備中</span><span class="novel-release-badge">2026/10/18 公開</span><span class="novel-button-mark" aria-hidden="true">＋</span></summary>
+<div class="novel-release-locked" aria-live="polite"><p>第4話「秘密基地、配信準備中」は2026/10/18 0:00（日本時間）に公開します。</p></div>
+<article class="novel-episode-content novel-release-content"><p class="novel-body-label">第4話 本編</p>
+<div class="novel-body">
+<p>星明かりのお城へ続く道は、思っていたよりずっと長かった。</p>
+<p>橋を渡っては森へ戻り、宝箱を見つけては寄り道をする。たぬちゃんがキーボードで駆け回り、幽霊が隣で道を確かめるうちに、秘密基地のランタンは何度も油を足すことになった。</p>
+<p>「今日はここまでにしよう」</p>
+<p>「あと一個だけ宝箱を開けるぽん」</p>
+<p>「それ、三個前にも聞いた」</p>
+<p>たぬちゃんは丸い体を椅子の上で少し縮めた。けれど、マウスを離す気配はなかった。</p>
+<p>幽霊が画面の隅を指した。いつもの地図の横に、見慣れない小さな窓が開いている。</p>
+<p>配信準備</p>
+<p>「はいしん……。新しいダンジョンぽん？」</p>
+<p>「たぶん違う。遊んでいるところを、ほかの誰かに見せるものみたい」</p>
+<p>窓の中には、ゲーム画面と小さなマイクの絵があった。その右側には、まだ何も書かれていない細長い箱が並んでいる。</p>
+<p>「見ている人が、ここへ言葉を送れるんだって」</p>
+<p>「じゃあ、さっきの宝箱も見てもらえるぽん？」</p>
+<p>「開ける前ならね」</p>
+<p>「もう一回探しに行くぽん！」</p>
+<p>「先に準備」</p>
+<p>幽霊がそう言って、机の端に置かれていた小さなマイクを二人の間へ動かした。PCと一緒に運び込んだ箱の底には、丸いカメラも入っていた。</p>
+<p>たぬちゃんがマイクへ顔を寄せる。</p>
+<p>「聞こえるぽーーーーん！」</p>
+<p>画面の音量メーターが、緑を通り越して真っ赤になった。幽霊は黙って目を細めた。</p>
+<p>「秘密基地の外まで聞こえたと思う」</p>
+<p>「マイク、すごいぽん」</p>
+<p>「すごいのは声の大きさ」</p>
+<p>幽霊がマウスで音量を下げる。たぬちゃんが普通の声で「ぽん」と言うと、今度は緑の棒がちょうどよく揺れた。</p>
+<p>カメラをつなぐと、画面の中にもう一つ、秘密基地が現れた。丸い耳と、透き通った体と、背景の木の壁。ランタンの灯りが少し明るすぎて、幽霊の輪郭が壁と混ざっている。</p>
+<p>「幽霊が、いつもより幽霊ぽん」</p>
+<p>「普段から幽霊だけど」</p>
+<p>二人はカメラの向きを直し、ランタンを机の奥へ移した。すると、画面の中でも二人がちゃんと隣にいるのが分かった。</p>
+<p>次は、配信画面の飾りだった。</p>
+<p>たぬちゃんは星のマークを次々と置いた。上にも下にも、ゲーム画面の真ん中にも。やがて、森も道も星に埋まった。</p>
+<p>「きらきらぽん！」</p>
+<p>「敵が見えない」</p>
+<p>「敵もきらきらにするぽん？」</p>
+<p>「星を減らそう」</p>
+<p>画面の縁だけに小さな星を残し、木の看板みたいな枠を置く。紫の線で囲まれたゲーム画面の隣には、チャット欄を作った。</p>
+<p>まだ何も届いていないその場所を、たぬちゃんはしばらく見つめていた。</p>
+<p>「ここに、誰かが来るぽんね」</p>
+<p>「来るかもしれない」</p>
+<p>「来たら、何て言うぽん？」</p>
+<p>「いらっしゃい、でいいんじゃない」</p>
+<p>たぬちゃんは小さくうなずいて、声に出さずに口を動かした。さっきマイクを赤くした時より、ずっと真剣な顔だった。</p>
+<p>最後に、配信の名前を入力する欄が出た。</p>
+<p>「たぬちゃんの最強宝箱探検隊ぽん」</p>
+<p>「毎回、宝箱を探すとは限らないよ」</p>
+<p>「じゃあ、幽霊とたぬちゃんの、すごい場所ぽん」</p>
+<p>「場所は合ってる」</p>
+<p>幽霊は木の壁を見回した。ふたりで運び込んだPC。少し傾いたランタン。机に残った、箱を引きずった時の傷。</p>
+<p>何かを始めるなら、この部屋の名前を、そのまま持っていきたかった。</p>
+<p>「柚胡椒の秘密基地、はどう？」</p>
+<p>たぬちゃんは画面と幽霊を交互に見て、それから大きく笑った。</p>
+<p>「それがいいぽん。ここに遊びに来てもらうぽん」</p>
+<p>一文字ずつ打ち込むたび、看板の名前が画面の中へ移っていった。</p>
+<p>配信準備　完了<br><br>そして、画面の真ん中に大きなボタンが出た。<br><br>配信開始</p>
+<p>たぬちゃんの手が、マウスのすぐそばで止まった。いつもの「もう一回」なら、迷わず押せる。でも、そのボタンの向こうには、まだ会ったことのない誰かがいた。</p>
+<p>「……押すぽん？」</p>
+<p>幽霊は少し考えてから、首を横に振った。</p>
+<p>「初めての配信はちゃんと始めたい」</p>
+<p>そう言って、机の上の空っぽのコップを見た。外ではもう、月が木々の向こうへ沈みかけている。</p>
+<p>「水も用意して、ちゃんと寝て。明日、二人で始めよう」</p>
+<p>「最初のあいさつも練習するぽん」</p>
+<p>「音量は、今のままで」</p>
+<p>二人は顔を見合わせて笑った。たぬちゃんがゲームを保存し、幽霊がマイクの灯りを消す。配信開始のボタンは、まだ押されないまま、画面の中で静かに待っていた。</p>
+<p>明日になれば、きっと押す。<br>二人で。<br>それが、柚胡椒の秘密基地の、はじめての配信になる。</p>
+</div></article></details>
+<details class="novel-accordion novel-episode-panel novel-release-gate" id="novel-episode-5" data-release-date="2026-10-25">
+<summary class="novel-accordion-button novel-episode-button"><span class="novel-button-kicker">第5話</span><span class="novel-button-title">はじめての配信</span><span class="novel-release-badge">2026/10/25 公開</span><span class="novel-button-mark" aria-hidden="true">＋</span></summary>
+<div class="novel-release-locked" aria-live="polite"><p>第5話「はじめての配信」は2026/10/25 0:00（日本時間）に公開します。</p></div>
+<article class="novel-episode-content novel-release-content"><p class="novel-body-label">第5話 本編</p>
+<div class="novel-body">
+<p>翌日の秘密基地は、いつもより少しだけ片付いていた。</p>
+<p>机には水の入ったコップが二つ。ランタンはカメラに映り込まない場所へ寄せられ、木の壁の看板も、たぬちゃんが背伸びをしてまっすぐに直していた。</p>
+<p>ただ、椅子に座ったたぬちゃんだけが、まったく落ち着かなかった。</p>
+<p>「あいさつ、忘れたぽん」</p>
+<p>「いらっしゃい、だよ」</p>
+<p>「それは覚えてるぽん。その次を忘れたぽん」</p>
+<p>「まだ誰も来てないから、その次は後で考えよう」</p>
+<p>幽霊も、いつもより何度も設定を見直していた。マイクの緑の棒。ゲームの音。画面の端に置いた星。そして、まだ空っぽのチャット欄。</p>
+<p>「準備、できた？」</p>
+<p>たぬちゃんは、丸い手を膝の上で握ってから、うなずいた。</p>
+<p>「できたぽん」</p>
+<p>マウスに触れているたぬちゃんの手の横へ、幽霊が短い手をそっと添えた。昨日は遠く見えたボタンが、今日はもう、すぐ目の前にあった。</p>
+<p>カチッ。</p>
+<p>画面の隅に、赤い小さな丸が灯った。<br>配信中　00:00:01</p>
+<p>二人はしばらく、その数字が増えていくのを見ていた。部屋のどこかで扉が開く音がするわけでも、誰かが拍手をするわけでもない。PCのファンが、いつもどおり静かに回っているだけだった。</p>
+<p>「……始まってるぽん？」</p>
+<p>「始まってる」</p>
+<p>「今のも聞こえたぽん？」</p>
+<p>「たぶん全部」</p>
+<p>たぬちゃんは背筋をぴんと伸ばした。</p>
+<p>「い、いらっしゃいぽん！　柚胡椒の秘密基地ぽん！　今日は、お城に……ええと、お城が……」</p>
+<p>「お城に向かいます」</p>
+<p>「それぽん！」</p>
+<p>幽霊の声が入ると、たぬちゃんの肩から少しだけ力が抜けた。いつもの隣の声だ。画面の向こうが誰であっても、この声は変わらない。</p>
+<p>ゲームを開くと、キャラクターは昨夜と同じ森の道に立っていた。けれど、たぬちゃんの指は少し忙しすぎた。前へ進もうとして木にぶつかり、戻ろうとして、また同じ木にぶつかる。</p>
+<p>「この木、昨日より強いぽん」</p>
+<p>「昨日と同じ木だと思う」</p>
+<p>その時、チャット欄に小さな文字が一行、現れた。</p>
+<p>『こんばんは。木と戦ってる？』</p>
+<p>たぬちゃんの指が止まった。幽霊も、マウスから少し手を離した。</p>
+<p>何度も試した音声テストより、きれいに並べた星より、その一行のほうがずっと不思議だった。二人しかいない部屋へ、本当に誰かの言葉が届いた。</p>
+<p>「来たぽん」</p>
+<p>「うん。来てくれたね」</p>
+<p>たぬちゃんはマイクへ顔を寄せかけ、昨日の赤いメーターを思い出して、少しだけ離れた。</p>
+<p>「こんばんはぽん！　木には、まだ負けてないぽん！」</p>
+<p>『まだ、なんだ』</p>
+<p>たぬちゃんが笑った。幽霊もつられて小さく笑い、その間にキャラクターは、ようやく木の横を通り抜けた。</p>
+<p>少し先の橋で、敵が二体現れた。幽霊が右の敵を知らせ、たぬちゃんが左へ動く。前の夜に練習したとおり、移動と照準がぴたりと重なった。</p>
+<p>光の弾が飛び、敵が星の粒になる。</p>
+<p>『今の、二人で操作してるの？』</p>
+<p>「そうぽん！　たぬちゃんが動いて、幽霊が狙うぽん！」</p>
+<p>『幽霊さん、一人でもやってみて』</p>
+<p>幽霊は画面を見たまま、ほんの少し固まった。</p>
+<p>「僕は、案内のほうが……」</p>
+<p>「たぬちゃんが案内するぽん！」</p>
+<p>「道、覚えてる？」</p>
+<p>「明るいほうぽん！」</p>
+<p>「だいぶ広い案内だね」</p>
+<p>それでも、幽霊はキーボードを自分の正面へ少し寄せた。片方の手をキーに、もう片方をマウスに置く。</p>
+<p>キャラクターが静かに橋を渡り始めた。敵の動きを待ち、横へ避け、照準を合わせる。たぬちゃんが驚く間もなく、道の先のランタンが一つ、また一つと灯った。</p>
+<p>「やっぱりうまいぽん！」</p>
+<p>『案内係、強かった』</p>
+<p>幽霊の輪郭が、ランタンの光の中で少しだけ揺れた。</p>
+<p>「落ち着いて見ていれば、そんなに……」</p>
+<p>「右に宝箱ぽん！」</p>
+<p>「えっ」</p>
+<p>幽霊がマウスを動かした瞬間、足元の小さな石につまずいた。キャラクターが橋の端でくるりと回り、危うく川へ落ちかける。</p>
+<p>チャット欄に、笑う文字がいくつか並んだ。たぬちゃんは椅子の上でおなかを抱えた。</p>
+<p>「幽霊も、びっくりするぽんね！」</p>
+<p>「急に言わなければ大丈夫だった」</p>
+<p>その言い方がいつもより少し早くて、たぬちゃんはもう一度笑った。</p>
+<p>お城には、まだ着かなかった。予定していた道から外れ、宝箱を探し、水を飲む休憩を挟んだ。けれど、空っぽだったチャット欄は、もう空っぽではなかった。</p>
+<p>『今日はここまで？』</p>
+<p>幽霊が時計を見てうなずいた。たぬちゃんは一瞬だけ「もう一回」と言いかけてから、コップを両手で持ち直した。</p>
+<p>「今日はここまでぽん。また、お城の続きからやるぽん」</p>
+<p>『また来るね』</p>
+<p>その言葉を、たぬちゃんはすぐには読み上げなかった。画面に残る短い文字を、もう一度、ゆっくり見た。</p>
+<p>「……また来てぽん」</p>
+<p>「見に来てくれて、ありがとう」</p>
+<p>幽霊が配信終了のボタンを押した。赤い丸が消えると、秘密基地には、二人の呼吸とPCの小さな音が残った。</p>
+<p>「どうだった？」</p>
+<p>「緊張したぽん」</p>
+<p>「僕も」</p>
+<p>「でも、またやりたいぽん」</p>
+<p>幽霊は消えたチャット欄のあたりを見て、それからうなずいた。</p>
+<p>二人で始めた冒険に、今日はもう一つ、帰ってきたくなる理由が増えていた。</p>
+</div></article></details>
+<details class="novel-accordion novel-episode-panel novel-release-gate" id="novel-episode-6" data-release-date="2026-11-01">
+<summary class="novel-accordion-button novel-episode-button"><span class="novel-button-kicker">第6話・最終話</span><span class="novel-button-title">柚胡椒の秘密基地</span><span class="novel-release-badge">2026/11/01 公開</span><span class="novel-button-mark" aria-hidden="true">＋</span></summary>
+<div class="novel-release-locked" aria-live="polite"><p>第6話「柚胡椒の秘密基地」は2026/11/01 0:00（日本時間）に公開します。</p></div>
+<article class="novel-episode-content novel-release-content"><p class="novel-body-label">第6話・最終話 本編</p>
+<div class="novel-body">
+<p>配信を始めてから、秘密基地の机には、小さな紙が置かれるようになった。</p>
+<p>水を用意する。<br>音を確かめる。<br>ゲームを保存する。<br>終わる前に、ありがとうを言う。</p>
+<p>最後の一行だけは、たぬちゃんが大きな文字で書いた。勢いよく書きすぎて、「う」のしっぽが紙から少しはみ出している。</p>
+<p>「それ、忘れないため？」</p>
+<p>幽霊が尋ねると、たぬちゃんは首を横に振った。</p>
+<p>「忘れたくないからぽん」</p>
+<p>幽霊は紙を机の端へずらし、マイクで隠れない位置に置いた。</p>
+<p>その夜、二人が配信を始めると、ほどなくチャット欄に言葉が届いた。</p>
+<p>『こんばんは。また来たよ』</p>
+<p>『今日はお城まで行けるかな』</p>
+<p>「いらっしゃいぽん！」</p>
+<p>「こんばんは。今日は、門の先まで行ってみます」</p>
+<p>最初の夜より、あいさつは少しだけ自然に出てきた。たぬちゃんの声は相変わらず元気で、幽霊は隣でさりげなく音量を確かめている。</p>
+<p>画面の中では、星明かりのお城が、ようやく二人の目の前に立っていた。森のランタンを順番に灯し、何度も橋を渡って、寄り道の宝箱もいくつか開けた。その先にあった、大きな門だった。</p>
+<p>「最初に見た時は、すぐ着けると思ったぽん」</p>
+<p>「宝箱の数を数えなければ、もう少し早かったかも」</p>
+<p>『宝箱も冒険のうち』</p>
+<p>「ほら、そうぽん！」</p>
+<p>たぬちゃんが胸を張ったところで、門の前の石像が動いた。星の欠片をまとった、大きな番人。地面に落ちる影が、二人のキャラクターをすっぽり覆った。</p>
+<p>「大きいぽん」</p>
+<p>「動きを見よう。まずは近づきすぎないで」</p>
+<p>たぬちゃんがキーボードを押す。幽霊がマウスで視点を動かす。番人の右腕が上がると、二人は息を合わせて横へ避けた。</p>
+<p>一度目は間に合わなかった。<br>二度目は避けた先でつまずいた。<br>三度目は、攻撃の光が番人の肩をすり抜けた。</p>
+<p>「あとちょっとだったぽん……」</p>
+<p>たぬちゃんの耳が、少しだけ下がった。マウスのそばにある幽霊の手も止まっている。</p>
+<p>『避けるの、さっきより早くなってた』</p>
+<p>『肩が光った後に、胸も光ってない？』</p>
+<p>幽霊は、もう一度画面を見た。攻撃の直前、右肩の星が明るくなる。その光が消える頃、胸の小さな模様が開いていた。</p>
+<p>「……本当だ。見る場所が一つ、足りなかった」</p>
+<p>「今度はいけるぽん？」</p>
+<p>「試してみよう。たぬちゃんは右に避けて。胸が光ったら、僕が狙う」</p>
+<p>たぬちゃんは椅子に座り直した。</p>
+<p>「わかったぽん」</p>
+<p>番人が腕を振り上げる。たぬちゃんがDキーを押し、キャラクターが横へ滑った。地面に光が走る。そのすぐ後ろで、番人の胸が淡く開いた。</p>
+<p>「今」</p>
+<p>幽霊の声は小さかった。けれど、たぬちゃんには、はっきり聞こえた。</p>
+<p>マウスの照準が止まる。<br>カチッ。</p>
+<p>放たれた光が、星の模様の真ん中へ吸い込まれた。番人の体が大きく揺れ、まとっていた欠片が、夜空へ向かってほどけていく。</p>
+<p>大きな門が、ゆっくりと開いた。</p>
+<p>「開いたぽん！」</p>
+<p>チャット欄にも、同じ言葉が並んだ。おめでとう。やったね。今の、きれいに当たった。</p>
+<p>たぬちゃんは両手を上げ、それから慌ててキーボードへ戻した。キャラクターが、嬉しさの勢いで門の柱にぶつかりかけている。</p>
+<p>「最後まで前を見て」</p>
+<p>「今はちょっと難しいぽん！」</p>
+<p>幽霊は笑いながら、視点を門の向こうへ向けた。</p>
+<p>お城の中にあったのは、金銀の山ではなかった。小さな中庭に、長い木の机が置かれている。真ん中のランタンには、森で見つけたものと同じ星の灯りがともっていた。</p>
+<p>画面に文字が浮かぶ。</p>
+<p>ここまで来た旅人へ。<br>どうぞ、ひと休みを。</p>
+<p>たぬちゃんは黙って、その机を見た。どこかで見たことがある気がした。きらきらした城壁よりも、広い宝物庫よりも、ずっとよく知っている場所に似ていた。</p>
+<p>「秘密基地みたいぽん」</p>
+<p>「そうだね」</p>
+<p>幽霊は、画面の外へ目を向けた。木の壁。紫のネオン。少し傾いたままのランタン。そして、自分たちの声を拾っている小さなマイク。</p>
+<p>人間世界から落ちてきた箱を、二人で引っ張ってきた夜には、ここはただ、二人で隠れて遊ぶ場所だった。</p>
+<p>今も、部屋の広さは変わっていない。椅子も二つのままだ。それなのに、画面の右側には、ここで一緒に笑ってくれた誰かの言葉が残っている。</p>
+<p>『いい部屋だね』</p>
+<p>「うん。いい部屋だと思う」</p>
+<p>幽霊がそう答えると、たぬちゃんが、ぱっとこちらを向いた。</p>
+<p>「ゲームのお城の話ぽん？」</p>
+<p>「どっちも」</p>
+<p>たぬちゃんは少し考えて、それから満足そうに笑った。</p>
+<p>ゲームの区切りの画面には、小さく「CLEAR」と出ていた。その下に、二人のキャラクターが並んでいる。</p>
+<p>「終わっちゃったぽんね」</p>
+<p>言ってから、たぬちゃんはチャット欄を見た。</p>
+<p>『次は何で遊ぶ？』</p>
+<p>『また二人で迷子になってほしい』</p>
+<p>「迷子は予定に入れてない」</p>
+<p>幽霊が答えた。たぬちゃんは、もう笑っていた。</p>
+<p>「でも、宝箱は探すぽん！」</p>
+<p>配信を終える前に、二人は机の紙を見た。</p>
+<p>「今日も見に来てくれて、ありがとうぽん」</p>
+<p>「また、ここで。見るだけでも、ひとこと話していっても」</p>
+<p>赤い丸が消えた後も、部屋の灯りは消えなかった。たぬちゃんがコップを片付け、幽霊がゲームの記録を確かめる。</p>
+<p>モニターの中には、長い机とランタンが残っていた。モニターの外では、同じように、紫の灯りが静かに揺れている。</p>
+<p>「最初は、すごいPCを見つけたと思ったぽん」</p>
+<p>たぬちゃんが言った。</p>
+<p>「すごいPCだったよ」</p>
+<p>「うん。でも、それだけじゃなかったぽん」</p>
+<p>幽霊はうなずいて、画面のそばの小さな星を一つ、まっすぐに直した。</p>
+<p>この箱が連れてきたのは、遠いお城だけではなかった。二人で何かを始める時間と、失敗を笑える相手と、また来るねと言ってくれる誰かだった。</p>
+<p>木の扉の向こうで、夜風が小さく鳴った。たぬちゃんが椅子の上で伸びをして、いつもの声で言う。</p>
+<p>「明日も遊ぶぽん」</p>
+<p>「明日は、最初から水を用意しておこう」</p>
+<p>二人の笑い声が、秘密基地にやわらかく響いた。</p>
+<p>看板に灯っている名前は、あの日と同じ。<br><br>柚胡椒の秘密基地。<br><br>もう、二人だけの秘密ではない。<br>けれど、ふらっと帰ってこられる灯りは、これからもここにある。</p>
+<p>――おしまい。</p>
+</div></article></details>
+</div></details>
+</div>
+<div class="novel-home-row">
+<a class="mini-btn" href="index.html#novel">秘密基地の小説欄に戻る →</a>
+</div>
+</article>
+</section>
+</main>
+<footer>
+<p>© 2026 柚胡椒の秘密基地 All Rights Reserved.</p>
+</footer><script src="script.js?v=235" defer></script><script defer src="daily-v235.js?v=235"></script><script defer src="upgrades-v234.js?v=235"></script></body>
+</html>
