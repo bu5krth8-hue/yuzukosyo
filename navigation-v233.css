@@ -35,7 +35,7 @@ body#top .topbar .shortcut-menu-links > a:focus-visible,
 .site-guide-links a:focus-visible, .site-breadcrumbs a:focus-visible, .shop-switch:focus-visible {
  outline:3px solid var(--theme-accent2,var(--blue)) !important; outline-offset:3px !important;
 }
-#lineStamps, #appSales { scroll-margin-top:90px; }
+#lineStampShop, #appSalesShop { scroll-margin-top:90px; }
 .shop-switch:target { outline:3px solid var(--theme-accent2,var(--blue)); outline-offset:4px; }
 .external-link-note { font-size:11px !important; opacity:.9; }
 .site-guide { max-width:760px; margin:22px auto; padding:22px; border:1px solid var(--line); border-radius:20px; background:var(--panel); text-align:center; }

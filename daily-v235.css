@@ -39,3 +39,5 @@ html[data-light-mode="on"] .guide,html[data-light-mode="on"] .guide img { animat
 html[data-light-mode="on"] .arrival-stamp-overlay.is-showing:not(.is-hiding),html[data-light-mode="on"] .arrival-stamp-overlay.is-showing .arrival-stamp-card { opacity:1 !important; transform:none !important; }
 @media(max-width:760px) { .today-base { padding:18px 14px; } .today-base h2 { font-size:22px; } .today-base-grid > a { padding:12px; min-height:110px; } .today-base-grid strong { font-size:14px; } .today-base-grid span { font-size:12px; } .episode-navigation { grid-template-columns:1fr; } }
 @media(max-width:340px) { .today-base-grid { grid-template-columns:1fr; } .today-base-grid > a { min-height:90px; } .favorite-choices { grid-template-columns:1fr; } }
+
+html[data-light-mode="on"] .town-walker{animation:none!important}html[data-light-mode="on"] .town-home-card{box-shadow:none!important;backdrop-filter:none!important}

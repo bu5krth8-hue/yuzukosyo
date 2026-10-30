@@ -18,7 +18,7 @@
    ["🔮 過去のくじ履歴", "omikuji-history.html", "おみくじ 占い 運勢 バックアップ 保存 復元"]
   ];
   rooms.forEach(([label, href, words]) => { const a = document.createElement("a"); a.href = href; a.textContent = label; a.dataset.searchWords = words; extra.append(a); });
-  const aliases = {socialLinks:"SNS ツイッター Twitter X Discord Twitch YouTube 動画",lineStamps:"LINE ライン スタンプ 販売 ショップ",appSales:"アプリ 販売 BOOTH ボース ショップ",visitStamp:"スタンプ 出席 来場 バックアップ 保存 復元",schedule:"予定 スケジュール 配信",omikuji:"おみくじ 占い 運勢",themeColors:"テーマ カラー 色 変更",novel:"小説 物語 読む",apps:"アプリ パシャ読み OCR 読み上げ ツール",'stream-gear':"機材 マイク PC パソコン 使ってるもの",updates:"更新 お知らせ 履歴"};
+  const aliases = {yuzuTown:"柚の街 RPG 町 人口 施設 住民 冒険",socialLinks:"SNS ツイッター Twitter X Discord Twitch YouTube 動画",lineStampShop:"LINE ライン スタンプ 販売 ショップ",appSalesShop:"アプリ 販売 BOOTH ボース ショップ",visitStamp:"スタンプ 出席 来場 バックアップ 保存 復元",schedule:"予定 スケジュール 配信",omikuji:"おみくじ 占い 運勢",themeColors:"テーマ カラー 色 変更",novel:"小説 物語 読む",apps:"アプリ パシャ読み OCR 読み上げ ツール",'stream-gear':"機材 マイク PC パソコン 使ってるもの",updates:"更新 お知らせ 履歴"};
   const form = document.createElement("form"); form.className = "destination-search"; form.setAttribute("role", "search"); form.setAttribute("aria-label", "秘密基地の行き先検索");
   const label = document.createElement("label"); label.htmlFor = "destinationSearch"; label.textContent = "🔎 行き先を検索";
   const row = document.createElement("div"); row.className = "destination-search-row";
