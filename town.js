@@ -31,6 +31,17 @@
     if(f.inn>0)out+=house(552,400,1.4,'#e2cba4','inn');
     if(f.smith>0)out+=house(725,408,1.05,'#b7b2a2','smith');
     if(f.lab>0)out+=house(648,340,1.1,'#d7d0c1','lab');
+    // Crowd is representative, not a one-to-one list of actual residents.
+    const crowd=Math.min(60,Math.max(3,Math.round(3+Math.sqrt(Math.max(0,pop-3))*.9)));
+    const coats=['#7e5360','#476e7e','#d4ad69','#5c7860','#9d7768','#77749b'];
+    out+='<g class="town-crowd" aria-hidden="true">';
+    for(let i=0;i<crowd;i++){
+      const row=Math.floor(i/15),col=i%15;
+      const x=304+col*41+(i*13%19),y=416+row*27+(i*7%13);
+      const scale=.78+(y-410)/220;
+      out+=`<g transform="translate(${x} ${y}) scale(${scale})"><g class="town-walker" style="animation-delay:-${i%9}s;animation-duration:${7+i%5}s"><ellipse cy="2" rx="4" ry="1.5" fill="#304339" opacity=".25"/><path d="M-2-1v-4m4 4v-4" stroke="#4e4a49" stroke-width="1.5"/><path d="M-3-5v-6q3-3 6 0v6" fill="${coats[i%coats.length]}"/><circle cy="-14" r="2.5" fill="#d9b08b"/><path d="M-3-15q3-5 6 0" fill="${i%3===0?'#e2c994':'#62554e'}"/></g></g>`;
+    }
+    out+='</g>';
     out+='<path d="M0 538Q135 457 279 520T531 560H0Z" fill="#668565"/>';
     out+=tree(99,525,1.8)+tree(1136,519,1.6)+tree(176,549,1.3)+tree(39,548,1.4);
     for(let i=0;i<18;i++)out+=`<circle cx="${250+i*43}" cy="${458+(i*17)%78}" r="2" fill="${night?'#c8b37a':'#e9d89d'}" opacity=".6"/>`;
