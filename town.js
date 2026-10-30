@@ -2,7 +2,7 @@
   'use strict';
   const $=id=>document.getElementById(id), fmt=n=>new Intl.NumberFormat('ja-JP').format(n);
   const svgNS='http://www.w3.org/2000/svg';
-  let current=null,night=false,busy=false;
+  let current=null,night=false,busy=false,peopleFocus=false;
   const preview=new URLSearchParams(location.search).get('preview')==='1';
   const samples=[{level:1,inn:0,smith:0,lab:0},{level:20,inn:3,smith:2,lab:1},{level:176,inn:5,smith:5,lab:5}];
   function sample(i){const s=samples[i],population=3+(s.level-1)*20;return {schema:1,capturedAt:new Date().toISOString(),town:{level:s.level,population,exp:15*s.level*(s.level-1)+s.level*12,progress:s.level*12,required:s.level*30,tier:['小さな集落','学術都市','王都'][i],stage:[1,11,20][i]},resources:{wood:[0,95,1600][i],ore:[0,40,980][i],crystal:[0,4,240][i]},facilities:{inn:s.inn,smith:s.smith,lab:s.lab},residents:[{arrived:population>=40},{arrived:population>=100},{arrived:population>=180}],quest:{name:['木材集め','鉱石集め','魔物調査'][i],progress:[0,2,1][i],goal:[6,4,3][i]},pending:false};}
@@ -31,23 +31,23 @@
     if(f.inn>0)out+=house(552,400,1.4,'#e2cba4','inn');
     if(f.smith>0)out+=house(725,408,1.05,'#b7b2a2','smith');
     if(f.lab>0)out+=house(648,340,1.1,'#d7d0c1','lab');
-    // Crowd is representative, not a one-to-one list of actual residents.
-    const crowd=Math.min(60,Math.max(3,Math.round(3+Math.sqrt(Math.max(0,pop-3))*.9)));
-    const coats=['#7e5360','#476e7e','#d4ad69','#5c7860','#9d7768','#77749b'];
-    out+='<g class="town-crowd" aria-hidden="true">';
-    for(let i=0;i<crowd;i++){
-      const row=Math.floor(i/15),col=i%15;
-      const x=304+col*41+(i*13%19),y=416+row*27+(i*7%13);
-      const scale=.78+(y-410)/220;
-      out+=`<g transform="translate(${x} ${y}) scale(${scale})"><g class="town-walker" style="animation-delay:-${i%9}s;animation-duration:${7+i%5}s"><ellipse cy="2" rx="4" ry="1.5" fill="#304339" opacity=".25"/><path d="M-2-1v-4m4 4v-4" stroke="#4e4a49" stroke-width="1.5"/><path d="M-3-5v-6q3-3 6 0v6" fill="${coats[i%coats.length]}"/><circle cy="-14" r="2.5" fill="#d9b08b"/><path d="M-3-15q3-5 6 0" fill="${i%3===0?'#e2c994':'#62554e'}"/></g></g>`;
-    }
-    out+='</g>';
     out+='<path d="M0 538Q135 457 279 520T531 560H0Z" fill="#668565"/>';
     out+=tree(99,525,1.8)+tree(1136,519,1.6)+tree(176,549,1.3)+tree(39,548,1.4);
     for(let i=0;i<18;i++)out+=`<circle cx="${250+i*43}" cy="${458+(i*17)%78}" r="2" fill="${night?'#c8b37a':'#e9d89d'}" opacity=".6"/>`;
+    // Crowd is representative, not a one-to-one list of actual residents.
+    const crowd=Math.min(45,Math.max(3,Math.round(3+Math.sqrt(Math.max(0,pop-3))*.9)));
+    const coats=['#7e5360','#476e7e','#d4ad69','#5c7860','#9d7768','#77749b'];
+    out+='<g class="town-crowd" aria-hidden="true">';
+    for(let i=0;i<crowd;i++){
+      const row=Math.floor(i/12),col=i%12;
+      const x=304+col*49+(i*13%13),y=421+row*29+(i*7%9);
+      const scale=(1.15+(y-410)/200)*(peopleFocus?1.55:1);
+      out+=`<g transform="translate(${x} ${y}) scale(${scale})"><title>街で暮らす住民</title><g class="town-walker" style="animation-delay:-${i%9}s;animation-duration:${7+i%5}s"><ellipse cy="2" rx="5" ry="2" fill="#304339" opacity=".25"/>${peopleFocus?'<ellipse cy="-8" rx="10" ry="16" fill="#fff7d9" opacity=".45"/>':''}<path d="M-2 0v-6m4 6v-6" stroke="#3c3f43" stroke-width="2"/><path d="M-3.5-6v-7q3.5-4 7 0v7Z" fill="${coats[i%coats.length]}" stroke="${night?'#ebd6ab':'#fff6e4'}" stroke-width=".6"/><path d="M-4-12-6-7m10-5 2 5" stroke="#d9b08b" stroke-width="1.7" stroke-linecap="round"/><circle cy="-17" r="3.3" fill="#e0b68d" stroke="#775f4d" stroke-width=".5"/><path d="M-3.5-18q3.5-6 7 0" fill="${i%3===0?'#e2c994':'#62554e'}"/><circle cx="-1" cy="-17" r=".35" fill="#4a3e38"/><circle cx="1" cy="-17" r=".35" fill="#4a3e38"/><path d="M0-11v4" stroke="#eee1c4" stroke-width=".6"/></g></g>`;
+    }
+    out+='</g>';
     const svg=$('townScene');while(svg.children.length>2)svg.lastElementChild.remove();
     const group=document.createElementNS(svgNS,'g');group.innerHTML=out;svg.append(group);
-    $('sceneTitle').textContent=(data?data.town.tier:'柚の街の風景イメージ')+'・'+(night?'夜':'昼');
+    $('sceneTitle').textContent=(data?data.town.tier:'柚の街の風景イメージ')+'・'+(night?'夜':'昼')+(peopleFocus?'・住民を拡大':'');
   }
   function render(d) {
     current=d;$('sceneEmpty').hidden=true;scene(d);
@@ -76,6 +76,7 @@
     }catch{$('syncStatus').textContent=current?'更新を確認できませんでした。最後に取得した街を表示しています。':'街の記録を取得できませんでした。しばらくしてから更新してください。';}
     finally{clearTimeout(timeout);busy=false;$('refreshButton').disabled=false;}
   }
+  $('peopleButton').addEventListener('click',()=>{peopleFocus=!peopleFocus;$('peopleButton').setAttribute('aria-pressed',String(peopleFocus));$('peopleButton').textContent=peopleFocus?'通常の大きさに戻す':'住民に注目';scene(current);});
   $('dayButton').addEventListener('click',()=>setNight(false));$('nightButton').addEventListener('click',()=>setNight(true));
   function setNight(value){night=value;$('dayButton').setAttribute('aria-pressed',String(!value));$('nightButton').setAttribute('aria-pressed',String(value));scene(current);}
   $('refreshButton').addEventListener('click',()=>{if(preview)render(current);else load();});

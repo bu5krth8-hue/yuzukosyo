@@ -2407,13 +2407,14 @@ setupUpdateHistoryMore();
 function setupStableShortcutJumps() {
  const nav = document.querySelector(".topbar-actions");
  if (!nav) return;
- const anchorMap = new Set(["#yuzuTown", "#top", "#socialLinks", "#visitStamp", "#schedule", "#omikuji", "#themeColors", "#novel", "#apps", "#updates", "#stream-gear"]);
+ const anchorMap = new Set(["#lineStampShop", "#appSalesShop", "#yuzuTown", "#top", "#socialLinks", "#visitStamp", "#schedule", "#omikuji", "#themeColors", "#novel", "#apps", "#updates", "#stream-gear"]);
  const jumpPrepareTargets = [
   ".social-anchor",
   ".social-switches",
   ".visit-stamp-section",
   ".mascot-area",
   ".beginner-section",
+  ".shop-switches",
   ".town-home-section",
   ".schedule-wide-section",
   ".schedule-wide-card",
@@ -2448,7 +2449,7 @@ function setupStableShortcutJumps() {
   }
   const actions = document.querySelector(".topbar-actions");
   const navHeight = actions ? Math.ceil(actions.getBoundingClientRect().height) : 0;
-  if (hash === "#yuzuTown" || hash === "#stream-gear" || hash === "#updates" || hash === "#visitStamp" || hash === "#themeColors" || hash === "#novel" || hash === "#apps" || hash === "#socialLinks") {
+  if (hash === "#lineStampShop" || hash === "#appSalesShop" || hash === "#yuzuTown" || hash === "#stream-gear" || hash === "#updates" || hash === "#visitStamp" || hash === "#themeColors" || hash === "#novel" || hash === "#apps" || hash === "#socialLinks") {
    if (width <= 900) return Math.max(188, navHeight + 16);
    return 210;
   }
