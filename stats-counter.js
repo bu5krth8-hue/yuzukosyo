@@ -5,15 +5,14 @@
   const noteEl = document.getElementById("accessNote");
   const n = Number(total);
   if (countEl) {
-   countEl.textContent = total != null && Number.isFinite(n) ? n.toLocaleString("ja-JP") : "—";
-   countEl.setAttribute("aria-label", note || `来場者数 ${n.toLocaleString("ja-JP")}人`);
+   countEl.textContent = Number.isFinite(n) ? n.toLocaleString("ja-JP") : "0";
   }
   if (noteEl) {
-   noteEl.textContent = note || "";
+   noteEl.textContent = "";
   }
  }
  async function runCounter() {
-  writeCount(null, "来場者数を読み込み中");
+  writeCount(0, "");
   try {
    const response = await fetch(`${API_URL}?v=${Date.now()}`, {
     method: "GET",
@@ -27,9 +26,9 @@
     writeCount(Number(data.total), "");
     return;
    }
-   writeCount(null, "来場者数を取得できませんでした");
+   writeCount(0, "");
   } catch (error) {
-   writeCount(null, "来場者数を取得できませんでした");
+   writeCount(0, "");
   }
  }
  function scheduleCounter() {
