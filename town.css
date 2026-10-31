@@ -8,3 +8,6 @@
 /* v242: top status shortcut, including mobile. */
 .town-status-link{display:inline-flex;align-items:center;border:1px solid #bd98e94d;border-radius:24px;padding:7px 13px;background:#b58ce410;color:var(--gold)}
 @media(max-width:580px){.town-header{flex-wrap:wrap;gap:12px}.town-header nav{width:100%;justify-content:center;flex-wrap:wrap}.town-header nav>a.town-status-link{display:inline-flex}.town-header nav>a[href="#facilities"],.town-header nav>a[href="#residents"]{display:none}}
+
+/* v243: account link stays visible on mobile. */
+@media(max-width:580px){.town-header nav>a.town-account-link{display:inline-flex}}

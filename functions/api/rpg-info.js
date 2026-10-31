@@ -1,3 +1,4 @@
+import {PLAY} from '../../rpg-play-data.js';
 import {json,botAuth} from './town-support.js';
 const KEY='yuzu_rpg_public_v1',MAX=2000000;
 const num=(v,max=Number.MAX_SAFE_INTEGER)=>{if(!Number.isSafeInteger(v)||v<0||v>max)throw Error('number');return v;};
@@ -23,6 +24,9 @@ export async function onRequest({request,env}){
  if(request.method==='GET'){try{const d=await env.RPG_TOWN.get(KEY,'json');return json({configured:true,data:d});}catch{return json({error:'storage_unavailable'},503);}}
  if(request.method!=='POST')return json({error:'method'},405);
  if(!await botAuth(request,env))return json({error:'unauthorized'},401);
- try{const d=validate(await readBody(request));const old=await env.RPG_TOWN.get(KEY,'json');if(old&&Date.parse(old.capturedAt)>Date.parse(d.capturedAt))return json({error:'older_snapshot'},409);await env.RPG_TOWN.put(KEY,JSON.stringify(d));return json({ok:true});}
+ try{const input=await readBody(request),d=validate(input);let identities=null;
+  if(input.privateIdentities!==undefined){if(!Array.isArray(input.privateIdentities)||input.privateIdentities.length>d.players.length)throw Error('identities');const ids=new Set(),publicIds=new Set(d.players.map(p=>p.id));identities=input.privateIdentities.map(p=>{if(!publicIds.has(p.id)||ids.has(p.id)||typeof p.login!=='string'||!/^[a-zA-Z0-9_]{1,25}$/.test(p.login))throw Error('identity');ids.add(p.id);return {id:p.id,login:p.login.toLowerCase()};});}
+  let game=null;if(input.privateGame!==undefined){if(!Array.isArray(input.privateGame)||input.privateGame.length!==d.players.length)throw Error('holdings');const ids=new Set(),publicIds=new Set(d.players.map(p=>p.id)),jobs=new Set(PLAY.jobs.map(j=>j.id)),titles=new Set(PLAY.titles.map(t=>t.id));game=input.privateGame.map(p=>{if(!publicIds.has(p.id)||ids.has(p.id)||typeof p.activeJob!=='string'||p.activeJob.length>40||!Array.isArray(p.ownedJobs)||p.ownedJobs.length>20||p.ownedJobs.some(j=>!jobs.has(j))||!Array.isArray(p.ownedTitles)||p.ownedTitles.length>6||p.ownedTitles.some(t=>!titles.has(t)))throw Error('holdings');ids.add(p.id);return {id:p.id,activeJob:p.activeJob,ownedJobs:[...new Set(p.ownedJobs)],ownedTitles:[...new Set(p.ownedTitles)]};});}
+  const old=await env.RPG_TOWN.get(KEY,'json');if(old&&Date.parse(old.capturedAt)>Date.parse(d.capturedAt))return json({error:'older_snapshot'},409);await env.RPG_TOWN.put(KEY,JSON.stringify(d));if(identities!==null)await env.RPG_TOWN.put('yuzu_rpg_identity_private_v1',JSON.stringify({capturedAt:d.capturedAt,identities}));if(game!==null)await env.RPG_TOWN.put('yuzu_rpg_game_private_v1',JSON.stringify({capturedAt:d.capturedAt,players:game}));return json({ok:true});}
  catch(e){return json({error:e.message==='large'?'too_large':'invalid_or_unavailable'},e.message==='large'?413:503);}
 }
