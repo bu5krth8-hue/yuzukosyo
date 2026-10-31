@@ -2,7 +2,7 @@ import {json,botAuth} from './town-support.js';
 export async function onRequest({request,env}){if(!await botAuth(request,env))return json({error:'unauthorized'},401);const db=env.RPG_SUPPORT;if(!db)return json({error:'not_configured'},503);try{
  if(request.method==='GET'){
   // Cancel unprocessed purchases after an account is disabled. Earned rewards remain held for reactivation.
-  await db.prepare("UPDATE web_commands SET status='rejected',last_error='account_disabled' WHERE kind='shop' AND status='pending' AND EXISTS(SELECT 1 FROM rpg_accounts a WHERE a.public_id=web_commands.public_id AND a.active=0)").run();
+  await db.prepare("UPDATE web_commands SET status='rejected',last_error='account_disabled' WHERE kind='shop' AND status='pending' AND polled_at=0 AND EXISTS(SELECT 1 FROM rpg_accounts a WHERE a.public_id=web_commands.public_id AND a.active=0)").run();
   const result=await db.prepare("SELECT c.id,c.public_id,c.kind,c.p1,c.p2,c.p3,c.p4 FROM web_commands c JOIN rpg_accounts a ON a.public_id=c.public_id WHERE c.status='pending' AND a.active=1 ORDER BY c.polled_at,c.seq LIMIT 20").all();const commands=result.results;
   if(commands.length)await db.batch(commands.map(c=>db.prepare('UPDATE web_commands SET polled_at=? WHERE id=?').bind(Date.now(),c.id)));
   const body=commands.map(c=>[c.id,c.kind,c.public_id,c.p1,c.p2,c.p3,c.p4].join('\t')).join('\n');return new Response(body,{headers:{'Content-Type':'text/plain; charset=utf-8','Cache-Control':'no-store'}});
