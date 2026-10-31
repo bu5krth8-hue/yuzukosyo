@@ -4,3 +4,7 @@
 .town-walker{animation:town-stroll 9s ease-in-out infinite alternate}@keyframes town-stroll{from{transform:translate(-4px,0)}to{transform:translate(5px,-2px)}}@media(prefers-reduced-motion:reduce){.town-walker{animation:none}}
 
 .people-focus-button{border:1px solid #ccb1f255;background:#ccb1f20d;color:#e5d6f3;border-radius:22px;padding:8px 14px;font-size:11px;white-space:nowrap}.people-focus-button[aria-pressed=true]{background:#eadcc4;color:#35283b;border-color:#eadcc4}.scene-top>div:first-child{margin-right:auto}.scene-top{flex-wrap:wrap}.town-crowd{pointer-events:none}.town-walker{paint-order:stroke fill}@media(max-width:580px){.scene-top{gap:10px}.people-focus-button{font-size:10px;padding:6px 11px}.scene-caption{gap:12px}.scene-caption span:last-child{max-width:145px;text-align:right;letter-spacing:0;font-size:8px}.resident .portrait{width:58px;height:66px;font-size:30px}.resident{gap:18px}.resident h3{font-size:22px}.resident .arrival{font-size:12px}}
+
+/* v242: top status shortcut, including mobile. */
+.town-status-link{display:inline-flex;align-items:center;border:1px solid #bd98e94d;border-radius:24px;padding:7px 13px;background:#b58ce410;color:var(--gold)}
+@media(max-width:580px){.town-header{flex-wrap:wrap;gap:12px}.town-header nav{width:100%;justify-content:center;flex-wrap:wrap}.town-header nav>a.town-status-link{display:inline-flex}.town-header nav>a[href="#facilities"],.town-header nav>a[href="#residents"]{display:none}}
