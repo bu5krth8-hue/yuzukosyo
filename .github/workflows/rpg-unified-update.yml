@@ -1,0 +1,57 @@
+name: Yuzu RPG unified update
+run-name: RPG ${{ inputs.mode }} / ${{ inputs.request_id }}
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        type: choice
+        options: [prepare, verify, verify-restore]
+        required: true
+      request_id:
+        description: Unique request ID from PC updater
+        required: true
+      release_sha:
+        description: Exact release commit SHA
+        required: true
+permissions:
+  contents: read
+concurrency:
+  group: yuzu-rpg-unified-update
+  cancel-in-progress: false
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    steps:
+      - name: Validate inputs
+        env:
+          RELEASE_SHA: ${{ inputs.release_sha }}
+          REQUEST_ID: ${{ inputs.request_id }}
+        run: |
+          [[ "$RELEASE_SHA" =~ ^[a-f0-9]{40}$ ]] || exit 1
+          [[ "$REQUEST_ID" =~ ^[a-f0-9]{32}$ ]] || exit 1
+      - uses: actions/checkout@v6
+        with:
+          path: control
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/checkout@v6
+        with:
+          path: release
+          ref: ${{ inputs.release_sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+      - name: Install pinned SQL update tool
+        if: inputs.mode == 'prepare'
+        run: npm ci --ignore-scripts --no-audit --no-fund --prefix control/.github/rpg-updater-v249
+      - name: Run update stage
+        run: node control/.github/rpg-updater-v249/core.mjs
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
+          UPDATE_MODE: ${{ inputs.mode }}
+          UPDATE_REQUEST_ID: ${{ inputs.request_id }}
+          UPDATE_RELEASE_SHA: ${{ inputs.release_sha }}
+          UPDATE_RELEASE_ROOT: release

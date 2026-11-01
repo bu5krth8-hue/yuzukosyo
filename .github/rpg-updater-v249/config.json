@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "repository": "bu5krth8-hue/yuzukosyo",
+  "branch": "main",
+  "accountId": "46a6431f63edf86fc25ed3743df891bf",
+  "pagesProject": "yuzukosyo",
+  "databaseName": "yuzu-town-support",
+  "publicUrl": "https://yuzukosyo.pages.dev",
+  "requiredKv": [
+    "RPG_TOWN",
+    "SITE_STATS"
+  ],
+  "requiredD1": "RPG_SUPPORT"
+}
