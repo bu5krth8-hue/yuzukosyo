@@ -1,7 +1,6 @@
 const KEY = 'yuzu_town_public_v1';
 const MAX = 8192;
-const names = ['小さな集落','開拓集落','柚の村','豊穣の村','街道の村','宿場町','市場町','職人の町','港町','交易都市','学術都市','工芸都市','城下町','大城下町','商業都市','文化都市','大都市','自治都市','都府','王都','大王都','皇都','帝都','大帝都','連邦首都','世界都市','星都','天空都市','伝説都市','永遠の柚都'];
-const thresholds = [3,20,40,60,80,100,140,180,220,280,350,450,600,800,1000,1300,1700,2200,2800,3500,4300,5200,6200,7300,8500,10000,12000,15000,20000,30000];
+import {TOWN_NAMES as names,TOWN_THRESHOLDS as thresholds} from '../../town-tiers.js';
 const reply = (body, status=200) => new Response(JSON.stringify(body), {status, headers:{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'}});
 function number(n, max=Number.MAX_SAFE_INTEGER) { if (!Number.isSafeInteger(n)||n<0||n>max) throw Error('invalid'); return n; }
 function validate(d) {

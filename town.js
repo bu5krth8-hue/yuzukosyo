@@ -53,7 +53,7 @@
     current=d;$('sceneEmpty').hidden=true;scene(d);
     const t=d.town;$('townTier').textContent=t.tier;$('level').textContent='Lv. '+fmt(t.level);$('population').textContent=fmt(t.population)+' 人';
     $('growthLabel').textContent=fmt(t.progress)+' / '+fmt(t.required)+' EXP';$('growthBar').max=t.required;$('growthBar').value=t.progress;
-    $('sceneCaption').textContent='発展段階 '+t.stage+' / 30';
+    $('sceneCaption').textContent='発展段階 '+t.stage+' / 100';
     for(const key of ['inn','smith','lab']){const lv=d.facilities[key];$(key+'Level').textContent=lv>0?'Lv. '+lv+' / 5':'これから発展';$(key+'Dots').replaceChildren();for(let i=0;i<5;i++){const dot=document.createElement('span');dot.className=i<lv?'on':'';$(key+'Dots').append(dot);}}
     $('innEffect').textContent='冒険中の宿屋の回復率 '+(25+2*d.facilities.inn)+'％';
     $('smithEffect').textContent='冒険で受けるダメージを最大 '+d.facilities.smith+'％軽減';
