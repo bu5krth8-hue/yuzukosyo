@@ -1,0 +1,8 @@
+import {currentSession,hash} from '../api/rpg-account.js';
+import {cookies} from '../api/town-support.js';
+import {OWNER} from './config.js';
+export const GATE='__Host-yuzu-world-test',GATE_AGE=21600;
+export function gateCookie(value,age=GATE_AGE){return `${GATE}=${value}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=${age}`;}
+export async function ownerSession(request,env){if(!env.RPG_SUPPORT||!env.RPG_TOWN)throw Error('not_configured');const session=await currentSession(request,env.RPG_SUPPORT);if(!session)throw Error('login_required');if(session.public_id!==OWNER)throw Error('owner_only');return session;}
+export async function requireGate(request,env){const session=await ownerSession(request,env),token=cookies(request)[GATE];if(typeof token!=='string'||!/^[A-Za-z0-9_-]{43}$/.test(token))throw Error('test_password_required');const gate=await env.RPG_SUPPORT.prepare('SELECT public_id,account_session_hash,expires_at FROM world252_gate WHERE token_hash=?').bind(await hash('world-gate:'+token)).first();if(!gate||gate.public_id!==session.public_id||gate.account_session_hash!==session.token_hash||gate.expires_at<=Date.now())throw Error('test_password_required');return session;}
+export function statusFor(e){return ['login_required','test_password_required'].includes(e.message)?401:e.message==='owner_only'?403:e.message==='rate_limit'?429:e.message==='conflict'?409:['invalid','blocked','too_far','not_ready','no_potion','boss_confirm','battle_active','no_item','create_first','materials','town_only','safe_place','unvisited','locked_item'].includes(e.message)?400:503;}

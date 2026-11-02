@@ -1,0 +1,15 @@
+import {REGIONS} from '../../world-content.js';
+export function regionMap(g){const r=REGIONS.find(r=>r.id===g.map);if(!r?.enemies)throw Error('invalid');const w=32,h=26,a=Array.from({length:h},(_,y)=>Array.from({length:w},(_,x)=>!x||!y||x===w-1||y===h-1?'t':'.'));
+ for(let x=1;x<w-1;x++)for(let y=12;y<=14;y++)a[y][x]='=';for(let y=3;y<h-2;y++)a[y][15]='=';
+ const obstacle=r.id==='quarry'||r.id==='ruins'?'#':'~';for(let y=3;y<9;y++)for(let x=4;x<11;x++)a[y][x]=obstacle;for(let y=17;y<22;y++)for(let x=22;x<28;x++)a[y][x]=obstacle;
+ for(const[x,y]of[[19,5],[20,5],[4,18],[5,19],[11,21],[25,10]])a[y][x]='t';
+ const entities=[{id:g.map+':back',kind:'exit',destination:'field',name:'始まりの平原へ',x:1,y:13},{id:g.map+':stone',kind:'waystone',name:'旅の石碑',x:15,y:12},{id:g.map+':herb',kind:'gather',material:'herb',name:'薬草の茂み',x:12,y:7},{id:g.map+':resource',kind:r.material==='fish'?'fishing':'gather',material:r.material,name:r.material==='fish'?'鏡湖の釣り場':'地域の資源',x:20,y:17},{id:g.map+':fish',kind:'fishing',material:'fish',name:'水辺の釣り場',x:11,y:5},{id:g.map+':chest',kind:'chest',name:'古びた宝箱',x:27,y:7,opened:!!g.claimed[g.map+':chest']}];
+ if(g.map==='ruins')entities.push({id:'ruins:deep',kind:'deep-cave',name:'古星の深層迷宮',x:28,y:21});
+ if(r.next)entities.push({id:g.map+':next',kind:'exit',destination:r.next,name:'奥の道へ',x:30,y:13});
+ for(let i=0;i<4;i++){const id=g.map+':enemy:'+i,species=r.enemies[i%r.enemies.length];if(!g.claimed[id])entities.push({id,kind:'enemy',species,name:'地域の魔物',x:[9,19,26,13][i],y:[13,11,15,20][i],level:r.level});}
+ return{key:g.map,name:r.name,subtitle:'推奨Lv.'+r.level+' / 入場制限なし',w,h,tiles:a.map(x=>x.join('')),entities,labels:[{x:15,y:10,text:'旅の石碑'}],palette:r.palette};}
+export function decorateMap(m,g){const r=REGIONS.find(r=>r.id===g.map);m.palette=r?.palette||'cave';if(g.map==='town')m.entities.push({id:'workshop',kind:'npc',name:'エマ',role:'変身工房',x:18,y:12,color:'#aaa3d7'},{id:'bard',kind:'npc',name:'フィン',role:'旅の吟遊詩人',x:8,y:11,color:'#a3c0a2'});
+ if(g.map==='field')m.entities.push({id:'to-forest',kind:'exit',destination:'forest',name:'灯籠の森へ',x:32,y:14},{id:'to-quarry',kind:'exit',destination:'quarry',name:'白晶の採掘跡へ',x:20,y:25},{id:'field:stone',kind:'waystone',name:'旅の石碑',x:28,y:14},{id:'field:herb',kind:'gather',material:'herb',name:'薬草の茂み',x:8,y:16},{id:'field:wood',kind:'gather',material:'wood',name:'香り木',x:19,y:18},{id:'field:fish',kind:'fishing',material:'fish',name:'平原の釣り場',x:15,y:8});
+ if(g.map==='cave'){const used=new Set(m.entities.map(e=>e.x+','+e.y));for(let y=2;y<m.h-2;y++)for(let x=2;x<m.w-2;x++)if(m.tiles[y][x]==='.'&&!used.has(x+','+y)){m.entities.push({id:g.run.id+':'+g.run.floor+':ore',kind:'gather',material:'ore',name:'洞窟の鉱脈',x,y});return m;}}
+ if(g.map!=='town'&&g.map!=='cave'&&(g.worldMinutes%1440>=1080||g.worldMinutes%1440<360)){const id=g.map+':night:'+Math.floor(g.worldMinutes/1440);if(!g.claimed[id]){let placed=false;for(let y=16;y<m.h-1&&!placed;y++)for(let x=5;x<m.w-1&&!placed;x++)if(!['#','~','t','R'].includes(m.tiles[y][x])&&!m.entities.some(e=>e.x===x&&e.y===y)){m.entities.push({id,kind:'enemy',species:g.map==='snow'?'wisp':'bat',name:'夜の魔物',x,y});placed=true;}}}
+ return m;}
