@@ -1,10 +1,12 @@
+import {campaignMap} from './campaign.js';
+import {CHAPTER_MONSTERS} from '../../world-campaign.js';
 import {EXTRA_MONSTERS} from '../../world-content.js';
 import {regionMap,decorateMap} from './regions.js';
 export function random(seed){let n=2166136261;for(const c of String(seed))n=Math.imul(n^c.charCodeAt(0),16777619);return()=>{n^=n<<13;n^=n>>>17;n^=n<<5;return(n>>>0)/4294967296;};}
 const grid=(w,h,c)=>Array.from({length:h},()=>Array(w).fill(c));
 const rect=(a,x,y,w,h,c)=>{for(let j=y;j<y+h;j++)for(let i=x;i<x+w;i++)a[j][i]=c;};
 export const walkable=t=>t!==undefined&&!['#','~','t','R'].includes(t);
-export function mapFor(g){const m=decorateMap(baseMap(g),g);for(const e of m.entities)if(e.species&&e.kind==='enemy')e.name=MONSTERS[e.species].name;return m;}
+export function mapFor(g){const m=campaignMap(g)||decorateMap(baseMap(g),g);for(const e of m.entities)if(e.species&&e.kind==='enemy')e.name=MONSTERS[e.species].name;return m;}
 function baseMap(g){
  if(g.map==='town'){
   const a=grid(28,22,'.');rect(a,0,0,28,1,'t');rect(a,0,21,28,1,'t');rect(a,0,0,1,22,'t');rect(a,27,0,1,22,'t');rect(a,12,1,3,20,'=');rect(a,1,10,26,3,'=');rect(a,3,3,6,4,'R');rect(a,19,3,6,4,'R');rect(a,4,14,6,4,'R');rect(a,19,15,6,4,'R');rect(a,3,19,5,2,'~');rect(a,3,19,5,1,'=');
@@ -45,7 +47,7 @@ export const MONSTERS={
  spider:{name:'石糸グモ',hp:66,attack:12,defense:6,speed:10,weak:'fire',color:'#b993b0'},
  golem:{name:'苔岩の守り手',hp:85,attack:14,defense:9,speed:3,weak:'wind',color:'#8baf97'}
 };
-Object.assign(MONSTERS,EXTRA_MONSTERS);
+Object.assign(MONSTERS,EXTRA_MONSTERS,CHAPTER_MONSTERS);
 export function chooseBoss(seed,previous){const pool=['wolf','spider','golem','fungus','boar','beetle','wisp','frog','shade','sentinel','frostwolf'].filter(x=>x!==previous),rng=random(seed+':boss'),species=pool[Math.floor(rng()*pool.length)],names={wolf:['石牙のヴァルム','月影のロウガ'],spider:['銀糸のアラクネア','岩織りのシルカ'],golem:['苔冠のグラニト','洞守りのオルガ'],fungus:['灯胞のモルカ','深緑のフンガル'],boar:['古樹のブラム','苔角のグロウ'],beetle:['白晶のバスト','硬殻のガルディ'],wisp:['宵灯のリュミエ','薄明のフィル'],frog:['鏡雨のオルネ','翠波のケロス'],shade:['廃庭のノクル','暮影のセイル'],sentinel:['星鎧のアストル','石衛のベリル'],frostwolf:['霜牙のフェンル','銀嶺のアルヴァ']};return{species,name:names[species][Math.floor(rng()*2)]};}
 
 export function deepBosses(seed,previous){const out={},names=new Set();for(let floor=5;floor<=40;floor+=5){let b;for(let attempt=0;attempt<100;attempt++){b=chooseBoss(seed+':'+floor+':'+attempt,previous);if(!names.has(b.name))break;}names.add(b.name);previous=b.species;out[floor]=b;}return out;}
