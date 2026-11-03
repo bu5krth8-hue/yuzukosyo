@@ -23,6 +23,56 @@ function dto(c,f,now){const stage=familyStage(f,now),other=f.parent_a===c.id?f.p
   candidates,round:f.name_round,votes:[f.vote_a,f.vote_b],myVote:f.parent_a===c.id?f.vote_a:f.vote_b,nameConfirmed:!!f.child_name,
   child:{name:f.child_name||candidates[0],jobId:f.child_job,job:job?.job||f.child_job,workplace:job?.name||'街の仕事'},events};
 }
+function renameName(value){
+ if(typeof value!=='string')throw Error('invalid_name');
+ const name=value.normalize('NFC').trim();
+ if(!name||[...name].length>20||/[\p{C}<>]/u.test(name))throw Error('invalid_name');
+ return name;
+}
+const renameHash=value=>hash('yuzu-child-rename-v259:'+codeValue(value));
+async function renameRow(c,f){return c.db.prepare('SELECT * FROM web_life_rename WHERE family_id=?').bind(f.id).first();}
+async function renamePreview(c,d){
+ if(!validId(d.familyId))throw Error('family_missing');
+ const f=await memberFamily(c,d.familyId),now=Date.now();
+ if(!f||!familyStage(f,now).born)throw Error('child_not_born');
+ const row=await renameRow(c,f);
+ if(!row||row.used||row.expires_at<=now||row.base_revision!==f.revision||row.code_hash!==await renameHash(d.code))throw Error('rename_expired');
+ if(row.proposer===c.id)throw Error('other_parent_required');
+ const owner=await c.db.prepare('SELECT active FROM rpg_accounts WHERE public_id=?').bind(row.proposer).first();
+ if(!owner?.active)throw Error('rename_expired');
+ return {family:f,row};
+}
+async function renameMutate(c,d,op,payload){
+ if(!validId(d.familyId)||d.accepted!==true)throw Error('confirmation_required');
+ const f=await memberFamily(c,d.familyId),now=Date.now();
+ if(!f||!familyStage(f,now).born)throw Error('child_not_born');
+ if(d.action==='rename_propose'){
+  if(d.revision!==f.revision)throw Error('family_changed');
+  const name=renameName(d.name),code=codeValue(d.code),h=await renameHash(code),old=await renameRow(c,f);
+  if(name===(f.child_name||JSON.parse(f.candidates_json)[0]))throw Error('same_name');
+  if(old&&now-old.created_at<60000)throw Error('code_cooldown');
+  const gate='EXISTS(SELECT 1 FROM web_life_families WHERE id=? AND revision=?)';
+  const stmt=c.db.prepare(`INSERT INTO web_life_rename(family_id,proposal_id,proposer,proposed_name,code_hash,base_revision,created_at,expires_at,used)
+   SELECT ?,?,?,?,?,?,?,?,0 WHERE ${gate}
+   ON CONFLICT(family_id) DO UPDATE SET proposal_id=excluded.proposal_id,proposer=excluded.proposer,proposed_name=excluded.proposed_name,code_hash=excluded.code_hash,base_revision=excluded.base_revision,created_at=excluded.created_at,expires_at=excluded.expires_at,used=0
+   WHERE web_life_rename.created_at<=?`).bind(f.id,op,c.id,name,h,f.revision,now,now+DAY,f.id,f.revision,now-60000);
+  await c.db.batch([stmt,await remember(c,d,op,payload,'EXISTS(SELECT 1 FROM web_life_rename WHERE family_id=? AND proposal_id=?)',[f.id,op])]);
+  return {renameCode:code.match(/.{8}/g).join('-'),renameFamily:f.id,renameProposal:op};
+ }
+ if(d.action==='rename_approve'){
+  const {row}=await renamePreview(c,d);
+  if(d.proposalId!==row.proposal_id||d.name!==row.proposed_name)throw Error('rename_expired');
+  const gate=`EXISTS(SELECT 1 FROM web_life_rename r JOIN rpg_accounts a ON a.public_id=r.proposer WHERE r.family_id=web_life_families.id AND r.proposal_id=? AND r.code_hash=? AND r.proposer<>? AND r.base_revision=web_life_families.revision AND r.expires_at>? AND r.used=0 AND a.active=1)`;
+  const updated='EXISTS(SELECT 1 FROM web_life_families WHERE id=? AND last_op=?)';
+  await c.db.batch([
+   c.db.prepare('UPDATE web_life_families SET child_name=?,revision=revision+1,last_op=? WHERE id=? AND revision=? AND '+gate).bind(row.proposed_name,op,f.id,f.revision,row.proposal_id,row.code_hash,c.id,now),
+   c.db.prepare('UPDATE web_life_rename SET used=1 WHERE family_id=? AND proposal_id=? AND '+updated).bind(f.id,row.proposal_id,f.id,op),
+   await remember(c,d,op,payload,updated,[f.id,op])
+  ]);return {};
+ }
+ throw Error('invalid_action');
+}
+
 async function state(c,extra={}){
  const now=Date.now(),profile=await c.db.prepare('SELECT alias,code_expires,code_hash,issued_at FROM web_life_profiles WHERE public_id=?').bind(c.id).first();
  const current=await active(c),families=await rows(c.db.prepare('SELECT * FROM web_life_families WHERE parent_a=? OR parent_b=? ORDER BY formed_at DESC,id DESC LIMIT 50').bind(c.id,c.id));
@@ -35,7 +85,8 @@ async function state(c,extra={}){
  const worker=await c.db.prepare('SELECT * FROM web_life_workers WHERE public_id=?').bind(c.id).first();
  let workerDto=null;if(worker){const family=await memberFamily(c,worker.family_id);if(family){const stage=familyStage(family,now);workerDto={familyId:family.id,cursorMs:worker.cursor_ms,born:stage.born,mature:stage.mature,workAt:stage.workAt,projection:familyProjection(worker,family,now),child:dto(c,family,now).child};}}
  const claims=await rows(c.db.prepare('SELECT id,family_id,minutes,exp,coins,status,created_at FROM web_life_claims WHERE public_id=? ORDER BY created_at DESC,id DESC LIMIT 12').bind(c.id));
- return {ok:true,me:c.id,name:c.player.name,now,profile:{alias:profile?.alias||aliasName(c.player.name),hasCode:!!profile?.code_hash&&profile.code_expires>now,expiresAt:profile?.code_expires||0,nextIssueAt:(profile?.issued_at||0)+60000},currentFamily:current?.family_id||null,families:families.map(f=>dto(c,f,now)),requests:requests.map(r=>({direction:r.sender===c.id?'outgoing':'incoming',partnerId:r.sender===c.id?r.target:r.sender,partnerName:nameOf(c,r.sender===c.id?r.target:r.sender),nonce:r.nonce,expiresAt:r.expires_at})),worker:workerDto,claims,...extra};
+ const renames=await rows(c.db.prepare('SELECT r.family_id,r.proposal_id,r.proposer,r.proposed_name,r.expires_at FROM web_life_rename r JOIN web_life_families f ON f.id=r.family_id WHERE (f.parent_a=? OR f.parent_b=?) AND r.used=0 AND r.expires_at>? AND r.base_revision=f.revision').bind(c.id,c.id,now));
+ return {renames:renames.map(r=>({familyId:r.family_id,proposalId:r.proposal_id,name:r.proposed_name,expiresAt:r.expires_at,mine:r.proposer===c.id})),ok:true,me:c.id,name:c.player.name,now,profile:{alias:profile?.alias||aliasName(c.player.name),hasCode:!!profile?.code_hash&&profile.code_expires>now,expiresAt:profile?.code_expires||0,nextIssueAt:(profile?.issued_at||0)+60000},currentFamily:current?.family_id||null,families:families.map(f=>dto(c,f,now)),requests:requests.map(r=>({direction:r.sender===c.id?'outgoing':'incoming',partnerId:r.sender===c.id?r.target:r.sender,partnerName:nameOf(c,r.sender===c.id?r.target:r.sender),nonce:r.nonce,expiresAt:r.expires_at})),worker:workerDto,claims,...extra};
 }
 async function targetForCode(c,d){
  const h=await codeHash(d.code),now=Date.now();
@@ -101,6 +152,7 @@ async function mutate(c,d,op,payload){
    ON CONFLICT(public_id) DO UPDATE SET alias=excluded.alias,code_hash=excluded.code_hash,code_expires=excluded.code_expires,issued_at=excluded.issued_at WHERE web_life_profiles.issued_at<=? AND NOT EXISTS(SELECT 1 FROM web_life_members WHERE public_id=?)`).bind(c.id,alias,h,now+DAY,now,c.id,now-60000,c.id),await remember(c,d,op,payload,'EXISTS(SELECT 1 FROM web_life_profiles WHERE public_id=? AND code_hash=? AND issued_at=?)',[c.id,h,now])];
   await c.db.batch(s);return {code:raw.match(/.{8}/g).join('-')};
  }
+ if(['rename_propose','rename_approve'].includes(d.action))return renameMutate(c,d,op,payload);
  if(d.action==='connect')return connect(c,d,op,payload);
  if(d.action==='withdraw'){
   if(!validId(d.nonce))throw Error('request_changed');
@@ -141,6 +193,7 @@ export async function onRequest({request,env}){
   if(d.action==='preview'){
    const target=await targetForCode(c,d);return json({ok:true,targetId:target.public_id,name:nameOf(c,target.public_id),alias:target.alias});
   }
+  if(d.action==='rename_preview'){const {family,row}=await renamePreview(c,d);return json({ok:true,name:row.proposed_name,oldName:family.child_name||JSON.parse(family.candidates_json)[0],proposalId:row.proposal_id,familyId:family.id,expiresAt:row.expires_at});}
   if(d.action==='end_preview'){
    if(!validId(d.familyId))throw Error('family_missing');const family=await memberFamily(c,d.familyId);
    if(!family||family.ended_at!==null)throw Error('family_changed');
@@ -151,9 +204,9 @@ export async function onRequest({request,env}){
   if(!uuid(d.requestId))throw Error('invalid_request');
   const op=await hash('yuzu-life-operation-v1:'+c.id+':'+d.requestId),payload=await hash(JSON.stringify(Object.fromEntries(Object.entries(d).sort(([a],[b])=>a.localeCompare(b)))));
   const receipt=await c.db.prepare('SELECT action,payload_hash FROM web_life_operations WHERE id=? AND public_id=?').bind(op,c.id).first();
-  if(receipt){if(receipt.action!==d.action||receipt.payload_hash!==payload)throw Error('request_changed');let extra={};if(d.action==='issue'){const current=await c.db.prepare('SELECT code_hash,code_expires FROM web_life_profiles WHERE public_id=?').bind(c.id).first();if(current?.code_hash===await codeHash(d.code)&&current.code_expires>now)extra.code=codeValue(d.code).match(/.{8}/g).join('-');}return json(await state(c,extra));}
+  if(receipt){if(receipt.action!==d.action||receipt.payload_hash!==payload)throw Error('request_changed');let extra={};if(d.action==='issue'){const current=await c.db.prepare('SELECT code_hash,code_expires FROM web_life_profiles WHERE public_id=?').bind(c.id).first();if(current?.code_hash===await codeHash(d.code)&&current.code_expires>now)extra.code=codeValue(d.code).match(/.{8}/g).join('-');}if(d.action==='rename_propose'){const row=await c.db.prepare('SELECT * FROM web_life_rename WHERE family_id=? AND proposal_id=? AND proposer=? AND used=0 AND expires_at>?').bind(d.familyId,op,c.id,now).first();if(row&&row.code_hash===await renameHash(d.code))extra={renameCode:codeValue(d.code).match(/.{8}/g).join('-'),renameFamily:d.familyId,renameProposal:op};}return json(await state(c,extra));}
   const extra=await mutate(c,d,op,payload);
   const saved=await c.db.prepare('SELECT id FROM web_life_operations WHERE id=? AND public_id=?').bind(op,c.id).first();if(!saved)throw Error(d.action==='end'?'confirmation_expired':'operation_conflict');
   return json(await state(c,extra));
- }catch(error){const known=['login_required','csrf','not_configured','sync_required','invalid_code','self_pair','already_paired','confirmation_required','partner_changed','own_code_required','code_cooldown','request_changed','no_worker','family_missing','child_not_grown','same_worker','not_ready','confirmation_expired','family_changed','name_locked','invalid_choice','reroll_limit','invalid_action','invalid_request','operation_conflict'];const code=known.includes(error.message)?error.message:'life_unavailable';return json({error:code},code==='login_required'?401:code==='csrf'?403:['not_configured','sync_required','life_unavailable'].includes(code)?503:409);}
+ }catch(error){const known=['invalid_name','same_name','child_not_born','rename_expired','other_parent_required','login_required','csrf','not_configured','sync_required','invalid_code','self_pair','already_paired','confirmation_required','partner_changed','own_code_required','code_cooldown','request_changed','no_worker','family_missing','child_not_grown','same_worker','not_ready','confirmation_expired','family_changed','name_locked','invalid_choice','reroll_limit','invalid_action','invalid_request','operation_conflict'];const code=known.includes(error.message)?error.message:'life_unavailable';return json({error:code},code==='login_required'?401:code==='csrf'?403:['not_configured','sync_required','life_unavailable'].includes(code)?503:409);}
 }
