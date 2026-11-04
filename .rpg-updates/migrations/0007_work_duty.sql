@@ -1,0 +1,4 @@
+CREATE TABLE IF NOT EXISTS web_work_duty (
+ public_id TEXT PRIMARY KEY, active INTEGER NOT NULL CHECK(active IN (0,1)),
+ carry_ms INTEGER NOT NULL DEFAULT 0 CHECK(carry_ms BETWEEN 0 AND 59999)
+);
