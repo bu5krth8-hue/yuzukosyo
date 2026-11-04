@@ -1,3 +1,4 @@
+import {townLevel} from '../../town-growth.js';
 const KEY = 'yuzu_town_public_v1';
 const MAX = 8192;
 import {TOWN_NAMES as names,TOWN_THRESHOLDS as thresholds} from '../../town-tiers.js';
@@ -8,13 +9,13 @@ function validate(d) {
   const stamp=Date.parse(d.capturedAt);
   if (!Number.isFinite(stamp)||stamp<Date.UTC(2020,0,1)||stamp>Date.now()+300000) throw Error('invalid');
   const t=d.town, r=d.resources, f=d.facilities, q=d.quest;
-  const level=number(t?.level,1000000000), population=number(t?.population), exp=number(t?.exp);
-  if(level<1||population!==3+(level-1)*20||exp<15*level*(level-1)||exp>=15*level*(level+1))throw Error('invalid');
+  const inputLevel=number(t?.level,1000000000), population=number(t?.population), exp=number(t?.exp);
+  const legacyLevel=townLevel(exp,15),level=townLevel(exp);if(![undefined,2].includes(t.growthVersion)||inputLevel!==(t.growthVersion===2?level:legacyLevel)||population!==3+(legacyLevel-1)*20)throw Error('invalid');
   let tier=0; thresholds.forEach((n,i)=>{if(population>=n)tier=i;});
   const types=['木材集め','鉱石集め','魔物調査','帰還の手伝い'], goals=[6,4,3,2];
   const questType=number(q?.type,3), progress=number(q?.progress,goals[questType]-1);
-  return {schema:1,capturedAt:new Date(stamp).toISOString(),town:{level,population,exp,tier:names[tier],stage:tier+1,
-    progress:exp-15*level*(level-1),required:30*level},
+  return {schema:1,capturedAt:new Date(stamp).toISOString(),town:{level,population,exp,growthVersion:2,tier:names[tier],stage:tier+1,
+    progress:exp-60*level*(level-1),required:120*level},
     resources:{wood:number(r?.wood),ore:number(r?.ore),crystal:number(r?.crystal)},
     facilities:{inn:number(f?.inn,5),smith:number(f?.smith,5),lab:number(f?.lab,5)},
     residents:[{name:'柚寧',role:'宿屋の女将',arrived:population>=40},{name:'鉄心',role:'名匠',arrived:population>=100},{name:'ルミナ',role:'星読みの学者',arrived:population>=180}],
