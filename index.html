@@ -18,7 +18,7 @@
 <link rel="stylesheet" href="upgrades-v234.css?v=237">
 <link rel="stylesheet" href="daily-v235.css?v=237">
 <script>try{document.documentElement.dataset.lightMode=localStorage.getItem("yuzuLightModeV1")==="true"?"on":"off"}catch(e){}</script>
-<link rel="stylesheet" href="town-home.css?v=265"><link rel="stylesheet" href="town-portal.css?v=265"/><link rel="stylesheet" href="home-simple.css?v=266"></head>
+<link rel="stylesheet" href="town-home.css?v=265"><link rel="stylesheet" href="town-portal.css?v=265"/><link rel="stylesheet" href="home-simple.css?v=267"></head>
 <body id="top">
 <div class="cursor-light" id="cursorLight">
 </div>
@@ -73,12 +73,7 @@
 </div><img alt="Twitch配信サムネイル" class="live-thumb" decoding="async" fetchpriority="low" hidden="" id="liveThumb" loading="lazy"/>
 </div>
 <p class="lead">ROMもコメントも大歓迎。気軽に遊んでいってね。</p>
-<details class="home-fold home-today"><summary>📅 今日のスタンプ・くじ・しおり</summary><section class="today-base" id="todayBase" aria-labelledby="todayBaseTitle">
-<h2 id="todayBaseTitle">🌙 今日の秘密基地</h2><p class="today-base-date" id="todayBaseDate">今日の状態を確認中…</p><p class="today-base-greeting" id="todayBaseGreeting">今日も、自分のペースで楽しんでね。</p>
-<div class="today-base-grid"><a href="#visitStamp"><strong>📮 来場スタンプ</strong><span id="todayStampSummary">確認中…</span></a><a href="#omikuji"><strong>🔮 今日のくじ</strong><span id="todayFortuneSummary">確認中…</span></a><a href="novel.html" id="todayNovelLink"><strong>📖 小説の最新話</strong><span id="todayNovelSummary">公開状況を確認中…</span></a><a href="#schedule"><strong>🔔 配信予定</strong><span id="todayScheduleSummary">確認中…</span></a></div>
-<a class="today-resume" id="todayNovelResume" href="novel.html?resume=1" hidden>🔖 小説のしおりから続きを読む →</a>
-<div class="favorite-home"><div class="favorite-home-head"><h3>⭐ よく使う部屋</h3><button type="button" id="editFavoriteRooms">選ぶ・変更する</button></div><div class="favorite-room-links" id="favoriteRoomLinks" aria-label="お気に入りの部屋"></div><p class="favorite-empty" id="favoriteRoomsEmpty">よく行く部屋を4つまで選べます。このブラウザに保存します。</p></div>
-</section></details>
+
 <div aria-label="各SNSリンクの見出し" class="social-anchor" id="socialLinks">
 <p class="section-kicker">SOCIAL LINKS</p>
 <h2>📱 各SNS</h2>
@@ -94,26 +89,34 @@
 <a class="switch youtube" href="https://youtube.com/@yuzukosho25?si=EWgYkPZEMo-T1OEH" rel="noopener" target="_blank"><span class="icon">▶</span><strong>YouTube</strong><small>動画置き場</small>
 </a>
 </nav>
-<nav aria-label="LINEスタンプとアプリ販売" class="shop-switches">
-<a class="switch shop-switch line-stamp-shop" id="lineStampShop" href="https://store.line.me/stickershop/author/3180349/ja" rel="noopener" target="_blank"><span class="icon" aria-hidden="true">💬</span><span class="shop-switch-copy"><strong>LINEスタンプ</strong><small>LINEスタンプを見る</small><small class="external-link-note">LINE STOREを別タブで開く ↗</small></span><span class="shop-switch-arrow" aria-hidden="true">↗</span>
-</a>
-<a class="switch shop-switch booth-shop" id="appSalesShop" href="https://yuzukosyo07.booth.pm/" rel="noopener" target="_blank"><span class="icon" aria-hidden="true">🧩</span><span class="shop-switch-copy"><strong>アプリ販売</strong><small>制作アプリを見る</small><small class="external-link-note">BOOTHを別タブで開く ↗</small></span><span class="shop-switch-arrow" aria-hidden="true">↗</span>
-</a>
-</nav>
-</section>
-<section class="home-directory-heading"><h2>気になる項目を選んでね</h2><p>タイトルを押すと、詳しい内容が開きます。</p></section>
+
 <section class="base-counter-card">
 <div class="base-counter-inner"><span class="base-counter-icon">👻</span><span class="base-counter-label">秘密基地来場者数</span><strong class="base-counter-number" id="totalAccessCount">0</strong><span class="base-counter-unit">人</span>
 </div>
 </section>
+</section>
+<section class="cards schedule-wide-section">
+<article class="card schedule-wide-card" id="schedule">
+<h2>📅 配信予定</h2>
+<p class="schedule-status" id="scheduleStatus">配信予定を確認中…</p>
+<ul class="schedule-list" id="scheduleList">
+<li>読み込み中…</li>
+</ul>
+<p class="schedule-note" id="scheduleNote">予定の詳細はTwitchへ。</p>
+<a class="mini-btn" href="https://www.twitch.tv/yuzukosyo07/schedule" rel="noopener" target="_blank">配信予定を見る →</a>
+</article>
+</section>
+<section class="town-home-section home-rpg" id="yuzuTown" aria-labelledby="homeRpgTitle"><article class="town-home-card"><div class="home-rpg-heading"><div><h2 id="homeRpgTitle">🏘 柚RPG・柚の街</h2><p id="townHomeStats" class="town-home-stats">街の便りを確認中…</p></div><button type="button" id="portalRefresh" class="home-quiet-button">更新</button></div><div class="town-portal" id="townPortal"><div class="portal-window"><div class="portal-scenery" id="portalScenery" role="img" aria-label="柚の街のイメージ"><div class="portal-sun"></div><div class="portal-houses" id="portalHouses"></div><div class="portal-people" id="portalPeople"></div></div></div>
+<div class="home-rpg-actions"><a id="portalEnter" href="account.html">ログイン</a><a href="town.html">街を見る</a></div>
+<div class="home-rpg-picker"><label for="homeRpgDestination">RPGの行き先を選ぶ<select id="homeRpgDestination"><option value="">行きたい項目を選択</option><option value="account.html">マイページ・ログイン</option><option value="town.html">柚の街・支援・住民の依頼</option><option value="play.html#journey">探索・街の手伝い</option><option value="work.html">仕事と経営</option><option value="life.html">恋人・家族</option><option value="play.html#shop">職業・称号ショップ</option><option value="rpg.html#players">みんなのステータス</option><option value="rpg.html#ranking">ランキング</option><option value="rpg.html#bestiary">モンスター図鑑</option><option value="rpg.html#world">世界地図</option><option value="newspaper.html">柚の新聞・宿敵の記録</option><option value="rpg.html#feedback">ご意見・ご要望</option><option value="world.html">新作RPG・配信者限定テスト</option></select></label><button type="button" id="homeRpgGo" disabled>開く →</button></div><span id="yuzuWorld" class="home-anchor"></span><span id="yuzuRpg" class="home-anchor"></span><span id="yuzuNewspaper" class="home-anchor"></span>
+<details class="home-fold home-rpg-details" id="homeRpgDetails"><summary>お知らせ・街の詳細</summary><div class="home-fold-body"><h3 id="portalTitle">柚の街からのお知らせ</h3><p id="portalGreeting">ログインすると、あなたの状況を確認できます。</p><p id="portalIdentityStatus" role="status"></p><div id="portalPersonal" hidden><div id="portalNotices" class="portal-notices"></div></div><div id="portalTownDetails"></div><p id="portalSceneNote" class="fine"></p><h3>最新の新聞</h3><div id="portalNews"></div><a href="newspaper.html">新聞を読む →</a><details id="portalBeginner"><summary>初めての方へ・参加方法</summary><ol><li>Twitch配信でコメントして柚RPGに参加。</li><li>配信者へホームページ用の秘密のパスを依頼。</li><li>マイページにログインして探索や仕事を楽しめます。</li></ol><a href="rpg.html">RPGの情報を見る →</a></details><p id="portalUpdated" class="fine" role="status"></p></div></details></div></article></section>
+<section class="home-directory-heading"><h2>気になる項目を選んでね</h2><p>タイトルを押すと、詳しい内容が開きます。</p></section>
 <section class="home-entries"><a class="home-entry" href="first-visit.html"><span aria-hidden="true">🌙</span><strong>はじめての方へ</strong><span class="home-entry-arrow" aria-hidden="true">→</span></a></section>
-<details class="home-fold home-mascots"><summary>👻 案内役のひとこと</summary><section aria-label="案内役" class="mascot-area">
-<div class="guide ghost-guide"><img alt="幽霊の案内役" decoding="async" fetchpriority="low" height="520" id="ghostMascot" loading="lazy" src="assets/ghost.webp" width="441"/>
-<div class="bubble primary-bubble" id="ghostBubble">Xでお知らせ出すから見てね！</div>
-</div>
-<div class="guide tanu-guide"><img alt="たぬちゃん" decoding="async" fetchpriority="low" height="520" id="tanuMascot" loading="lazy" src="assets/tanuchan.webp" width="416"/>
-<div class="bubble tanu-bubble" id="tanuBubble">Discordでも待ってるよ〜！</div>
-</div>
+<details class="home-fold home-today"><summary>📅 今日のスタンプ・くじ・しおり</summary><section class="today-base" id="todayBase" aria-labelledby="todayBaseTitle">
+<h2 id="todayBaseTitle">🌙 今日の秘密基地</h2><p class="today-base-date" id="todayBaseDate">今日の状態を確認中…</p><p class="today-base-greeting" id="todayBaseGreeting">今日も、自分のペースで楽しんでね。</p>
+<div class="today-base-grid"><a href="#visitStamp"><strong>📮 来場スタンプ</strong><span id="todayStampSummary">確認中…</span></a><a href="#omikuji"><strong>🔮 今日のくじ</strong><span id="todayFortuneSummary">確認中…</span></a><a href="novel.html" id="todayNovelLink"><strong>📖 小説の最新話</strong><span id="todayNovelSummary">公開状況を確認中…</span></a><a href="#schedule"><strong>🔔 配信予定</strong><span id="todayScheduleSummary">確認中…</span></a></div>
+<a class="today-resume" id="todayNovelResume" href="novel.html?resume=1" hidden>🔖 小説のしおりから続きを読む →</a>
+<div class="favorite-home"><div class="favorite-home-head"><h3>⭐ よく使う部屋</h3><button type="button" id="editFavoriteRooms">選ぶ・変更する</button></div><div class="favorite-room-links" id="favoriteRoomLinks" aria-label="お気に入りの部屋"></div><p class="favorite-empty" id="favoriteRoomsEmpty">よく行く部屋を4つまで選べます。このブラウザに保存します。</p></div>
 </section></details>
 <section id="visitStamp" class="home-interactive"><details class="home-fold" id="homeStamp"><summary>📮 来場スタンプカード<span>カード・履歴・保存</span></summary><div class="home-fold-body"><section aria-label="来場スタンプカード" class="cards visit-stamp-section">
 <article class="card stamp-card">
@@ -153,21 +156,6 @@
 </div>
 </article>
 </section></div></details></section>
-<section class="cards schedule-wide-section">
-<article class="card schedule-wide-card" id="schedule">
-<h2>📅 配信予定</h2>
-<p class="schedule-status" id="scheduleStatus">配信予定を確認中…</p>
-<ul class="schedule-list" id="scheduleList">
-<li>読み込み中…</li>
-</ul>
-<p class="schedule-note" id="scheduleNote">予定の詳細はTwitchへ。</p>
-<a class="mini-btn" href="https://www.twitch.tv/yuzukosyo07/schedule" rel="noopener" target="_blank">配信予定を見る →</a>
-</article>
-</section><section class="town-home-section home-rpg" id="yuzuTown" aria-labelledby="homeRpgTitle"><article class="town-home-card"><div class="home-rpg-heading"><div><h2 id="homeRpgTitle">🏘 柚RPG・柚の街</h2><p id="townHomeStats" class="town-home-stats">街の便りを確認中…</p></div><button type="button" id="portalRefresh" class="home-quiet-button">更新</button></div><div class="town-portal" id="townPortal"><div class="portal-window"><div class="portal-scenery" id="portalScenery" role="img" aria-label="柚の街のイメージ"><div class="portal-sun"></div><div class="portal-houses" id="portalHouses"></div><div class="portal-people" id="portalPeople"></div></div></div>
-<div class="home-rpg-actions"><a id="portalEnter" href="account.html">ログイン</a><a href="town.html">街を見る</a></div>
-<div class="home-rpg-picker"><label for="homeRpgDestination">RPGの行き先を選ぶ<select id="homeRpgDestination"><option value="">行きたい項目を選択</option><option value="account.html">マイページ・ログイン</option><option value="town.html">柚の街・支援・住民の依頼</option><option value="play.html#journey">探索・街の手伝い</option><option value="work.html">仕事と経営</option><option value="life.html">恋人・家族</option><option value="play.html#shop">職業・称号ショップ</option><option value="rpg.html#players">みんなのステータス</option><option value="rpg.html#ranking">ランキング</option><option value="rpg.html#bestiary">モンスター図鑑</option><option value="rpg.html#world">世界地図</option><option value="newspaper.html">柚の新聞・宿敵の記録</option><option value="rpg.html#feedback">ご意見・ご要望</option><option value="world.html">新作RPG・配信者限定テスト</option></select></label><button type="button" id="homeRpgGo" disabled>開く →</button></div><span id="yuzuWorld" class="home-anchor"></span><span id="yuzuRpg" class="home-anchor"></span><span id="yuzuNewspaper" class="home-anchor"></span>
-<details class="home-fold home-rpg-details" id="homeRpgDetails"><summary>お知らせ・街の詳細</summary><div class="home-fold-body"><h3 id="portalTitle">柚の街からのお知らせ</h3><p id="portalGreeting">ログインすると、あなたの状況を確認できます。</p><p id="portalIdentityStatus" role="status"></p><div id="portalPersonal" hidden><div id="portalNotices" class="portal-notices"></div></div><div id="portalTownDetails"></div><p id="portalSceneNote" class="fine"></p><h3>最新の新聞</h3><div id="portalNews"></div><a href="newspaper.html">新聞を読む →</a><details id="portalBeginner"><summary>初めての方へ・参加方法</summary><ol><li>Twitch配信でコメントして柚RPGに参加。</li><li>配信者へホームページ用の秘密のパスを依頼。</li><li>マイページにログインして探索や仕事を楽しめます。</li></ol><a href="rpg.html">RPGの情報を見る →</a></details><p id="portalUpdated" class="fine" role="status"></p></div></details></div></article></section>
-
 <section class="home-entries home-daily"><a class="home-entry" href="quotes.html"><span aria-hidden="true">📜</span><strong>今日の格言</strong><span class="home-entry-arrow" aria-hidden="true">→</span></a><a class="home-entry" href="meigen.html"><span aria-hidden="true">🗯️</span><strong>みんなの迷言集</strong><span class="home-entry-arrow" aria-hidden="true">→</span></a><details class="home-fold" id="homeFortune"><summary>🔮 今日の柚胡椒くじ<span>押して開く</span></summary><div class="home-fold-body"><article class="card daily-word-card omikuji-card" id="omikuji">
 <div class="daily-word-link omikuji-inner">
 <h2>🔮 今日の柚胡椒くじ</h2>
@@ -195,7 +183,21 @@
 </div>
 </article></div></details><span id="dailyWordText" hidden></span><span id="dailyMeigenText" hidden></span></section>
 <section class="home-entries"><a class="home-entry" href="profile.html"><span aria-hidden="true">👤</span><strong>プロフィール</strong><span class="home-entry-arrow" aria-hidden="true">→</span></a><a class="home-entry" href="mascots.html"><span aria-hidden="true">👻</span><strong>秘密基地の住人</strong><span class="home-entry-arrow" aria-hidden="true">→</span></a></section>
+<details class="home-fold home-mascots"><summary>👻 案内役のひとこと</summary><section aria-label="案内役" class="mascot-area">
+<div class="guide ghost-guide"><img alt="幽霊の案内役" decoding="async" fetchpriority="low" height="520" id="ghostMascot" loading="lazy" src="assets/ghost.webp" width="441"/>
+<div class="bubble primary-bubble" id="ghostBubble">Xでお知らせ出すから見てね！</div>
+</div>
+<div class="guide tanu-guide"><img alt="たぬちゃん" decoding="async" fetchpriority="low" height="520" id="tanuMascot" loading="lazy" src="assets/tanuchan.webp" width="416"/>
+<div class="bubble tanu-bubble" id="tanuBubble">Discordでも待ってるよ〜！</div>
+</div>
+</section></details>
 <section class="home-entries"><a class="home-entry" id="themeColors" href="theme-colors.html"><span aria-hidden="true">🎨</span><strong>テーマカラー</strong><span class="home-entry-arrow" aria-hidden="true">→</span></a><a class="home-entry" id="novel" href="novel.html"><span aria-hidden="true">📖</span><strong>小説「秘密の話」</strong><span class="home-entry-arrow" aria-hidden="true">→</span></a><span id="novelPublicationStatus" hidden></span></section>
+<nav aria-label="LINEスタンプとアプリ販売" class="shop-switches">
+<a class="switch shop-switch line-stamp-shop" id="lineStampShop" href="https://store.line.me/stickershop/author/3180349/ja" rel="noopener" target="_blank"><span class="icon" aria-hidden="true">💬</span><span class="shop-switch-copy"><strong>LINEスタンプ</strong><small>LINEスタンプを見る</small><small class="external-link-note">LINE STOREを別タブで開く ↗</small></span><span class="shop-switch-arrow" aria-hidden="true">↗</span>
+</a>
+<a class="switch shop-switch booth-shop" id="appSalesShop" href="https://yuzukosyo07.booth.pm/" rel="noopener" target="_blank"><span class="icon" aria-hidden="true">🧩</span><span class="shop-switch-copy"><strong>アプリ販売</strong><small>制作アプリを見る</small><small class="external-link-note">BOOTHを別タブで開く ↗</small></span><span class="shop-switch-arrow" aria-hidden="true">↗</span>
+</a>
+</nav>
 <section id="apps" class="home-entries"><a class="home-entry" href="apps.html"><span aria-hidden="true">🧩</span><strong>アプリ・Webツール</strong><span class="home-entry-arrow" aria-hidden="true">→</span></a></section>
 <section id="stream-gear" class="home-entries"><a class="home-entry" href="gear.html"><span aria-hidden="true">🎮</span><strong>配信で使っているもの</strong><span class="home-entry-arrow" aria-hidden="true">→</span></a></section>
 <section id="updates" class="home-entries"><a class="home-entry" href="updates.html"><span aria-hidden="true">📝</span><strong>更新履歴・今回の変更</strong><span class="home-entry-arrow" aria-hidden="true">→</span></a></section>

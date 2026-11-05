@@ -88,3 +88,51 @@ body#top .home-interactive,body#top .home-entries,body#top .home-entry[id]{scrol
 
 /* The compact page has no oversized lazy-layout placeholders. Keep anchor jumps stable. */
 body#top main section,body#top main article,body#top main .reveal-on-scroll,body#top main .home-entry{content-visibility:visible!important;contain-intrinsic-size:none!important;contain:none!important;opacity:1!important;transform:none!important;transition:none!important}
+
+/* v267: centered directory, original prominent identity and generous icon sizes. */
+body#top .page{margin-left:auto!important;margin-right:auto!important;text-align:center!important}
+body#top .hero{padding-top:26px!important}
+body#top .logo-image-wrap{width:min(660px,100%)!important;max-width:660px!important;margin:8px auto 18px!important}
+body#top .site-logo-image{max-height:none!important;height:auto!important}
+body#top .social-switches{max-width:760px!important;margin:18px auto!important;gap:18px!important}
+body#top .social-switches .switch{flex-direction:column!important;min-height:132px!important;padding:20px 12px!important;gap:12px!important}
+body#top .social-switches .icon{width:54px!important;height:54px!important;font-size:42px!important}
+body#top .social-switches .icon img{width:52px!important;height:52px!important}
+body#top .social-switches strong{font-size:21px!important}
+body#top .social-anchor h2,body#top .home-directory-heading h2{font-size:clamp(27px,3vw,36px)!important}
+body#top .home-directory-heading{text-align:center!important;margin-top:36px!important}
+body#top .base-counter-card{max-width:760px!important;margin:20px auto!important;padding:18px!important}
+body#top .base-counter-inner{justify-content:center!important;flex-wrap:wrap!important}
+body#top .base-counter-number{font-size:34px!important}
+body#top .base-counter-icon{font-size:36px!important}
+body#top .home-entry{position:relative!important;justify-content:center!important;text-align:center!important;padding:24px 44px!important;min-height:108px!important;gap:16px!important}
+body#top .home-entry>span:first-child{font-size:40px!important}
+body#top .home-entry strong{font-size:clamp(22px,2.2vw,28px)!important}
+body#top .home-entry-arrow{position:absolute!important;right:16px!important;margin:0!important}
+body#top .home-fold>summary{position:relative!important;justify-content:center!important;text-align:center!important;font-size:24px!important;padding:22px 46px!important;min-height:90px!important}
+body#top .home-fold>summary:after{position:absolute;right:18px;margin:0}
+body#top .home-fold>summary>span{display:none!important}
+body#top .home-fold-body,body#top .home-fold .card{text-align:center!important}
+body#top .schedule-wide-card h2,body#top .home-rpg-heading h2{font-size:clamp(28px,3vw,36px)!important;text-align:center!important}
+body#top .home-rpg-heading{position:relative!important;justify-content:center!important;padding:0 66px!important}
+body#top .home-rpg-heading .home-quiet-button{position:absolute!important;right:0!important}
+body#top .schedule-wide-card,body#top .schedule-list li,body#top .live-info{text-align:center!important}
+body#top .home-rpg-details>summary{font-size:20px!important;min-height:64px!important}
+body#top .shop-switches{width:100%!important;max-width:900px!important;margin:28px auto!important}
+body#top .shop-switch{justify-content:center!important;text-align:center!important;min-height:112px!important;padding:22px!important}
+body#top .shop-switch .icon{font-size:42px!important;width:54px!important}
+body#top .shop-switch-copy strong{font-size:24px!important}
+body#top .today-base-grid,body#top .today-base-actions{justify-content:center!important}
+@media(max-width:650px){
+ body#top .logo-image-wrap{max-width:100%!important}
+ body#top .social-switches .switch{min-height:122px!important}
+ body#top .home-entry{padding:20px 38px!important;min-height:96px!important;gap:12px!important}
+ body#top .home-entry>span:first-child{font-size:34px!important}
+ body#top .home-fold>summary{font-size:22px!important;padding:20px 38px!important;min-height:82px!important}
+ body#top .home-rpg-heading{padding:0!important;flex-direction:column!important;gap:10px!important}
+ body#top .home-rpg-heading .home-quiet-button{position:static!important}
+ body#top .home-rpg-heading h2{font-size:28px!important}
+ body#top .shop-switch{padding:18px 10px!important;gap:10px!important}
+ body#top .shop-switch-copy strong{font-size:22px!important}
+ body#top .home-rpg-details>summary{font-size:19px!important;min-height:64px!important}
+}
