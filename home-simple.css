@@ -1,0 +1,90 @@
+/* v266: the front page is a directory; full details live at each destination. */
+body#top .page{max-width:1120px!important;padding-left:24px!important;padding-right:24px!important}
+body#top .hero{min-height:0!important;padding:26px 0 14px!important;gap:14px!important}
+body#top .logo-image-wrap{margin:0 auto 12px!important;max-width:340px!important}
+body#top .site-logo-image{width:100%!important;max-height:190px!important;object-fit:contain!important}
+body#top .home-intro,body#top .lead{font-size:16px!important;line-height:1.8!important;margin:10px 0!important}
+body#top .live-panel{margin:12px auto!important;padding:14px!important;max-width:820px!important}
+body#top .live-thumb{max-height:90px!important;width:auto!important;object-fit:contain!important}
+body#top .social-anchor{margin-top:24px!important;margin-bottom:12px!important}
+body#top .social-anchor h2{font-size:22px!important;margin:0!important}
+body#top .social-switches{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:12px!important;margin:12px 0!important}
+body#top .social-switches .switch{min-height:64px!important;padding:10px 14px!important;display:flex!important;flex-direction:row!important;gap:10px!important;justify-content:center!important;align-items:center!important;border-radius:16px!important}
+body#top .social-switches .icon{width:28px!important;height:28px!important;font-size:24px!important;line-height:1!important;display:grid!important;place-items:center!important}
+body#top .social-switches .icon img{width:26px!important;height:26px!important;object-fit:contain!important}
+body#top .social-switches small{display:none!important}
+body#top .social-switches strong{font-size:18px!important;line-height:1.5!important}
+body#top .shop-switches{gap:12px!important;margin:12px 0 20px!important}
+body#top .shop-switch{padding:12px 16px!important;min-height:72px!important;border-radius:16px!important}
+body#top .shop-switch .icon{font-size:28px!important;width:auto!important}
+body#top .shop-switch-copy strong{font-size:18px!important}
+body#top .shop-switch-copy>small:not(.external-link-note){display:none!important}
+body#top .shop-switch-copy .external-link-note{font-size:14px!important;line-height:1.5!important;margin-top:4px!important}
+body#top .home-directory-heading{margin:26px 0 14px!important;text-align:left!important}
+body#top .home-directory-heading h2{font-size:23px!important;margin:0 0 6px!important}
+body#top .home-directory-heading p{font-size:16px!important;margin:0!important}
+body#top .base-counter-card{padding:10px 16px!important;margin:16px 0!important;border-radius:14px!important}
+body#top .base-counter-number{font-size:24px!important}
+body#top .base-counter-icon{font-size:24px!important}
+body#top .home-entries{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:12px!important;margin:12px 0!important}
+body#top .home-entry{display:flex!important;align-items:center!important;gap:12px!important;min-width:0!important;min-height:76px!important;padding:16px 20px!important;margin:0!important;border:1px solid var(--line,#b99ae65c)!important;border-radius:16px!important;background:linear-gradient(135deg,var(--theme-soft,#322345cc),var(--panel,#181827dd))!important;color:#f7efff!important;text-decoration:none!important;text-align:left!important;box-shadow:none!important;transition:background .15s!important}
+body#top .home-entry:hover{background:var(--theme-soft,#44345e)!important;border-color:var(--purple2,#e3c5ff)!important}
+body#top .home-entry>span:first-child{font-size:23px!important;flex-shrink:0!important}
+body#top .home-entry strong{font-size:18px!important;line-height:1.6!important;font-weight:700!important}
+body#top .home-entry-arrow{margin-left:auto!important;font-size:22px!important;color:#dbc3ee!important}
+body#top .home-fold{border:1px solid #af95d34f!important;border-radius:16px!important;background:var(--panel,#211b30d9)!important;margin:12px 0!important;min-width:0!important;color:#f5effb!important}
+body#top .home-fold>summary{display:flex!important;align-items:center!important;gap:12px!important;min-height:68px!important;padding:16px 20px!important;font-size:18px!important;line-height:1.6!important;font-weight:700!important;cursor:pointer!important;list-style:none!important}
+body#top .home-fold>summary::-webkit-details-marker{display:none!important}
+body#top .home-fold>summary:after{content:'＋';margin-left:auto;flex-shrink:0;color:var(--purple2,#e8ceff);font-size:24px}
+body#top .home-fold[open]>summary:after{content:'−'}
+body#top .home-fold>summary>span{font-size:15px!important;font-weight:400!important;color:#d2c3df!important}
+body#top .home-fold-body{padding:0 20px 20px!important;min-width:0!important}
+body#top .home-fold .card{margin:0!important;padding:20px!important;min-height:0!important;box-shadow:none!important}
+body#top .home-fold .today-base{margin:0!important;padding:8px 20px 20px!important;box-shadow:none!important;border:0!important}
+body#top .home-fold .today-base>h2{display:none!important}
+body#top .home-fold .today-base-grid{gap:10px!important}
+body#top .home-fold .mascot-area{margin:0!important;padding:14px 20px!important;min-height:0!important}
+body#top .home-fold .guide img{max-width:96px!important;height:auto!important}
+body#top .home-fold .bubble{font-size:16px!important;line-height:1.7!important}
+body#top .home-daily>.home-fold{grid-column:1/-1;margin:0!important}
+body#top .home-interactive{margin:12px 0!important}
+body#top .home-interactive>.home-fold{margin:0!important}
+body#top .schedule-wide-section{margin:18px 0!important}
+body#top .schedule-wide-card{padding:20px!important;min-height:0!important}
+body#top .schedule-wide-card h2{font-size:24px!important;margin:0 0 10px!important}
+body#top .schedule-list{margin:12px 0!important;gap:10px!important}
+body#top .schedule-list li{padding:12px!important}
+body#top .schedule-list li:nth-child(n+3){display:none!important}
+body#top .schedule-note{display:none!important}
+body#top .schedule-wide-card .mini-btn{margin:12px 0 0!important}
+body#top .home-rpg{margin:22px 0!important;scroll-margin-top:90px!important}
+body#top .home-rpg .town-home-card{display:block!important;padding:24px!important;gap:0!important}
+body#top .home-rpg-heading{display:flex!important;justify-content:space-between!important;align-items:center!important;gap:16px!important}
+body#top .home-rpg-heading h2{font-size:25px!important;margin:0 0 6px!important}
+body#top .home-rpg .town-home-stats{font-size:16px!important;line-height:1.7!important;margin:0!important}
+body#top .home-quiet-button{font:inherit!important;min-height:44px!important;padding:8px 14px!important;border:1px solid #c4aad36b!important;border-radius:10px!important;background:#322641!important;color:#f6ecff!important;cursor:pointer!important;flex-shrink:0!important}
+body#top .home-rpg .town-portal{display:block!important;margin-top:18px!important}
+body#top .home-rpg .portal-window{padding:0!important;border:0!important;box-shadow:none!important;background:none!important}
+body#top .home-rpg .portal-scenery{height:185px!important}
+body#top .home-rpg-actions{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important;margin:14px 0!important}
+body#top .home-rpg-actions a{display:flex!important;align-items:center!important;justify-content:center!important;min-height:48px!important;padding:10px!important;border:1px solid #b6a2d266!important;border-radius:12px!important;color:#f7eeff!important;background:#55405c55!important;font-size:17px!important;line-height:1.6!important;text-decoration:none!important;text-align:center!important;overflow-wrap:anywhere!important}
+body#top .home-rpg-picker{display:flex!important;gap:12px!important;align-items:flex-end!important}
+body#top .home-rpg-picker label{display:flex!important;flex:1!important;min-width:0!important;flex-direction:column!important;font-size:16px!important;gap:8px!important;color:#f4eaff!important}
+body#top .home-rpg-picker select{box-sizing:border-box!important;width:100%!important;min-width:0!important;min-height:48px!important;background:#14121e!important;border:1px solid #bc9dce88!important;color:#fff!important;border-radius:10px!important;padding:10px!important;font:inherit!important}
+body#top .home-rpg-picker button{min-height:48px!important;padding:10px 18px!important;flex-shrink:0!important;border:1px solid #d8b5f4!important;border-radius:10px!important;background:var(--purple2,#d6b5ed)!important;color:#21172d!important;font-size:17px!important;font-weight:700!important;cursor:pointer!important}
+body#top .home-rpg-picker button:disabled{opacity:.45!important;cursor:default!important}
+body#top .home-rpg-details>summary{font-size:16px!important;min-height:54px!important;padding:12px 16px!important}
+body#top .home-rpg-details .home-fold-body p{font-size:16px!important;line-height:1.85!important}
+body#top .home-rpg-details h3{font-size:20px!important;margin:16px 0 8px!important}
+body#top .home-rpg-details a{color:#e7c5ff!important}
+body#top .home-rpg .portal-ledger{margin:14px 0!important}
+body#top .home-anchor{display:block;height:0;scroll-margin-top:90px}
+body#top .home-entry:focus-visible,body#top summary:focus-visible,body#top .home-rpg-actions a:focus-visible,body#top select:focus-visible,body#top .home-rpg-picker button:focus-visible{outline:3px solid #ffe4a2!important;outline-offset:4px!important}
+.updates-page{font-size:18px;line-height:1.9}.updates-page .topbar{padding:20px}.updates-page .update-history-section{display:block!important}.updates-page .update-history-card{padding:24px!important}.updates-page .update-history-viewport{max-height:none!important;height:auto!important;overflow:visible!important;mask-image:none!important;-webkit-mask-image:none!important}.updates-page .update-history-list{max-height:none!important}.updates-page .update-history-list p,.updates-page .update-history-list time{font-size:16px!important;line-height:1.85!important}.updates-page .update-history-list li{content-visibility:visible!important}
+@media(max-width:650px){body#top .page{padding-left:16px!important;padding-right:16px!important}body#top .logo-image-wrap{max-width:260px!important}body#top .site-logo-image{max-height:150px!important}body#top .social-switches{grid-template-columns:repeat(2,minmax(0,1fr))!important}body#top .social-switches .switch{min-height:56px!important}body#top .home-entries{grid-template-columns:1fr!important}body#top .home-entry{min-height:66px!important;padding:14px 16px!important}body#top .home-fold>summary{padding:14px 16px!important;flex-wrap:wrap!important;gap:6px 12px!important}body#top .home-fold>summary>span{display:none!important}body#top .home-fold-body{padding:0 12px 16px!important}body#top .home-rpg .town-home-card{padding:18px!important}body#top .home-rpg-heading h2{font-size:22px!important}body#top .home-rpg .portal-scenery{height:160px!important}body#top .home-rpg-actions{gap:7px!important}body#top .home-rpg-actions a{font-size:16px!important;padding:9px 6px!important}body#top .home-rpg-picker{gap:8px!important}.updates-page .update-history-card{padding:16px!important}}
+@media(prefers-reduced-motion:reduce){body#top .home-entry{transition:none!important}}
+
+body#top .home-interactive,body#top .home-entries,body#top .home-entry[id]{scroll-margin-top:100px!important}
+
+/* The compact page has no oversized lazy-layout placeholders. Keep anchor jumps stable. */
+body#top main section,body#top main article,body#top main .reveal-on-scroll,body#top main .home-entry{content-visibility:visible!important;contain-intrinsic-size:none!important;contain:none!important;opacity:1!important;transform:none!important;transition:none!important}
