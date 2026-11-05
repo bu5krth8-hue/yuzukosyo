@@ -136,3 +136,26 @@ body#top .today-base-grid,body#top .today-base-actions{justify-content:center!im
  body#top .shop-switch-copy strong{font-size:22px!important}
  body#top .home-rpg-details>summary{font-size:19px!important;min-height:64px!important}
 }
+
+/* v268: equal-width centered sections and grouped disclosures. */
+body#top main.page{width:min(1120px,100%)!important;margin:0 auto!important;padding-left:24px!important;padding-right:24px!important}
+body#top main.page>section{width:100%!important;max-width:920px!important;margin-left:auto!important;margin-right:auto!important}
+body#top main.page>.schedule-wide-section{display:block!important;grid-template-columns:none!important}
+body#top .schedule-wide-card,body#top .home-rpg .town-home-card{width:100%!important;max-width:none!important;margin-left:auto!important;margin-right:auto!important}
+body#top .home-group{margin-top:32px!important;margin-bottom:32px!important;text-align:center!important}
+body#top .home-group>h2{font-size:clamp(26px,3vw,34px)!important;text-align:center!important;margin:0 0 18px!important}
+body#top .home-group-note{text-align:center!important;font-size:16px!important;margin:0 0 18px!important}
+body#top .home-group>.home-entries,body#top .home-group>.home-interactive,body#top .home-group>.home-fold{width:100%!important;max-width:100%!important;margin:14px auto!important}
+body#top .home-link-group .home-entries:has(>.home-entry:only-of-type){grid-template-columns:minmax(0,1fr)!important}
+body#top .home-group .shop-switches{max-width:100%!important}
+body#top .home-fold>summary{flex-wrap:nowrap!important;overflow-wrap:anywhere!important}
+body#top .home-entry strong{min-width:0!important;overflow-wrap:anywhere!important}
+body#top .live-panel{justify-content:center!important;align-items:center!important;text-align:center!important}
+body#top .live-info{flex:0 1 auto!important;text-align:center!important}
+body#top .home-rpg-details .portal-resources,body#top .home-rpg-details .portal-facilities{justify-content:center!important}
+@media(max-width:650px){body#top main.page{padding-left:16px!important;padding-right:16px!important}body#top .home-group>h2{font-size:26px!important}body#top .home-entry{padding-left:32px!important;padding-right:42px!important}body#top .home-entry strong{font-size:22px!important}body#top .home-fold>summary{padding-left:18px!important;padding-right:46px!important}}
+body#top main .home-link-group .shop-switches .shop-switch{display:flex!important;position:relative!important;justify-content:center!important;align-items:center!important;padding-left:48px!important;padding-right:48px!important;gap:16px!important}
+body#top main .home-link-group .shop-switch-copy{flex:0 1 auto!important;text-align:center!important}
+body#top main .home-link-group .shop-switch-arrow{position:absolute!important;right:18px!important;margin:0!important}
+body#top main .home-link-group .shop-switch .icon{flex:0 0 54px!important}
+@media(max-width:650px){body#top main .home-link-group .shop-switches .shop-switch{padding:18px 36px 18px 14px!important;gap:10px!important}body#top main .home-link-group .shop-switch .icon{flex-basis:42px!important;font-size:34px!important}body#top main .home-link-group .shop-switch-copy .external-link-note{font-size:13px!important}}
