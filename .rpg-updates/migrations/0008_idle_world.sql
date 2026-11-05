@@ -1,0 +1,9 @@
+CREATE TABLE IF NOT EXISTS idle270_state (
+ public_id TEXT PRIMARY KEY, revision INTEGER NOT NULL DEFAULT 0,
+ cursor_ms INTEGER NOT NULL, state_json TEXT NOT NULL, last_op TEXT NOT NULL DEFAULT ''
+);
+CREATE TABLE IF NOT EXISTS idle270_events (
+ public_id TEXT NOT NULL, tick INTEGER NOT NULL, at_ms INTEGER NOT NULL,
+ text TEXT NOT NULL, favorite INTEGER NOT NULL DEFAULT 0 CHECK(favorite IN (0,1)),
+ PRIMARY KEY(public_id,tick)
+);
