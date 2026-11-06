@@ -1,5 +1,5 @@
-import {renderRelease,releaseTick,clearRelease,releaseHasDraft} from './idle-release.js?v=272';
-import {timerRow,updateTimer,duration} from './activity-ui.js?v=272';
+import {renderRelease,releaseTick,clearRelease,releaseHasDraft} from './idle-release.js?v=273';
+import {timerRow,updateTimer,duration} from './activity-ui.js?v=273';
 const $=id=>document.getElementById(id),E=(tag,text,cls)=>{const e=document.createElement(tag);if(text!==undefined)e.textContent=text;if(cls)e.className=cls;return e;};
 let pending=null;try{pending=JSON.parse(sessionStorage.getItem('yuzuIdlePending271')||'null');}catch{}
 let data=null,csrf='',busy=false,anchor=0,server=0,dirty=false,allEvents=[],visibleEvents=5,moreRecords=false,controller=null,epoch=0;
@@ -10,7 +10,7 @@ function lock(){clearRelease();data=null;csrf='';allEvents=[];$('game').hidden=t
 function service(name){const s=data?.services.find(s=>s.name===name);return s?.ok?s.data:null;}
 function adopt(d){data=d;csrf=d.csrf;server=d.now;anchor=performance.now();$('locked').hidden=true;$('game').hidden=false;allEvents=d.events;moreRecords=d.events.length===30;visibleEvents=5;render();$('saved').textContent='確認 '+date(d.now)+'（日本時間）';}
 async function refresh(){const e=++epoch,d=await api();if(e===epoch&&!document.hidden)adopt(d);}
-async function act(fn){if(busy)return;busy=true;controls();$('status').textContent='保存を確認しています…';try{const result=await fn();if(result?.release===272)adopt(result);else await refresh();$('status').textContent='保存しました。';}catch(e){$('status').textContent=errors[e.message]||'通信・保存の完了を確認できません。再接続後に更新してください。';if(csrf&&!document.hidden)try{await refresh();}catch{}}finally{busy=false;controls();tick();}}
+async function act(fn){if(busy)return;busy=true;controls();$('status').textContent='保存を確認しています…';try{const result=await fn();if(result?.release===273)adopt(result);else await refresh();$('status').textContent='保存しました。';}catch(e){$('status').textContent=errors[e.message]||'通信・保存の完了を確認できません。再接続後に更新してください。';if(csrf&&!document.hidden)try{await refresh();}catch{}}finally{busy=false;controls();tick();}}
 const change=(action,extra={})=>api({action,revision:data.revision,requestId:crypto.randomUUID(),...extra});
 function button(text,fn,why=''){const b=E('button',text);b.disabled=!!why||busy;b.dataset.why=why;b.title=why;b.onclick=()=>act(fn);if(why)b.setAttribute('aria-label',text+'：'+why);return b;}
 function summary(box,label,value){const e=E('span',label);e.append(E('b',value));box.append(e);}
@@ -48,5 +48,5 @@ let catalogue=null;async function resume(){if(busy)return;await act(async()=>{aw
 window.addEventListener('beforeunload',e=>{if(dirty||releaseHasDraft()){e.preventDefault();e.returnValue='';}});document.addEventListener('visibilitychange',()=>{if(document.hidden){epoch++;controller?.abort();lock();}else resume();});window.addEventListener('online',resume);window.addEventListener('pageshow',e=>{if(e.persisted)resume();});
 (async()=>{try{const r=await fetch('rpg-catalogue.json',{cache:'no-store'});if(r.ok)catalogue=await r.json();}catch{}await resume();})();setInterval(tick,1000);setInterval(()=>{if(!document.hidden&&!busy)resume();},60000);
 
-function selectPane(id){if(!['activities','party','production','story','home','journal'].includes(id))id='activities';document.querySelectorAll('[data-pane]').forEach(e=>e.hidden=e.dataset.pane!==id);document.querySelectorAll('.tabs a').forEach(a=>a.setAttribute('aria-current',a.getAttribute('href')==='#'+id?'page':'false'));}
+function selectPane(id){if(!['activities','party','production','story','home','journal','shop','services'].includes(id))id='activities';document.querySelectorAll('[data-pane]').forEach(e=>e.hidden=e.dataset.pane!==id);document.querySelectorAll('.tabs a').forEach(a=>a.setAttribute('aria-current',a.getAttribute('href')==='#'+id?'page':'false'));}
 document.querySelectorAll('.tabs a').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();const id=a.getAttribute('href').slice(1);selectPane(id);history.replaceState(null,'','#'+id);}));selectPane(location.hash.slice(1));
