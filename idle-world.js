@@ -1,4 +1,4 @@
-import {renderRelease,releaseTick,clearRelease,releaseHasDraft} from './idle-release.js?v=275';
+import {renderRelease,releaseTick,clearRelease,releaseHasDraft} from './idle-release.js?v=278';
 import {timerRow,updateTimer,duration} from './activity-ui.js?v=275';
 const $=id=>document.getElementById(id),E=(tag,text,cls)=>{const e=document.createElement(tag);if(text!==undefined)e.textContent=text;if(cls)e.className=cls;return e;};
 let pending=null;try{pending=JSON.parse(sessionStorage.getItem('yuzuIdlePending271')||'null');}catch{}

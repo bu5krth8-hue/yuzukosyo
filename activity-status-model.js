@@ -5,6 +5,8 @@ export function activityCards(d){
  for(const m of p?.missions||[])if(m.status==='running')out.push({title:m.kind==='errand'?'以前の街の手伝い':'以前の探索',text:now>=m.ends_at?'帰還済みです。結果を受け取るとオート冒険へ出発できます。':'この探索が終わり、結果を受け取るまでオート冒険には出発できません。',href:'/idle-world#legacyStatus',start:m.started_at,end:m.ends_at,kind:'mission'});
  if(w?.work)out.push({title:'以前の仕事が勤務中',text:'仕事を終了・回収するとオート冒険へ出発できます。',href:'/idle-world#legacyStatus',start:w.work.cursorMs,end:w.work.cursorMs+28800000,kind:'work'});
  if(!p||!w)out.push({title:'活動情報の確認が必要です',text:'一部の情報を取得できません。オート冒険で最新の状態を確認してください。',href:'/idle-world#activities'});
- else if(!out.length)out.push({title:'オート冒険へ出発できます',text:'冒険・街への貢献・お金稼ぎからひとつ選びましょう。',href:'/idle-world#activities'});
+ else if(!out.length&&!w?.jobPending&&!(d.syncPending||[]).some(q=>q.kind==='shop'&&q.count>0))out.push({title:'オート冒険へ出発できます',text:'冒険・街への貢献・お金稼ぎからひとつ選びましょう。',href:'/idle-world#activities'});
+ for(const q of d.syncPending||[])if(q.count>0)out.push({title:q.label+"：反映待ち "+q.count+"件",text:q.kind==='shop'?'配信側で確定するまでジョブチェンジ・次の購入はできません。同期後に表示が更新されます。':'受付内容は保存されています。Streamer.botの処理と次回同期を待っています。',href:q.kind==='shop'?'/idle-world#shop':'/idle-world#activities'});
+ if(w?.jobPending&&!(d.syncPending||[]).some(q=>q.kind==='shop'&&q.count>0))out.push({title:'転職の反映待ち',text:'配信側で確定するまでジョブチェンジできません。',href:'/idle-world#shop'});
  return out;
 }

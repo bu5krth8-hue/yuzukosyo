@@ -45,6 +45,7 @@
       out+=`<g transform="translate(${x} ${y}) scale(${scale})"><title>街で暮らす住民</title><g class="town-walker" style="animation-delay:-${i%9}s;animation-duration:${7+i%5}s"><ellipse cy="2" rx="5" ry="2" fill="#304339" opacity=".25"/>${peopleFocus?'<ellipse cy="-8" rx="10" ry="16" fill="#fff7d9" opacity=".45"/>':''}<path d="M-2 0v-6m4 6v-6" stroke="#3c3f43" stroke-width="2"/><path d="M-3.5-6v-7q3.5-4 7 0v7Z" fill="${coats[i%coats.length]}" stroke="${night?'#ebd6ab':'#fff6e4'}" stroke-width=".6"/><path d="M-4-12-6-7m10-5 2 5" stroke="#d9b08b" stroke-width="1.7" stroke-linecap="round"/><circle cy="-17" r="3.3" fill="#e0b68d" stroke="#775f4d" stroke-width=".5"/><path d="M-3.5-18q3.5-6 7 0" fill="${i%3===0?'#e2c994':'#62554e'}"/><circle cx="-1" cy="-17" r=".35" fill="#4a3e38"/><circle cx="1" cy="-17" r=".35" fill="#4a3e38"/><path d="M0-11v4" stroke="#eee1c4" stroke-width=".6"/></g></g>`;
     }
     out+='</g>';
+    const people=out.slice(out.indexOf('<g class="town-crowd"'));out='<image href="assets/idle-town.webp" width="1200" height="560" preserveAspectRatio="xMidYMid slice"/>'+(night?'<rect width="1200" height="560" fill="#172b59" opacity=".48"/>':'')+people;
     const svg=$('townScene');while(svg.children.length>2)svg.lastElementChild.remove();
     const group=document.createElementNS(svgNS,'g');group.innerHTML=out;svg.append(group);
     $('sceneTitle').textContent=(data?data.town.tier:'柚の街の風景イメージ')+'・'+(night?'夜':'昼')+(peopleFocus?'・住民を拡大':'');
