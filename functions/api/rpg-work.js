@@ -1,3 +1,4 @@
+import {requireNoIdleJourney} from './idle-duty.js';
 import {activeWorkSQL,pendingJobSQL} from './work-duty.js';
 import {json} from './town-support.js';
 import {gameContext} from './rpg-play.js';
@@ -11,7 +12,7 @@ export async function onRequest({request,env}){if(!['GET','POST'].includes(reque
  const d=await readBody(request,1024);if(!['select','claim','end'].includes(d.action)||typeof d.requestId!=='string'||!/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/.test(d.requestId))throw Error('invalid_request');
  const op=await hash('yuzu-work-v1:'+c.id+':'+d.requestId),done=await c.db.prepare('SELECT id FROM web_work_operations WHERE id=? AND public_id=?').bind(op,c.id).first();if(done)return json(await state(c,op));
  const now=Date.now(),old=await c.db.prepare('SELECT * FROM web_work_state WHERE public_id=?').bind(c.id).first();const duty=await c.db.prepare('SELECT * FROM web_work_duty WHERE public_id=?').bind(c.id).first(),active=!!old&&(!duty||duty.active===1);let target=old?.job_id;
- if(d.action==='select'){if(active)throw Error('work_active');const j=WORK_JOBS.find(x=>x.id===d.jobId);if(!j)throw Error('invalid_job');const privateData=await env.RPG_TOWN.get('yuzu_rpg_game_private_v1','json');if(privateData?.capturedAt!==c.snapshot.capturedAt)throw Error('sync_required');const own=privateData.players.find(p=>p.id===c.id);if(j.price>0&&!own?.ownedJobs?.includes(j.id))throw Error('job_locked');target=j.id;}
+ if(d.action==='select'){await requireNoIdleJourney(c.db,c.id);if(active)throw Error('work_active');const j=WORK_JOBS.find(x=>x.id===d.jobId);if(!j)throw Error('invalid_job');const privateData=await env.RPG_TOWN.get('yuzu_rpg_game_private_v1','json');if(privateData?.capturedAt!==c.snapshot.capturedAt)throw Error('sync_required');const own=privateData.players.find(p=>p.id===c.id);if(j.price>0&&!own?.ownedJobs?.includes(j.id))throw Error('job_locked');target=j.id;}
  if(!active&&d.action!=='select')throw Error('not_working');if(active&&now<old.cursor_ms)throw Error('clock_conflict');
  let projection=null;if(active){const level=await c.db.prepare('SELECT xp FROM web_work_levels WHERE public_id=? AND job_id=?').bind(c.id,old.job_id).first();projection=workProjection(old,level?.xp||0,now);if(d.action==='claim'&&projection.minutes===0)throw Error('not_ready');}
  const revision=(old?.revision??-1)+1,guard='EXISTS(SELECT 1 FROM web_work_state WHERE public_id=? AND last_op=? AND revision=?)',statements=[];
