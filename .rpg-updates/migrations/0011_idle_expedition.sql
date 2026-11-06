@@ -1,0 +1,1 @@
+CREATE TABLE IF NOT EXISTS idle274_runs(public_id TEXT PRIMARY KEY, run_json TEXT NOT NULL);
