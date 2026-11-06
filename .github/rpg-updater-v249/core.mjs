@@ -15,7 +15,17 @@ export function safePath(path) {
   need(!/(^|\/)\.env(?:\.|$)|(^|\/)(?:data|runtime|node_modules|\.git)(\/|$)/i.test(path), 'PRIVATE_PATH_REFUSED');
   return path;
 }
-export function additiveSql(text) {
+// Reviewed exception: these guards only abort conflicting starts. They do
+// not update, delete, or copy player rows. Keep the exact reviewed SQL pinned;
+// future trigger migrations still require a separate review and control update.
+const reviewedMigrations = new Map([
+  ['0012_idle_activity_guards.sql', '32c7e13fd51c0bfd2625017f38b9cdef8b841aec9f0d1f5d50c410c47c85999a']
+]);
+export function additiveSql(text, migrationName = '') {
+  if (reviewedMigrations.has(migrationName)) {
+    need(hash(Buffer.from(text, 'utf8')) === reviewedMigrations.get(migrationName), 'REVIEWED_MIGRATION_HASH_MISMATCH');
+    return;
+  }
   const clean = text.replace(/'(?:''|[^'])*'/g,"''").replace(/\/\*[\s\S]*?\*\//g,' ').replace(/--[^\r\n]*/g,' ');
   const statements = clean.split(';').map(s=>s.trim()).filter(Boolean);
   need(statements.length > 0, 'EMPTY_MIGRATION');
@@ -126,7 +136,7 @@ export async function run({config, mode, releaseSha, root, ghToken, cfToken, rep
     }
     if(file.path.startsWith('.rpg-updates/migrations/')){
       need(file.previousSha256===null && /^\.rpg-updates\/migrations\/\d{4}_[a-z0-9_-]+\.sql$/.test(file.path),'MIGRATION_IMMUTABLE_OR_INVALID');
-      additiveSql(bytes.toString('utf8')); sqlFiles.push(file.path);
+      additiveSql(bytes.toString('utf8'), file.path.split('/').at(-1)); sqlFiles.push(file.path);
     }else need(!file.path.startsWith('.rpg-updates/'),'UNSUPPORTED_CONTROL_PATH');
   }
   const marker=JSON.parse((await localFile(root,'rpg-update-status.json')).toString('utf8'));
@@ -143,7 +153,7 @@ export async function run({config, mode, releaseSha, root, ghToken, cfToken, rep
       // modifications to old migrations. All are passed to Wrangler's ledger.
       const names=(await readdir(migrationRoot)).filter(x=>x.endsWith('.sql')).sort();
       need(names.every(x=>/^\d{4}_[a-z0-9_-]+\.sql$/.test(x)),'INVALID_MIGRATION_FILENAME');
-      for(const name of names)additiveSql((await localFile(root,'.rpg-updates/migrations/'+name)).toString('utf8'));
+      for(const name of names)additiveSql((await localFile(root,'.rpg-updates/migrations/'+name)).toString('utf8'), name);
       const temporary=await mkdtemp(join(tmpdir(),'yuzu-rpg-migration-'));
       try {
         const configFile=join(temporary,'wrangler.json');
