@@ -17,7 +17,7 @@ export function battle(s,route,level,tick,jobName=''){const rng=random(s.seed+ti
   if(enemy.hp<=0){outcome='win';break;}const alive=actors.filter(a=>a.hp>0),target=alive[Math.floor(rng()*alive.length)],guard=(friends.some(a=>a.type==='guard')?.8:1)*(target===actors[0]?1-Math.min(.2,(job?.guard||0)/100):1),damage=Math.floor(enemy.attack*(.8+rng()*.4)*guard);target.hp=Math.max(0,target.hp-damage);log.push(monster+'が'+target.name+'に'+damage);if(actors[0].hp<=0||actors.every(a=>a.hp<=0)){log.push('仲間と合流し、街へ帰還しました。');break;}}
  return {monster,boss,outcome,rounds:Math.min(round,12),route:route.id,enemy,actors,log:log.slice(-48)};}
 export function unlockedChapter(s,c,i){if(s.read.includes(i))return true;return s.cleared.includes(Math.floor(i/2));const boss={3:0,7:2,11:5}[i];return s.ticks>=c.at&&(boss===undefined||s.cleared.includes(boss));}
-export function settle(row,now,context={level:1}){const s=valid(JSON.parse(row.state_json)),p=projection(row,Math.max(row.cursor_ms,Math.min(now,s.journey&&!s.journey.claimed?s.journey.end:row.cursor_ms))),events=[];for(let i=0;i<p.count;i++){const n=++s.ticks,at=row.cursor_ms+(i+1)*STEP,rng=random(s.seed+n*31337),weather=weatherAt(at),life=livingBefore(s,at,weather),detail={weather,...life.detail},rest=s.focus==='rest'||s.energy<25;let kind=rest?'rest':s.focus==='balanced'?chooseLivingAction(s,rng):s.focus,text='';
+export function settle(row,now,context={level:1}){const s=valid(JSON.parse(row.state_json)),p=projection(row,Math.max(row.cursor_ms,Math.min(now,s.journey&&!s.journey.claimed?s.journey.end:row.cursor_ms))),events=[],oldFive=s.journey?.fiveUnits??(s.journey?.processed||0)*6;for(let i=0;i<p.count;i++){const n=++s.ticks,at=row.cursor_ms+(i+1)*STEP,rng=random(s.seed+n*31337),weather=weatherAt(at),life=livingBefore(s,at,weather),detail={weather,...life.detail},rest=s.focus==='rest'||s.energy<25;let kind=rest?'rest':s.focus==='balanced'?chooseLivingAction(s,rng):s.focus,text='';
  if(life.force){kind=life.force;detail.reason=life.reason;}
  if(kind==='explore'&&weather.weather==='雨'&&s.cautious)kind='gather';if(weather.night&&s.energy<50)kind='rest';
  if(!s.partyCustomized)for(const ally of ALLIES)if(ally.at===n&&s.party.length<3&&!s.party.includes(ally.id))s.party.push(ally.id);
@@ -39,5 +39,6 @@ export function settle(row,now,context={level:1}){const s=valid(JSON.parse(row.s
  text+=' '+[...life.notes,...livingAfter(s,at,kind,detail.battle,rng,detail)].join(' ');
  const c=CHAPTERS.findIndex(c=>c.at===n);if(c>=0)text+=' 「'+CHAPTERS[c].title+'」の手がかりが届きました。';s.lastAction=kind;events.push({tick:n,at,text,kind,detail});if(s.nextFocus){s.focus=s.nextFocus;delete s.nextFocus;}
  }
+ let fiveChanged=false;if(s.journey&&!s.journey.claimed){const units=Math.max(oldFive,Math.min(288,Math.floor((Math.min(now,s.journey.end)-s.journey.started)/300000))),delta=units-oldFive;s.journey.fiveUnits=units;fiveChanged=delta>0;if(delta>0){if(s.journey.mode==='town')s.wood+=delta;else if(s.journey.mode==='adventure')s.supplies.herb+=delta;}}
  if(s.journey)s.journey.processed=Math.min(48,s.journey.processed+p.count);
- if(p.count>0)s.lastSettlement={at:now,count:p.count,credited:p.count*STEP,discarded:p.discardedMs};return {s,p,events};}
+ if(p.count>0)s.lastSettlement={at:now,count:p.count,credited:p.count*STEP,discarded:p.discardedMs};return {s,p,events,fiveChanged};}

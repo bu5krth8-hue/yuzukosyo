@@ -1,5 +1,5 @@
 import {activityCards} from './activity-status-model.js?v=278';
-import {timerRow,updateTimer} from './activity-ui.js?v=275';
+import {timerRow,updateTimer} from './activity-ui.js?v=280';
 const box=document.getElementById('activityStatus');let epoch=0,anchor=0,server=0,active=null;
 const el=(tag,text)=>{const e=document.createElement(tag);e.textContent=text;return e;};
 async function get(path,signal){const r=await fetch(path,{credentials:'same-origin',cache:'no-store',signal});if(!r.ok)throw Error(String(r.status));return r.json();}

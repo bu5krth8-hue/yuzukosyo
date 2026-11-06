@@ -51,10 +51,13 @@ export async function onRequest({request,env}){try{
  const members=d.partyMode==='random'?pool.slice(0,3-guests.length).map(a=>a.id):d.members;if(!Array.isArray(members)||members.length>3||new Set(members).size!==members.length||members.some(g=>!pool.some(a=>a.id===g)))throw Error('party_locked');
  const job=PLAY.jobs.find(j=>j.id===player.job||j.name===player.job)?.id||'warrior';startJourney(s,{...d,job},now,guests);s.companions=[...members,...guests.map(g=>'viewer_'+g.id)];s.partyCustomized=true;result.p.nextCursor=now;
  }else if(d.action==='journey_claim'){if(!s.journey||s.journey.claimed)throw Error('no_journey');s.journey.claimed=true;result.p.nextCursor=now;}else applyAction(s,d,now);
-    if(d.action!=='settle'||result.events.length||JSON.parse(row.state_json).idleVersion!==2)row=await save(db,id,row,s,result.p.nextCursor,result.events,d,payloadHash);
+    if(d.action!=='settle'||result.events.length||result.fiveChanged||JSON.parse(row.state_json).idleVersion!==2)row=await save(db,id,row,s,result.p.nextCursor,result.events,d,payloadHash);
    }
   }
  }
+ // Mutations must return the run just committed, not the snapshot read before
+ // departure/return; otherwise the button and progress stay on the old screen.
+ if(request.method==='POST'){const latest=await db.prepare('SELECT run_json FROM idle274_runs WHERE public_id=?').bind(id).first();if(latest){durableJourney=JSON.parse(latest.run_json);if(durableJourney){const eligible=await rows(db.prepare('SELECT a.public_id FROM rpg_accounts a LEFT JOIN web_random_support_settings s ON s.public_id=a.public_id WHERE a.active=1 AND COALESCE(s.enabled,1)=1'));allowedViewers=new Set(eligible.map(x=>x.public_id));durableJourney.guests=durableJourney.guests.filter(x=>allowedViewers.has(x.id));}}}
  const s=row?withClaims({...decode(row),journey:structuredClone(durableJourney)}):null;
  const services=await Promise.all([play,work,life].map(async(fn,i)=>{try{const r=await synced(fn,request,env);return {name:['explore','work','life'][i],ok:r.ok,status:r.status,data:await r.json()};}catch{return {name:['explore','work','life'][i],ok:false,status:503,data:{error:'service_unavailable'}};}}));
  const before=Number(url.searchParams.get('before')||Number.MAX_SAFE_INTEGER),q=(url.searchParams.get('q')||'').trim(),favorite=url.searchParams.get('favorite')==='1';if(!Number.isSafeInteger(before)||before<1||q.length>100)throw Error('invalid');
