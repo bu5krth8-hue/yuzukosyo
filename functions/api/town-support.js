@@ -13,7 +13,11 @@ export async function session(request,env){const s=await verify(env,cookies(requ
 export function day(now=new Date()){return new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Tokyo',year:'numeric',month:'2-digit',day:'2-digit'}).format(now);}
 export function sameOrigin(request){return request.headers.get('Origin')===ORIGIN;}
 export async function botAuth(request,env){const s=env.RPG_TOWN_TOKEN;if(typeof s!=='string'||s.length<32)return false;const got=request.headers.get('Authorization')||'';if(got.length>1024)return false;const hash=async text=>new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(text)));const [a,b]=await Promise.all([hash(got),hash('Bearer '+s)]);let n=0;for(let i=0;i<a.length;i++)n|=a[i]^b[i];return n===0;}
-export async function aggregate(db){const meta=await db.prepare('SELECT epoch, applied FROM town_support_meta WHERE singleton=1').first();const all=await db.prepare('SELECT COUNT(*) AS total, COALESCE(MAX(id),0) AS last FROM town_support_v2').first();if(!meta||!/^[a-f0-9]{32}$/.test(meta.epoch)||!Number.isSafeInteger(all.total)||all.total<0||!Number.isSafeInteger(meta.applied)||meta.applied<0||all.total!==all.last||meta.applied>all.total)throw Error('invalid_state');return {...meta,total:all.total};}
+export async function aggregate(db){
+ const state=await db.prepare('SELECT epoch, applied, total FROM town_support_rollup WHERE singleton=1').first();
+ if(!state||!/^[a-f0-9]{32}$/.test(state.epoch)||!Number.isSafeInteger(state.total)||!Number.isSafeInteger(state.applied)||state.applied<0||state.applied>state.total)throw Error('invalid_state');
+ return state;
+}
 
 export async function onRequest({request,env}){
  const db=env.RPG_SUPPORT;if(!db)return json({configured:false,error:'support_not_configured'},503);
@@ -30,7 +34,8 @@ export async function onRequest({request,env}){
     const data=new Uint8Array(bytes);let i=0;for(const p of parts){data.set(p,i);i+=p.length;}
     const [v,epoch,raw,previous,...extra]=new TextDecoder().decode(data).split('|'),n=Number(raw);
     if(v!=='1'||epoch!==a.epoch||extra.length||!/^\d+$/.test(raw)||!/^\d+$/.test(previous)||!Number.isSafeInteger(n)||n<0||n>a.total||Number(previous)>n)return json({error:'invalid_ack'},409);
-    await db.prepare('UPDATE town_support_meta SET applied=MAX(applied,?) WHERE singleton=1 AND epoch=?').bind(n,epoch).run();return json({ok:true});
+    if(n>a.applied)await db.prepare('UPDATE town_support_meta SET applied=? WHERE singleton=1 AND epoch=? AND applied<?').bind(n,epoch,n).run();
+    return json({ok:true});
    }
    return json({error:'method'},405);
   }catch{return json({error:'support_storage_unavailable'},503);}
