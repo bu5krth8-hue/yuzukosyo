@@ -28,3 +28,5 @@ input[type=checkbox],input[type=radio]{min-width:22px;min-height:22px;flex-shrin
 .hero>p:not(.eyebrow){font-size:18px}.muted,.fine,.small-copy{font-size:16px}
 
 small{font-size:16px;line-height:1.85}
+
+.story.important {border-left: 4px solid #a4783f}

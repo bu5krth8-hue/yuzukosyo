@@ -1,4 +1,5 @@
 import {townLevel} from '../../town-growth.js';
+import {snapshotGet,storeSnapshot} from './rpg-snapshot.js';
 const KEY = 'yuzu_town_public_v1';
 const MAX = 8192;
 import {TOWN_NAMES as names,TOWN_THRESHOLDS as thresholds} from '../../town-tiers.js';
@@ -40,7 +41,7 @@ export async function onRequest({request,env}) {
   const kv=env.RPG_TOWN;
   if(!kv)return reply({configured:false,data:null,message:'街データの連携準備中です。'},503);
   if(request.method==='GET') {
-    try {const raw=await kv.get(KEY);return reply({configured:true,data:raw?validate(JSON.parse(raw)):null});}
+    try {const data=await snapshotGet(env,KEY);return reply({configured:true,data:data?validate(data):null});}
     catch{return reply({error:'town_unavailable'},503);}
   }
   if(typeof env.RPG_TOWN_TOKEN!=='string'||env.RPG_TOWN_TOKEN.length<32)return reply({error:'sync_not_configured'},503);
@@ -49,8 +50,10 @@ export async function onRequest({request,env}) {
   let data;
   try{data=validate(await readLimited(request));}catch(e){return reply({error:e.message==='large'?'payload_too_large':'invalid_payload'},e.message==='large'?413:400);}
   try {
-    const old=await kv.get(KEY);
-    if(old && Date.parse(JSON.parse(old).capturedAt)>Date.parse(data.capturedAt))return reply({error:'older_snapshot'},409);
-    await kv.put(KEY,JSON.stringify(data));return reply({ok:true,capturedAt:data.capturedAt});
+    if(!env.RPG_SUPPORT)return reply({error:'sync_not_configured'},503);
+    const old=await snapshotGet(env,KEY);
+    const capturedAt=Date.parse(data.capturedAt);
+    if((old && Date.parse(old.capturedAt)>capturedAt)||!await storeSnapshot(env.RPG_SUPPORT,[[KEY,data]],capturedAt))return reply({error:'older_snapshot'},409);
+    return reply({ok:true,capturedAt:data.capturedAt});
   }catch{return reply({error:'save_failed'},503);}
 }

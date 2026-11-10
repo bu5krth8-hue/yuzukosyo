@@ -1,0 +1,17 @@
+.character-preview {display:grid;place-items:center;min-height:9rem;background:#e4ecdf;border:1px solid #98b49f;border-radius:1rem}
+.character-fields {display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,13rem),1fr));gap:.75rem;margin:1rem 0}
+.character-fields label,.guide form>label:not(.character-check) {display:grid;gap:.3rem}
+.character-fields select {min-height:2.75rem}
+.character-check {display:flex;align-items:center;gap:.6rem;margin:1rem 0}
+.character-check input {width:auto}
+.rpg-portrait {display:inline-grid;place-items:center;position:relative;width:3rem;height:3rem;flex:none}
+.character-preview .rpg-portrait {width:6rem;height:6rem}
+.rpg-portrait img {width:100%;height:100%;object-fit:cover;border-radius:25%}
+.rpg-portrait-sprite {width:100%;height:100%;background:url("assets/idle-characters.webp") 0 0 / 200% 200%;image-rendering:pixelated}
+.rpg-portrait-sprite[data-sprite="knight"] {background-position:100% 0}
+.rpg-portrait-sprite[data-sprite="mage"] {background-position:0 100%}
+.rpg-portrait-sprite[data-sprite="healer"] {background-position:100% 100%}
+.rpg-portrait-sprite[data-color="warm"] {filter:sepia(.55) saturate(1.4)}
+.rpg-portrait-sprite[data-color="cool"] {filter:hue-rotate(28deg) saturate(1.3)}
+.rpg-portrait-sprite[data-color="violet"] {filter:hue-rotate(100deg) saturate(1.3)}
+.rpg-portrait-charm {position:absolute;right:-.2rem;bottom:-.15rem;padding:.04rem .2rem;background:#f9f6e9;border-radius:.6rem}

@@ -8,10 +8,17 @@ export function dayAt(at){return new Date(at+32400000).toISOString().slice(0,10)
 export function livingUpgrade(s){
  if(s.livingVersion!==undefined&&s.livingVersion!==1)throw Error('save_invalid');
  if(s.livingVersion!==1){s.livingVersion=1;s.personality=Object.fromEntries(Object.keys(PERSONALITIES).map((k,i)=>[k,40+((s.seed+i*17)>>>0)%21]));s.mood={name:'穏やか',until:0};s.routine={early:false,autoHeal:true};s.injury=0;s.construction=null;s.garden=[];s.exterior={style:'cottage',roof:0,wall:5,door:1};s.blueprints=[];s.roster=[];s.companions=null;s.collection={};s.questDay='';s.daily={gather:0,win:0,social:0,claimed:[]};s.memories=[];s.celebrations=[];s.gallery=[];}
+ if(s.interior===undefined)s.interior={wall:5,floor:3,furniture:{}};
  return s;
 }
+const dyeIndex=value=>Number.isInteger(value)&&value>=0&&value<DYES.length;
+function interiorValid(value,furniture){
+ return !!value&&dyeIndex(value.wall)&&dyeIndex(value.floor)&&!!value.furniture&&
+  typeof value.furniture==='object'&&!Array.isArray(value.furniture)&&
+  Object.entries(value.furniture).every(([id,dye])=>furniture.includes(id)&&dyeIndex(dye));
+}
 export function livingValid(s){
- livingUpgrade(s);const num=n=>Number.isSafeInteger(n)&&n>=0,text=(v,n)=>typeof v==='string'&&[...v].length<=n&&!/[\u0000-\u001f\u007f<>]/.test(v);
+ livingUpgrade(s);if(!interiorValid(s.interior,s.furniture))throw Error('save_invalid');const num=n=>Number.isSafeInteger(n)&&n>=0,text=(v,n)=>typeof v==='string'&&[...v].length<=n&&!/[\u0000-\u001f\u007f<>]/.test(v);
  if(!s.personality||Object.keys(PERSONALITIES).some(k=>!num(s.personality[k])||s.personality[k]>100)||!s.mood||!text(s.mood.name,24)||!num(s.mood.until)||!s.routine||typeof s.routine.early!=='boolean'||typeof s.routine.autoHeal!=='boolean'||!num(s.injury)||s.injury>12||!Array.isArray(s.garden)||s.garden.some(k=>!GARDEN[k])||new Set(s.garden).size!==s.garden.length||!s.exterior||!HOUSE_STYLES[s.exterior.style]||['roof','wall','door'].some(k=>!Number.isInteger(s.exterior[k])||s.exterior[k]<0||s.exterior[k]>=DYES.length))throw Error('save_invalid');
  const c=s.construction;if(c&&(!['home','garden'].includes(c.kind)||c.kind==='garden'&&!GARDEN[c.item]||!num(c.startedAt)||!num(c.readyAt)||c.readyAt<=c.startedAt||c.kind==='home'&&c.to!==s.home+1))throw Error('save_invalid');
  if(!Array.isArray(s.roster)||s.roster.some(a=>!/^wanderer_[1-9][0-9]*$/.test(a.id)||!text(a.name,24)||!['guard','magic','physical','heal','swift'].includes(a.type)||!num(a.at)||a.at>s.ticks)||new Set(s.roster.map(a=>a.id)).size!==s.roster.length||s.companions!==null&&(!Array.isArray(s.companions)||s.companions.length>3||new Set(s.companions).size!==s.companions.length)||!s.collection||Object.entries(s.collection).some(([k,v])=>!/^relic_[0-9]{1,2}_[1-5]$/.test(k)||!num(v))||!Array.isArray(s.blueprints)||s.blueprints.length>5||s.blueprints.some(b=>!text(b.name,16)||!Array.isArray(b.items)||b.items.length>4||new Set(b.items.map(p=>p.id)).size!==b.items.length||new Set(b.items.map(p=>p.x+','+p.y)).size!==b.items.length||b.items.some(p=>!s.furniture.includes(p.id)||!Number.isInteger(p.x)||p.x<0||p.x>5||!Number.isInteger(p.y)||p.y<0||p.y>3||![0,90,180,270].includes(p.rotation)))||!Array.isArray(s.memories)||s.memories.length>30||!Array.isArray(s.celebrations)||s.celebrations.some(d=>!/^\d{4}-07-25$/.test(d))||!Array.isArray(s.gallery)||s.gallery.length>60||!s.daily||['gather','win','social'].some(k=>!num(s.daily[k]))||!Array.isArray(s.daily.claimed)||s.daily.claimed.some(k=>!['gather','win','social'].includes(k))||new Set(s.daily.claimed).size!==s.daily.claimed.length)throw Error('save_invalid');
@@ -48,6 +55,7 @@ export function livingAfter(s,at,kind,battle,rng,detail){
 export function livingAction(s,d,now){
  if(d.action==='routine'){if(typeof d.early!=='boolean'||typeof d.autoHeal!=='boolean')throw Error('invalid');s.routine={early:d.early,autoHeal:d.autoHeal};}
  else if(d.action==='companions'){const ids=d.members;if(!Array.isArray(ids)||ids.length>3||new Set(ids).size!==ids.length)throw Error('party_limit');s.companions=[...ids];}
+ else if(d.action==='interior'){if(!interiorValid(d.interior,s.furniture))throw Error('invalid');s.interior={wall:d.interior.wall,floor:d.interior.floor,furniture:{...d.interior.furniture}};}
  else if(d.action==='exterior'){if(!HOUSE_STYLES[d.style]||['roof','wall','door'].some(k=>!Number.isInteger(d[k])||d[k]<0||d[k]>=DYES.length))throw Error('invalid');s.exterior={style:d.style,roof:d.roof,wall:d.wall,door:d.door};}
  else if(d.action==='construction'){
   if(s.construction)throw Error('construction_busy');let wood,ore,hours;

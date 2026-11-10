@@ -1,3 +1,4 @@
+import {snapshotGet} from './rpg-snapshot.js';
 import {json,sameOrigin} from './town-support.js';
 import {readBody} from './rpg-info.js';
 import {adminAuth,randomToken,hash} from './rpg-account.js';
@@ -6,8 +7,8 @@ export async function onRequest({request,env}){
  if(!await adminAuth(request,env))return json({error:'unauthorized'},401);
  const db=env.RPG_SUPPORT;if(!db||!env.RPG_TOWN)return json({error:'not_configured'},503);
  try{
-  const snapshot=await env.RPG_TOWN.get(KEY,'json');if(!snapshot)return json({error:'snapshot_required'},409);
-  const players=snapshot.players,identityData=await env.RPG_TOWN.get('yuzu_rpg_identity_private_v1','json');
+  const snapshot=await snapshotGet(env,KEY);if(!snapshot)return json({error:'snapshot_required'},409);
+  const players=snapshot.players,identityData=await snapshotGet(env,'yuzu_rpg_identity_private_v1');
   const identities=new Map((identityData?.capturedAt===snapshot.capturedAt?identityData.identities:[]).map(p=>[p.id,p.login]));
   if(request.method==='GET'){
    const rows=await db.prepare('SELECT public_id,active,version,created_at,updated_at FROM rpg_accounts').all();const map=new Map(rows.results.map(r=>[r.public_id,r]));

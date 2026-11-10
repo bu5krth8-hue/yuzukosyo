@@ -435,68 +435,6 @@ function scheduleMascotRotation() {
  observer.observe(area);
 }
 scheduleMascotRotation();
-const dailyQuotes = [
- {
-  text: "成功とは、失敗を重ねても情熱を失わないことだ。",
-  author: "ウィンストン・チャーチル"
- },
- {
-  text: "困難の中に、機会がある。",
-  author: "アルベルト・アインシュタイン"
- },
- {
-  text: "人生に失敗がないと、人生を失敗する。",
-  author: "斎藤茂太"
- },
- {
-  text: "夢を見ることができるなら、それは実現できる。",
-  author: "ウォルト・ディズニー"
- },
- {
-  text: "最も大切なのは、問い続けることをやめないことだ。",
-  author: "アルベルト・アインシュタイン"
- },
- {
-  text: "努力する人は希望を語り、怠ける人は不満を語る。",
-  author: "井上靖"
- },
- {
-  text: "明日死ぬかのように生きよ。永遠に生きるかのように学べ。",
-  author: "マハトマ・ガンジー"
- },
- {
-  text: "できると思えばできる。できないと思えばできない。",
-  author: "ヘンリー・フォード"
- },
- {
-  text: "勝つことばかり知りて、負くることを知らざれば、害その身に至る。",
-  author: "徳川家康"
- },
- {
-  text: "為せば成る、為さねば成らぬ何事も。",
-  author: "上杉鷹山"
- },
- {
-  text: "今日という日は、残りの人生の最初の日である。",
-  author: "チャールズ・ディードリッヒ"
- },
- {
-  text: "小さいことを積み重ねることが、とんでもないところへ行くただ一つの道だ。",
-  author: "イチロー"
- },
- {
-  text: "準備しておこう。チャンスはいつか訪れるものだ。",
-  author: "エイブラハム・リンカーン"
- },
- {
-  text: "人を信じよ、しかし、その百倍も自らを信じよ。",
-  author: "手塚治虫"
- },
- {
-  text: "過去から学び、今日のために生き、未来に希望を持て。",
-  author: "アルベルト・アインシュタイン"
- }
-];
 function getTodayKey() {
  const now = new Date();
  return [
@@ -504,197 +442,6 @@ function getTodayKey() {
   String(now.getMonth() + 1).padStart(2, "0"),
   String(now.getDate()).padStart(2, "0")
  ].join("-");
-}
-function setDailyQuote() {
- const text = document.getElementById("dailyWordText");
- if (!text) return;
- const todayKey = getTodayKey();
- const storageKey = "yuzukosyoDailyQuote";
- let saved = null;
- try {
-  saved = JSON.parse(localStorage.getItem(storageKey) || "null");
- } catch (error) {
-  saved = null;
- }
- let quote = null;
- if (
-  saved &&
-  saved.date === todayKey &&
-  Number.isInteger(saved.index) &&
-  dailyQuotes[saved.index]
- ) {
-  quote = dailyQuotes[saved.index];
- } else {
-  const index = Math.floor(Math.random() * dailyQuotes.length);
-  quote = dailyQuotes[index];
-  try {
-   localStorage.setItem(storageKey, JSON.stringify({
-    date: todayKey,
-    index
-   }));
-  } catch (error) {
-  }
- }
- text.innerHTML = `
-  <span class="quote-mark">“</span>${escapeHtml(quote.text)}<span class="quote-mark">”</span>
-  <small>— ${escapeHtml(quote.author)}</small>
- `;
-}
-function normalizeMeigenValue(value) {
- return String(value || "").normalize("NFKC").trim().replace(/\s+/g, " ");
-}
-function isUnsetMeigenValue(value) {
- const normalized = normalizeMeigenValue(value);
- return !normalized || normalized === "未設定" || normalized === "不明";
-}
-function normalizeMeigenTextForSignature(value) {
- return normalizeMeigenValue(value)
-  .replace(/[（(]\s*DBD\s*[）)]/gi, "")
-  .replace(/[「」『』“”"]/g, "")
-  .replace(/\s+/g, " ")
-  .trim();
-}
-function getMeigenSignature(item) {
- return normalizeMeigenTextForSignature(item?.text) || normalizeMeigenValue(item?.id);
-}
-function hasMeigenGameTag(value) {
- return /[（(]\s*DBD\s*[）)]/i.test(String(value || ""));
-}
-function meigenFieldScoreForTop(value, type) {
- const normalized = normalizeMeigenValue(value);
- if (!normalized || normalized === "未設定" || normalized === "不明") return 0;
- if (type === "speaker" && normalized.length <= 1) return 2;
- if (type === "memo") return 30 + Math.min(normalized.length, 80);
- if (type === "text") return normalized.length + (hasMeigenGameTag(normalized) ? 80 : 0);
- return 20 + Math.min(normalized.length, 20);
-}
-function meigenItemScoreForTop(item) {
- return (
-  meigenFieldScoreForTop(item?.text, "text") +
-  meigenFieldScoreForTop(item?.speaker, "speaker") +
-  meigenFieldScoreForTop(item?.place, "place") +
-  meigenFieldScoreForTop(item?.date, "date") +
-  meigenFieldScoreForTop(item?.memo, "memo") +
-  (item?.visible === false ? 0 : 5)
- );
-}
-function chooseMeigenTextForTop(currentText, nextText) {
- const current = normalizeMeigenValue(currentText);
- const next = normalizeMeigenValue(nextText);
- if (!current) return next;
- if (!next) return current;
- if (hasMeigenGameTag(next) && !hasMeigenGameTag(current)) return next;
- if (hasMeigenGameTag(current) && !hasMeigenGameTag(next)) return current;
- return next.length > current.length ? next : current;
-}
-function chooseMeigenFieldForTop(currentValue, nextValue, type) {
- const current = normalizeMeigenValue(currentValue);
- const next = normalizeMeigenValue(nextValue);
- if (type === "memo") {
-  if (!current) return next;
-  if (!next) return current;
-  return next.length > current.length ? next : current;
- }
- if (isUnsetMeigenValue(current)) return next || current || "未設定";
- if (isUnsetMeigenValue(next)) return current;
- if (type === "speaker" && current.length <= 1 && next.length > current.length) return next;
- return current;
-}
-function mergeMeigenForTop(currentItem, nextItem) {
- const current = currentItem || {};
- const next = nextItem || {};
- const currentScore = meigenItemScoreForTop(current);
- const nextScore = meigenItemScoreForTop(next);
- const base = nextScore > currentScore ? { ...next, ...current } : { ...current, ...next };
- return {
-  ...base,
-  id: nextScore > currentScore ? (next.id || current.id || "") : (current.id || next.id || ""),
-  text: chooseMeigenTextForTop(current.text, next.text),
-  speaker: chooseMeigenFieldForTop(current.speaker, next.speaker, "speaker") || "未設定",
-  place: chooseMeigenFieldForTop(current.place, next.place, "place") || "未設定",
-  date: chooseMeigenFieldForTop(current.date, next.date, "date") || "未設定",
-  memo: chooseMeigenFieldForTop(current.memo, next.memo, "memo") || "",
-  visible: current.visible !== false || next.visible !== false
- };
-}
-function deduplicateMeigensForTop(items) {
- const map = new Map();
- const order = [];
- (Array.isArray(items) ? items : []).forEach((item) => {
-  if (!item || item.visible === false || !String(item.text || "").trim()) return;
-  const signature = getMeigenSignature(item);
-  if (!signature) return;
-  if (!map.has(signature)) {
-   map.set(signature, { ...item });
-   order.push(signature);
-   return;
-  }
-  map.set(signature, mergeMeigenForTop(map.get(signature), item));
- });
- return order.map((key) => map.get(key));
-}
-function getVisibleMeigensForTop() {
- const publicItems = Array.isArray(window.YUZUKOSYO_PUBLIC_MEIGEN)
-  ? window.YUZUKOSYO_PUBLIC_MEIGEN
-  : [];
- let localItems = [];
- try {
-  const raw = localStorage.getItem("yuzukosyoMeigenItems");
-  const parsed = raw ? JSON.parse(raw) : [];
-  localItems = Array.isArray(parsed) ? parsed : [];
- } catch (error) {
-  localItems = [];
- }
- return deduplicateMeigensForTop([...publicItems, ...localItems]);
-}
-function getDailyMeigenForTop(items) {
- const todayKey = getTodayKey();
- const storageKey = "yuzukosyoDailyMeigen";
- let saved = null;
- try {
-  saved = JSON.parse(localStorage.getItem(storageKey) || "null");
- } catch (error) {
-  saved = null;
- }
- if (saved && saved.date === todayKey) {
-  if (saved.id) {
-   const savedItem = items.find((item) => item.id === saved.id);
-   if (savedItem) return savedItem;
-  }
-  if (Number.isInteger(saved.index) && items[saved.index]) {
-   return items[saved.index];
-  }
- }
- const index = Math.floor(Math.random() * items.length);
- const item = items[index];
- try {
-  localStorage.setItem(storageKey, JSON.stringify({
-   date: todayKey,
-   index,
-   id: item.id || ""
-  }));
- } catch (error) {
- }
- return item;
-}
-function setDailyMeigen() {
- const text = document.getElementById("dailyMeigenText");
- if (!text) return;
- const items = getVisibleMeigensForTop();
- if (!items.length) {
-  text.innerHTML = `
-   公開中の迷言はまだありません。
-   <small>追加されたらここに出るよ</small>
-  `;
-  return;
- }
- const item = getDailyMeigenForTop(items);
- const speaker = item.speaker || "発言者未設定";
- const place = item.place ? ` / ${item.place}` : "";
- text.innerHTML = `
-  <span class="quote-mark">“</span>${escapeHtml(item.text)}<span class="quote-mark">”</span>
-  <small>— ${escapeHtml(speaker + place)}</small>
- `;
 }
 const omikujiItems = [
  {
@@ -2294,8 +2041,8 @@ function setupSecretInteractions() {
   });
  }
 }
-setDailyQuote();
-setDailyMeigen();
+
+
 setupDailyOmikuji();
 setupOmikujiShareButton();
 setupOmikujiSaveButton();
@@ -2442,7 +2189,7 @@ setupUpdateHistoryMore();
 function setupStableShortcutJumps() {
  const nav = document.querySelector(".topbar-actions");
  if (!nav) return;
- const anchorMap = new Set(["#yuzuTown", "#top", "#lineStampShop", "#appSalesShop", "#mainContent", "#stampHistoryPage", "#omikujiHistoryPage", "#socialLinks", "#visitStamp", "#schedule", "#omikuji", "#themeColors", "#novel", "#apps", "#updates", "#stream-gear"]);
+ const anchorMap = new Set(["#yuzuTown", "#top", "#lineStampShop", "#appSalesShop", "#mainContent", "#stampHistoryPage", "#omikujiHistoryPage", "#socialLinks", "#visitStamp", "#schedule", "#omikuji", "#themeColors", "#novel", "#updates", "#stream-gear"]);
  const jumpPrepareTargets = [
   ".social-anchor",
   ".social-switches",

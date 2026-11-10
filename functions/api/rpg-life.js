@@ -1,3 +1,4 @@
+import {snapshotGet} from './rpg-snapshot.js';
 import {json} from './town-support.js';
 import {gameContext,rows} from './rpg-play.js';
 import {hash,randomToken} from './rpg-account.js';
@@ -105,7 +106,7 @@ async function connect(c,d,op,payload){
  const own=await c.db.prepare('SELECT * FROM web_life_profiles WHERE public_id=? AND code_hash IS NOT NULL AND code_expires>?').bind(c.id,now).first();if(!own)throw Error('own_code_required');
  const order=[own,target].sort((a,b)=>a.public_id.localeCompare(b.public_id)),[a,b]=order;
  const familyId=await hash('yuzu-family-v1:'+a.public_id+':'+a.code_hash+':'+b.public_id+':'+b.code_hash);
- const privateGame=await c.env.RPG_TOWN.get('yuzu_rpg_game_private_v1','json');if(privateGame?.capturedAt!==c.snapshot.capturedAt)throw Error('sync_required');
+ const privateGame=await snapshotGet(c.env,'yuzu_rpg_game_private_v1');if(privateGame?.capturedAt!==c.snapshot.capturedAt)throw Error('sync_required');
  const inherited=[];for(const person of order){
   const saved=privateGame.players.find(p=>p.id===person.public_id),pool=WORK_JOBS.filter(j=>j.price===0||saved?.ownedJobs?.includes(j.id));
   let job=pool.find(j=>j.id.toLowerCase()===String(saved?.activeJob||'').toLowerCase()||j.job===saved?.activeJob||PLAY.jobs.find(p=>p.id===j.id)?.number===saved?.activeJob);

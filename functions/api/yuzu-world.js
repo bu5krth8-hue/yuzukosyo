@@ -1,9 +1,10 @@
+import {snapshotGet} from './rpg-snapshot.js';
 import {json,sameOrigin} from './town-support.js';
 import {readBody} from './rpg-info.js';
 import {hash,randomToken} from './rpg-account.js';
 import {requireGate,statusFor} from '../_world/access.js';
 import {initial,reduce,view,SCHEMA} from '../_world/engine.js';
-async function sharedFor(env,id){const publicData=await env.RPG_TOWN.get('yuzu_rpg_public_v1','json'),privateData=await env.RPG_TOWN.get('yuzu_rpg_game_private_v1','json'),town=await env.RPG_TOWN.get('yuzu_town_public_v1','json'),player=publicData?.players?.find(p=>p.id===id);if(!player)throw Error('sync_required');return{player,privatePlayer:privateData?.capturedAt===publicData.capturedAt?privateData.players.find(p=>p.id===id):null,town};}
+async function sharedFor(env,id){const publicData=await snapshotGet(env,'yuzu_rpg_public_v1'),privateData=await snapshotGet(env,'yuzu_rpg_game_private_v1'),town=await snapshotGet(env,'yuzu_town_public_v1'),player=publicData?.players?.find(p=>p.id===id);if(!player)throw Error('sync_required');return{player,privatePlayer:privateData?.capturedAt===publicData.capturedAt?privateData.players.find(p=>p.id===id):null,town};}
 async function state(db,id){let row=await db.prepare('SELECT revision,state_json,updated_at FROM world252_saves WHERE public_id=?').bind(id).first();if(!row){const now=Date.now();await db.prepare('INSERT OR IGNORE INTO world252_saves(public_id,revision,state_json,updated_at) VALUES(?,0,?,?)').bind(id,JSON.stringify(initial(randomToken())),now).run();row=await db.prepare('SELECT revision,state_json,updated_at FROM world252_saves WHERE public_id=?').bind(id).first();}const game=JSON.parse(row.state_json);if(game.schemaVersion!==SCHEMA)throw Error('schema');return{row,game};}
 function reply(saved,shared){return{ok:true,revision:saved.row.revision,savedAt:saved.row.updated_at,...view(saved.game,shared)};}
 export async function onRequest({request,env}){try{

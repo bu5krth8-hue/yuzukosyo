@@ -1,3 +1,4 @@
+import {snapshotGet} from './rpg-snapshot.js';
 import {json,cookie,cookies,sameOrigin,botAuth} from './town-support.js';
 import {readBody} from './rpg-info.js';
 const COOKIE='__Host-yuzu-rpg-session',AGE=604800,KEY='yuzu_rpg_public_v1';
@@ -12,7 +13,7 @@ export async function onRequest({request,env}){
  try{
   if(action==='me'&&request.method==='GET'){
    const s=await currentSession(request,db);if(!s)return response({authenticated:false},200,'');
-   const data=await env.RPG_TOWN.get(KEY,'json'),profile=data?.players?.find(p=>p.id===s.public_id)||null;
+   const data=await snapshotGet(env,KEY),profile=data?.players?.find(p=>p.id===s.public_id)||null;
    return response({authenticated:true,csrf:s.csrf,expiresAt:s.expires_at,profile,capturedAt:data?.capturedAt||null});
   }
   if(request.method!=='POST')return json({error:'method'},405);

@@ -16,25 +16,6 @@
   <priority>0.7</priority>
  </url>
  <url>
-  <loc>https://yuzukosyo.pages.dev/quotes.html</loc>
-  <lastmod>2026-05-27</lastmod>
-  <priority>0.7</priority>
- </url>
-
- <url>
-  <loc>https://yuzukosyo.pages.dev/meigen.html</loc>
-  <lastmod>2026-05-27</lastmod>
-  <changefreq>monthly</changefreq>
-  <priority>0.7</priority>
- </url>
-
- <url>
-  <loc>https://yuzukosyo.pages.dev/meigen-submit.html</loc>
-  <lastmod>2026-05-27</lastmod>
-  <changefreq>monthly</changefreq>
-  <priority>0.6</priority>
- </url>
- <url>
   <loc>https://yuzukosyo.pages.dev/first-visit.html</loc>
  </url>
  <url>
@@ -53,9 +34,5 @@
   <lastmod>2026-06-25</lastmod>
   <priority>0.7</priority>
  </url>
- <url>
-  <loc>https://yuzukosyo.pages.dev/apps.html</loc>
-  <lastmod>2026-06-08</lastmod>
-  <priority>0.6</priority>
- </url>
-<url><loc>https://yuzukosyo.pages.dev/town.html</loc></url><url><loc>https://yuzukosyo.pages.dev/updates.html</loc><lastmod>2026-11-05</lastmod></url></urlset>
+ <url><loc>https://yuzukosyo.pages.dev/town.html</loc></url><url><loc>https://yuzukosyo.pages.dev/updates.html</loc><lastmod>2026-11-05</lastmod></url>  <url><loc>https://yuzukosyo.pages.dev/rpg-guide.html</loc></url>
+</urlset>

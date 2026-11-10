@@ -2,7 +2,8 @@ export async function onRequest(context) {
  const env = context.env || {};
  const kv = env.SITE_STATS;
 
- if (!kv) {
+ const db = env.RPG_SUPPORT;
+ if (!kv || !db) {
   return json({
    configured: false,
    total: 0,
@@ -11,24 +12,26 @@ export async function onRequest(context) {
  }
 
  try {
-  const key = "total_access";
-  const currentValue = await kv.get(key);
-  const current = Number.parseInt(currentValue || "0", 10);
-  const next = Number.isFinite(current) ? current + 1 : 1;
-
-  await kv.put(key, String(next));
+  if (context.request.method !== 'GET') return json({configured: false}, 405);
+  const advance = () => db.prepare('UPDATE web_visit_counter SET total=total+1 WHERE singleton=1 RETURNING total').first();
+  let row = await advance();
+  if (!row) {
+   const current = Number.parseInt(await kv.get('total_access') || '0', 10);
+   const seed = Number.isSafeInteger(current) && current >= 0 ? current : 0;
+   await db.prepare('INSERT OR IGNORE INTO web_visit_counter(singleton,total) VALUES(1,?)').bind(seed).run();
+   row = await advance();
+  }
 
   return json({
    configured: true,
-   total: next,
+   total: row.total,
    message: "アクセス数を更新しました"
   });
- } catch (error) {
+ } catch {
   return json({
    configured: false,
    total: 0,
-   message: "アクセス数の更新に失敗しました",
-   error: error.message
+   message: "アクセス数の更新に失敗しました"
   }, 500);
  }
 }

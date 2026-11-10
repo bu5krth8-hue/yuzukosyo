@@ -3,12 +3,8 @@ const YUZU_FAVORITE_ROOMS = [
  {id:"fortune",label:"🔮 柚胡椒くじ",href:"index.html#omikuji"},
  {id:"novel",label:"📖 小説",href:"novel.html"},
  {id:"schedule",label:"🔔 配信予定",href:"index.html#schedule"},
- {id:"apps",label:"🧩 アプリ関係",href:"apps.html"},
- {id:"pashayomi",label:"📷 パシャ読み",href:"pashayomi.html"},
  {id:"profile",label:"👤 プロフィール",href:"profile.html"},
  {id:"residents",label:"👻 秘密基地の住人",href:"mascots.html"},
- {id:"quotes",label:"📜 今日の格言",href:"quotes.html"},
- {id:"meigen",label:"🗯️ 迷言集",href:"meigen.html"}
 ];
 const YUZU_NOVEL_EPISODES = [
  {id:"novel-episode-1",number:1,title:"人間世界から落ちてきた箱",date:"2000-01-01"},
