@@ -15,11 +15,12 @@ export function safePath(path) {
   need(!/(^|\/)\.env(?:\.|$)|(^|\/)(?:data|runtime|node_modules|\.git)(\/|$)/i.test(path), 'PRIVATE_PATH_REFUSED');
   return path;
 }
-// Reviewed exception: these guards only abort conflicting starts. They do
-// not update, delete, or copy player rows. Keep the exact reviewed SQL pinned;
-// future trigger migrations still require a separate review and control update.
+// Keep reviewed trigger migrations pinned to their exact contents.
+// 0012 prevents conflicting starts. 0014 derives and maintains the support rollup
+// while preserving the existing ledger and receipt cursor.
 const reviewedMigrations = new Map([
-  ['0012_idle_activity_guards.sql', '32c7e13fd51c0bfd2625017f38b9cdef8b841aec9f0d1f5d50c410c47c85999a']
+  ['0012_idle_activity_guards.sql', '32c7e13fd51c0bfd2625017f38b9cdef8b841aec9f0d1f5d50c410c47c85999a'],
+  ['0014_town_support_rollup.sql', '08b0c908d1c01bd388fe7ac01b91eb0f5d5883d21b84d9639dab6502cd146969']
 ]);
 export function additiveSql(text, migrationName = '') {
   if (reviewedMigrations.has(migrationName)) {
@@ -192,7 +193,9 @@ export async function run({config, mode, releaseSha, root, ghToken, cfToken, rep
     await sleep(5000);
   }
   need(healthy,'PUBLIC_MARKER_NOT_UPDATED');
-  for(const path of ['/', '/api/rpg-town', '/api/rpg-info']){
+  const healthPaths = ['/', '/api/rpg-town', '/api/rpg-info'];
+  if (meta.files.some(file => file.path === 'functions/api/town-support.js')) healthPaths.push('/api/town-support');
+  for(const path of healthPaths){
     const response=await fetcher(config.publicUrl+path,{headers:{'Cache-Control':'no-cache'},signal:AbortSignal.timeout(30000)});
     need(response.ok,'PUBLIC_HEALTH_CHECK_FAILED');
     if(path!=='/'){
