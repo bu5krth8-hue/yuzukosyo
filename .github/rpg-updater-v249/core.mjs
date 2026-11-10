@@ -34,6 +34,7 @@ export function additiveSql(text, migrationName = '') {
     need(/^(?:CREATE\s+(?:TABLE|(?:UNIQUE\s+)?INDEX)\s+IF\s+NOT\s+EXISTS\b|ALTER\s+TABLE\s+[\w"`\[\]]+\s+ADD\s+(?:COLUMN\s+)?)/i.test(statement), 'SQL_REQUIRES_MANUAL_REVIEW');
   }
 }
+const retiredFiles = new Set(["MEIGEN_ADMIN_README.txt", "PASHAYOMI_LITE_NOTE.txt", "PASHAYOMI_LITE_OCR_BETA_NOTE.txt", "PASHAYOMI_LITE_V206_NOTE.txt", "PASHAYOMI_LITE_V207_NOTE.txt", "PASHAYOMI_LITE_V208_NOTE.txt", "PASHAYOMI_LITE_V209_NOTE.txt", "PASHAYOMI_LITE_V210_NOTE.txt", "PASHAYOMI_LITE_V211_NOTE.txt", "PASHAYOMI_LITE_V212_NOTE.txt", "PASHAYOMI_LITE_V213_NOTE.txt", "PASHAYOMI_LITE_V214_NOTE.txt", "PASHAYOMI_NOTE.txt", "PASHAYOMI_SERVER_OCR_SETUP.txt", "PASHAYOMI_V206_NOTE.txt", "PASHAYOMI_V207_NOTE.txt", "PASHAYOMI_V208_NOTE.txt", "PASHAYOMI_V209_NOTE.txt", "PASHAYOMI_V210_NOTE.txt", "PASHAYOMI_V211_NOTE.txt", "PASHAYOMI_V212_NOTE.txt", "PASHAYOMI_V213_NOTE.txt", "PASHAYOMI_V214_NOTE.txt", "PASHAYOMI_V215_NOTE.txt", "PASHAYOMI_V216_NOTE.txt", "PASHAYOMI_V217_NOTE.txt", "PASHAYOMI_V218_NOTE.txt", "PASHAYOMI_V229_OCR_TEXT_ONLY_NOTE.txt", "apps.html", "functions/api/meigen-submit.js", "functions/api/pashayomi-ocr.js", "meigen-data.js", "meigen-submit.html", "meigen.html", "meigen.js", "pashayomi-app.js", "pashayomi-style.css", "pashayomi.html", "quotes.html", "yuzu-secret-meigen-control-2026.html"]);
 export function validateMeta(meta) {
   need(meta?.schema === 1 && /^[a-zA-Z0-9._-]{1,80}$/.test(meta.releaseId) && /^[a-f0-9]{32}$/.test(meta.nonce), 'INVALID_METADATA');
   need(sha(meta.baseCommit) && meta.compatibleBeforeNative === true, 'INVALID_BASE_OR_COMPATIBILITY');
@@ -43,6 +44,13 @@ export function validateMeta(meta) {
     safePath(file.path);
     need(!file.path.startsWith('.github/') && file.path !== '.rpg-updates/release.json', 'CONTROL_FILE_IN_RELEASE');
     need(!names.has(file.path) && /^[a-f0-9]{64}$/.test(file.sha256) && (file.previousSha256 === null || /^[a-f0-9]{64}$/.test(file.previousSha256)), 'INVALID_FILE_HASH');
+    names.add(file.path);
+  }
+  const deletions=meta.deletions??[];
+  need(Array.isArray(deletions) && deletions.length<=retiredFiles.size,'INVALID_DELETIONS');
+  for(const file of deletions){
+    safePath(file.path);
+    need(retiredFiles.has(file.path)&&!names.has(file.path)&&/^[a-f0-9]{64}$/.test(file.previousSha256),'UNAPPROVED_DELETION');
     names.add(file.path);
   }
   need(names.has('rpg-update-status.json'), 'PUBLIC_MARKER_MISSING');
@@ -121,7 +129,12 @@ export async function run({config, mode, releaseSha, root, ghToken, cfToken, rep
   const comparison=await gh(`/compare/${meta.baseCommit}...${releaseSha}`);
   need(comparison.total_commits===1 && comparison.files?.length<300,'DIFF_TOO_LARGE_OR_MULTI_COMMIT');
   const changed=new Map(comparison.files.map(x=>[x.filename,x]));
-  need(changed.size===meta.files.length+1 && changed.has('.rpg-updates/release.json'),'UNDECLARED_FILE_CHANGE');
+  need(changed.size===meta.files.length+(meta.deletions?.length??0)+1 && changed.has('.rpg-updates/release.json'),'UNDECLARED_FILE_CHANGE');
+  for(const file of meta.deletions??[]){
+    need(changed.get(file.path)?.status==='removed','EXPECTED_REMOVAL_MISSING');
+    const old=await gh('/contents/'+file.path.split('/').map(encodeURIComponent).join('/')+'?ref='+meta.baseCommit);
+    need(old.encoding==='base64'&&hash(Buffer.from(old.content.replace(/\s/g,''),'base64'))===file.previousSha256,'REMOVED_FILE_HASH_MISMATCH');
+  }
   const sqlFiles=[];
   for(const file of meta.files){
     const change=changed.get(file.path);
