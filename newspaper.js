@@ -1,3 +1,5 @@
+import {setupImageExport} from './newspaper-image.js?v=287';
+
 const $=id=>document.getElementById(id),LABEL={boss:'討伐の知らせ',rescue:'救出の知らせ',town:'街の発展',adventure:'冒険の記録',pvp:'対人戦'};
 const today=()=>new Date(Date.now()+32400000).toISOString().slice(0,10),time=at=>new Date(at).toLocaleTimeString('ja-JP',{timeZone:'Asia/Tokyo',hour:'2-digit',minute:'2-digit'});
 let nemesis=null,data=null,captured=0,busy=false,failed=false,nextRefresh=0,delay=60000,selected=/^\d{4}-\d{2}-\d{2}$/.test(new URLSearchParams(location.search).get('day')||'')?new URLSearchParams(location.search).get('day'):today();
@@ -11,7 +13,7 @@ function renderNemesis(){
 function render(){renderNemesis();
  const dates=[...new Set([today(),selected,...(data?.events||[]).map(e=>e.day)])].sort().reverse();$('day').replaceChildren(...dates.map(day=>{const o=element('option',day.replaceAll('-',' / ')+(day===today()?'　今日':''));o.value=day;return o;}));$('day').value=selected;$('issueDate').textContent=selected.replaceAll('-',' / ')+'　日本時間';
  for(const kind of ['boss','rescue','town'])$(kind+'Count').textContent=String(allForDay().filter(e=>e.kind===kind).length);
- const stories=visible();$('articles').replaceChildren();$('copy').disabled=allForDay().length===0;
+ const stories=visible();$('saveImage').disabled=stories.length===0;$('articles').replaceChildren();$('copy').disabled=allForDay().length===0;
  if(!stories.length){const empty=element('div',undefined,'empty');empty.append(element('h2',allForDay().length?'該当する記事がありません。':data?'この日の新聞は、まだ白紙です。':'最初の新聞を待っています。'),element('p',allForDay().length?'名前や記事の種類を変えて探してみてください。':'配信で記録された出来事が、発生した順に並びます。'));$('articles').append(empty);}
  for(const e of stories){const article=element('article',undefined,'story'+(e.kind==='boss'||e.kind==='rescue'?' important':'')),body=element('div'),meta=element('div',undefined,'meta'),at=element('time',time(e.at)+' 記録');at.dateTime=new Date(e.at).toISOString();meta.append(element('span',LABEL[e.kind],'tag'),at);body.append(meta,element('h2',e.headline),element('p',e.text));if(e.names.length)body.append(element('p','記事に登場：'+e.names.join('・'),'people'));article.append(body);$('articles').append(article);}
  $('status').textContent=failed?'通信を確認できませんでした。前回受信した記録は保持しています。「最新の記録へ」で再試行できます。':captured?`最終同期 ${new Date(captured).toLocaleString('ja-JP',{timeZone:'Asia/Tokyo'})}（日本時間）${Date.now()-captured>600000?' ／ 新しい同期を待っています。':' ／ 出来事は約1分を目安に反映します。'}`:'最初の同期を待っています。';
@@ -22,5 +24,14 @@ async function refresh(force=false){if(busy||document.hidden||(!force&&Date.now(
  delay=Math.max(120000,Math.min(900000,wait||delay*2));throw Error('rate_limit');
  }if(!r.ok)throw Error('network');const body=await r.json();if(body.data!==null&&(body.data?.schema!==1||!Array.isArray(body.data.events)))throw Error('schema');data=body.data;nemesis=body.nemesis||null;captured=Date.parse(body.capturedAt)||0;failed=false;delay=60000;}catch{failed=true;delay=Math.min(900000,Math.max(120000,delay));}finally{nextRefresh=Date.now()+delay;clearTimeout(timer);busy=false;$('refresh').disabled=false;render();}}
 $('day').addEventListener('change',()=>{selected=$('day').value;render();});for(const name of ['search','kind'])$(name).addEventListener(name==='search'?'input':'change',render);$('refresh').addEventListener('click',()=>refresh(!failed));$('print').addEventListener('click',()=>window.print());
+setupImageExport(() => ({
+  date: selected,
+  articles: visible().map(event => ({
+    label: `${LABEL[event.kind]}　${time(event.at)} 記録`,
+    headline: event.headline,
+    text: event.text,
+    people: event.names.length ? '記事に登場：' + event.names.join('・') : ''
+  }))
+}));
 $('copy').addEventListener('click',async()=>{let text=`柚の新聞｜${selected}（日本時間）\n`;for(const e of allForDay()){const line=`\n・${e.headline}\n${e.text}\n`;if((text+line).length>1770){text+='\nほかの記事はホームページへ。\n';break;}text+=line;}text+='\nhttps://yuzukosyo.pages.dev/newspaper.html?day='+selected;try{await navigator.clipboard.writeText(text);$('copyStatus').textContent='コピーしました（2,000文字以内）。';}catch{$('copyStatus').textContent='コピーできませんでした。ブラウザの権限を確認してください。';}});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh();});setInterval(()=>{if(!document.hidden)refresh();},60000);refresh();

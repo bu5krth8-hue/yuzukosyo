@@ -1,0 +1,57 @@
+.image-export {
+  width: min(680px, calc(100% - 24px));
+  max-height: calc(100% - 24px);
+  padding: clamp(12px, 3vw, 24px);
+  border: 1px solid #b8b0a2;
+  border-radius: 12px;
+  color: #282621;
+  background: #fffdf6;
+}
+
+.image-export::backdrop { background: #17151eb0; }
+.image-export h2 { margin: 0 0 8px; }
+.image-export p { margin: 8px 0; font-size: 16px; }
+.image-export-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; }
+.image-export-actions a { display: inline-flex; align-items: center; min-height: 48px; }
+.image-export img { display: block; width: 100%; height: auto; margin-top: 12px; border: 1px solid #b8b0a2; }
+.image-export [hidden] { display: none; }
+
+@page { size: A4; margin: 13mm 14mm; }
+
+@media print {
+  html, body, body main {
+    width: auto !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    color: #282621 !important;
+    background: white !important;
+    box-shadow: none !important;
+    border: 0 !important;
+  }
+
+  nav, .toolbar, #status, .footer-tools, .image-export { display: none !important; }
+  .masthead { margin: 0 0 5mm; padding: 0; break-inside: avoid; background: white !important; color: #282621 !important; }
+  .masthead h1 { font-size: 30pt; margin: 3mm 0 2mm; }
+  .masthead p { margin-bottom: 3mm; }
+  .edition, .rule { font-size: 10pt; padding: 2mm 0; }
+  .nemesis-board { margin: 0 0 4mm; padding: 3mm; background: white !important; }
+  .nemesis-board h2, .nemesis-board h3 { font-size: 15pt; margin: 0 0 2mm; }
+  .nemesis-board p, .nemesis-board li { font-size: 10pt; line-height: 1.55; margin: 1mm 0; }
+  .nemesis-board summary { min-height: 0; padding: 1mm 0; }
+  .summary { grid-template-columns: repeat(3, minmax(0, 1fr)); margin: 0 0 4mm; padding: 2mm 0; break-inside: avoid; }
+  .summary div { border-bottom: 0; padding: 0; }
+  .summary span { background: white !important; }
+  .summary strong { font-size: 15pt; }
+  .articles { display: block; }
+  .story, .empty { margin: 0 0 4mm; padding: 0 0 3mm; break-inside: avoid; }
+  .story.important { padding-left: 2mm; }
+  .story .meta { flex-wrap: wrap; }
+  .story h2, .empty h2 { font-size: 16pt; line-height: 1.4; margin: 2mm 0; break-after: avoid; }
+  .story p, .story .people, .empty p { font-size: 11pt; line-height: 1.6; margin: 1mm 0; orphans: 2; widows: 2; }
+  .story .tag, .story .meta time { font-size: 10pt; }
+  .story .people { padding-top: 1mm; }
+  footer { margin-top: 4mm; padding-top: 2mm; }
+  footer p { font-size: 9pt; line-height: 1.55; margin: 1mm 0; }
+}
