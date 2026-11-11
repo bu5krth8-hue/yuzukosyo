@@ -3,4 +3,31 @@
 
 #shortcutMenuLinks .town-jump-btn{position:static;display:inline-flex;align-items:center;justify-content:center;width:184px;min-height:52px;padding:8px 10px;border:1px solid rgba(190,120,255,.55);border-radius:16px;background:rgba(20,8,32,.82);color:var(--purple2,#d8b4fe);font-size:16px;font-weight:1000;text-align:center;box-shadow:0 0 14px rgba(168,85,247,.22)}#shortcutMenuLinks .town-jump-btn:hover{box-shadow:0 0 28px rgba(168,85,247,.55)}
 
+@media (max-width: 700px) {
+  #yuzuTown #portalPeople {
+    position: absolute;
+    inset: auto 10px 10px;
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
+    align-items: end;
+    justify-items: center;
+  }
+
+  #yuzuTown #portalPeople .portal-illustrated-person {
+    position: static;
+    width: min(36px, calc(100% - 6px));
+    height: auto;
+    aspect-ratio: 1;
+  }
+
+  #yuzuTown #portalPeople .portal-illustrated-person:nth-child(even) {
+    margin-bottom: 23px;
+  }
+
+  #yuzuTown #portalPeople .portal-illustrated-person:nth-child(n+8) {
+    display: none;
+  }
+}
+
 #portalScenery{background-repeat:no-repeat}#portalHouses[hidden]{display:none!important}#portalPeople .portal-illustrated-person{width:48px;height:48px;background-color:transparent!important;background-repeat:no-repeat;box-shadow:none!important;border-radius:0;filter:drop-shadow(0 2px 1px #173c3555)}#portalPeople .portal-illustrated-person:before,#portalPeople .portal-illustrated-person:after{content:none!important}
