@@ -8,8 +8,8 @@
 <link rel="stylesheet" href="rpg.css?v=284">
 <link rel="stylesheet" href="rpg-world-theme.css?v=284">
 <link rel="stylesheet" href="rpg-guide.css?v=284">
-<link rel="stylesheet" href="rpg-character.css?v=284">
-<script src="rpg-character.js?v=293" type="module"></script>
+<link rel="stylesheet" href="rpg-character.css?v=295">
+<script src="rpg-character.js?v=295" type="module"></script>
 </head>
 <body>
 <header><a href="account.html">← マイページ</a><a href="/idle-world#activities">オート冒険へ →</a></header>
@@ -18,14 +18,25 @@
 <form id="characterForm" hidden>
 <div id="characterPreview" class="character-preview" aria-label="キャラクターのプレビュー"></div>
 <div class="character-fields">
-<label>見た目<select name="sprite"><option value="forest">森の旅人</option><option value="knight">蒼の騎士</option><option value="mage">宵の魔法使い</option><option value="healer">花の治癒師</option></select></label>
 <label>色<select name="color"><option value="original">オリジナル</option><option value="warm">夕焼け</option><option value="cool">水色</option><option value="violet">藤色</option></select></label>
 <label>アクセサリー<select name="accessory"><option value="none">なし</option><option value="leaf">若葉</option><option value="star">星飾り</option><option value="ribbon">リボン</option></select></label>
 <label>性別（任意・自分にだけ表示）<select name="gender"><option value="unset">未設定</option><option value="male">男性</option><option value="female">女性</option><option value="nonbinary">ノンバイナリー</option><option value="private">回答しない</option></select></label>
 </div>
+<section aria-labelledby="lookTitle">
+<h2 id="lookTitle">外見を選ぶ</h2><p id="lookSelected"></p>
+<p>性別は候補の表示だけに使います。いつでも無料で変更できます。</p>
+<div class="character-fields">
+<label>外見名で検索<input id="lookSearch" type="search" placeholder="騎士、料理人など"></label>
+<label>テーマ<select id="lookTheme"><option value="">すべて</option><option>戦闘</option><option>魔法</option><option>探索</option><option>暮らし</option></select></label>
+<label class="character-check"><span><input id="lookFavorites" type="checkbox"> お気に入りだけ表示</span></label>
+</div><p id="lookCount" role="status"></p><div class="look-grid" id="lookGrid"></div>
+<button type="button" id="lookMore" hidden>さらに12種を表示</button>
+</section><div class="look-actions"><button type="submit">キャラを保存</button></div>
+<details><summary>自分の画像を使う</summary>
 <label>自分の画像（PNG・JPEG・WebP、10 MBまで）<input name="image" type="file" accept="image/png,image/jpeg,image/webp"></label>
 <p>画像を使うと、冒険中の自分のキャラに表示します。街の住人として画像を公開済みの場合、その住人画像も更新されます。</p>
+<button id="removeCharacterImage" type="button">画像を外す</button></details>
 <label class="character-check"><input name="shareImage" type="checkbox">おまかせ同行のとき、仲間に自分の姿を見せる</label>
-<button type="submit">キャラを保存</button> <button id="removeCharacterImage" type="button">画像を外す</button>
+<label class="character-check"><input name="publicLook" type="checkbox">選んだ外見をステータス・街で公開する</label>
 </form></section>
 </main></body></html>

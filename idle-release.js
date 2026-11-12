@@ -1,4 +1,4 @@
-import {portrait} from './rpg-portrait.js';
+import {portrait} from './rpg-portrait.js?v=295';
 import {PLAY as SHOP} from './rpg-play-data.js';
 const el=(tag,text,cls)=>{const e=document.createElement(tag);if(text!==undefined)e.textContent=text;if(cls)e.className=cls;return e;},$=id=>document.getElementById(id),levels=xp=>Math.min(50,1+Math.floor(Math.sqrt(Math.max(0,xp)/3)));
 const drafts=new Set();export const releaseHasDraft=()=>drafts.size>0;

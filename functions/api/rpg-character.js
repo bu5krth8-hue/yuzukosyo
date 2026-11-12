@@ -3,6 +3,8 @@ import {json,sameOrigin} from './town-support.js';
 import {readBody} from './rpg-info.js';
 import {validateAvatar} from './rpg-residents.js';
 
+import {lookIds} from '../../rpg-look-catalog.js';
+
 const sprites = ['forest','knight','mage','healer'];
 const colors = ['original','warm','cool','violet'];
 const accessories = ['none','leaf','star','ribbon'];
@@ -10,7 +12,7 @@ const genders = ['unset','male','female','nonbinary','private'];
 const characterSQL = 'SELECT c.*,p.avatar_revision,LENGTH(p.avatar)>0 AS has_image FROM web_character c LEFT JOIN web_profiles p ON p.public_id=c.public_id WHERE c.public_id=?';
 
 function publicLook(row) {
-  return {sprite:row.sprite,color:row.color,accessory:row.accessory,
+  return {sprite:row.sprite?.split(':')[0],color:row.color,accessory:row.accessory,
     image:row.has_image?'api/rpg-character?image='+row.public_id+'&v='+row.avatar_revision:null};
 }
 
@@ -29,6 +31,12 @@ export async function onRequest({request,env}) {
   const db = env.RPG_SUPPORT;
   if (!db) return json({error:'not_configured'},503);
   try {
+    if(request.method==='GET'&&new URL(request.url).searchParams.has('showcase')){
+      const result=await db.prepare(
+        "SELECT c.public_id,c.sprite,c.color,c.accessory FROM web_character c JOIN rpg_accounts a USING(public_id) WHERE a.active=1 AND c.sprite LIKE '%:public' LIMIT 1000"
+      ).all();
+      return json({looks:Object.fromEntries(result.results.map(row=>[row.public_id,publicLook(row)]))});
+    }
     const session = await currentSession(request,db);
     if (!session) return json({error:'login_required'},401);
     const id = session.public_id;
@@ -52,18 +60,20 @@ export async function onRequest({request,env}) {
       const legacy = row ? null : await db.prepare(
         "SELECT CASE WHEN json_valid(state_json) THEN json_extract(state_json,'$.appearance.sprite') END AS sprite FROM idle270_state WHERE public_id=?"
       ).bind(id).first();
-      return json({csrf:session.csrf,gender:row?.gender||'unset',shareImage:!!row?.share_image,
+      return json({id,publicLook:!!row?.sprite?.endsWith(':public'),csrf:session.csrf,gender:row?.gender||'unset',shareImage:!!row?.share_image,
         look:publicLook({public_id:id,sprite:sprites[legacy?.sprite]||'forest',color:'original',accessory:'none',...avatar})});
     }
     if (request.method !== 'POST') return json({error:'method'},405);
     if (!sameOrigin(request)||request.headers.get('X-RPG-CSRF')!==session.csrf) return json({error:'csrf'},403);
     const d = await readBody(request,140000);
-    if (!sprites.includes(d.sprite)||!colors.includes(d.color)||!accessories.includes(d.accessory)||
-      !genders.includes(d.gender)||typeof d.shareImage!=='boolean'||(d.removeImage && d.avatar)) return json({error:'invalid'},400);
+    if (!lookIds.has(d.sprite)||!colors.includes(d.color)||!accessories.includes(d.accessory)||
+      !genders.includes(d.gender)||typeof d.shareImage!=='boolean'||(d.publicLook!==undefined&&typeof d.publicLook!=='boolean')||(d.removeImage && d.avatar)) return json({error:'invalid'},400);
     const commands = [db.prepare(
       'INSERT INTO web_character(public_id,gender,sprite,color,accessory,share_image) VALUES(?,?,?,?,?,?) ' +
-      'ON CONFLICT(public_id) DO UPDATE SET gender=excluded.gender,sprite=excluded.sprite,color=excluded.color,accessory=excluded.accessory,share_image=excluded.share_image'
-    ).bind(id,d.gender,d.sprite,d.color,d.accessory,d.shareImage?1:0)];
+      `ON CONFLICT(public_id) DO UPDATE SET gender=excluded.gender,
+      sprite=CASE WHEN ? AND web_character.sprite LIKE '%:public' THEN excluded.sprite||':public' ELSE excluded.sprite END,
+      color=excluded.color,accessory=excluded.accessory,share_image=excluded.share_image`
+    ).bind(id,d.gender,d.sprite+(d.publicLook?':public':''),d.color,d.accessory,d.shareImage?1:0,d.publicLook===undefined?1:0)];
     if (d.avatar) commands.push(db.prepare(
       'INSERT INTO web_profiles(public_id,avatar,avatar_revision,updated_at) VALUES(?,?,1,?) ' +
       'ON CONFLICT(public_id) DO UPDATE SET avatar=excluded.avatar,avatar_revision=avatar_revision+1,updated_at=excluded.updated_at'

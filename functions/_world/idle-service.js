@@ -67,7 +67,7 @@ export async function onRequest({request,env}){try{
   return json({candidates:eligible.flatMap(a=>{
    const p=players.get(a.public_id);
    if(!p)return [];
-   const look=a.share_image?{sprite:a.sprite,color:a.color,accessory:a.accessory,
+   const look=a.share_image?{sprite:a.sprite?.split(':')[0],color:a.color,accessory:a.accessory,
      image:a.has_image?'api/rpg-character?image='+a.public_id+'&v='+a.avatar_revision:null}:null;
    return [{name:p.name,level:Number.isSafeInteger(p.level)&&p.level>0?p.level:1,job:p.job||'未設定',look}];
   }).sort((a,b)=>a.name.localeCompare(b.name,'ja'))});
