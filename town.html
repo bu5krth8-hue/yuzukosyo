@@ -2,7 +2,7 @@
 <html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>柚の街｜柚胡椒の秘密基地</title><meta name="description" content="みんなの冒険で育つ柚の街。街の風景、人口、施設、特別住民と依頼を紹介します。">
 <link rel="canonical" href="https://yuzukosyo.pages.dev/town.html"><meta name="theme-color" content="#120d21">
-<link rel="stylesheet" href="town.css?v=279"><script src="town.js?v=279" defer></script><link rel="stylesheet" href="town-support.css?v=265"><script src="town-support.js?v=239" defer></script><link rel="stylesheet" href="play.css?v=265"><script src="residents.js?v=244" defer></script><link rel="stylesheet" href="rpg-world-theme.css?v=280"></head>
+<link rel="stylesheet" href="town.css?v=279"><script src="town.js?v=279" defer></script><link rel="stylesheet" href="town-support.css?v=265"><link rel="stylesheet" href="play.css?v=265"><script src="residents.js?v=244" defer></script><link rel="stylesheet" href="rpg-world-theme.css?v=280"></head>
 <body class="town-page"><div class="ambient" aria-hidden="true"></div>
 <header class="town-header"><a class="brand" href="index.html"><img src="assets/ghost.webp" width="40" height="40" alt="">柚胡椒の秘密基地</a><nav aria-label="ページ内メニュー"><a href="index.html">ホーム</a><a class="town-status-link" href="rpg.html#players">ステータス</a> <a href="newspaper.html">柚の新聞</a><a class="town-account-link" href="account.html">マイページ</a><a href="#facilities">施設</a><a href="#residents">住民</a><a class="nav-live" href="https://www.twitch.tv/yuzukosyo07" target="_blank" rel="noopener">配信へ ↗</a></nav></header>
 <main><div class="sample-note" id="sampleNote" hidden>表示サンプルです。実際の街データではありません。<div class="sample-controls"><button data-sample="0">集落</button><button data-sample="1">発展した街</button><button data-sample="2">王都</button></div></div>
@@ -11,14 +11,6 @@
 <div class="landscape" id="landscape"><svg id="townScene" viewBox="0 0 1200 560" role="img" aria-labelledby="sceneTitle sceneDesc"><title id="sceneTitle">柚の街の風景</title><desc id="sceneDesc">街の発展に合わせて家や施設が増えていく風景です。</desc></svg><div class="scene-empty" id="sceneEmpty"><strong>街の便りを待っています</strong><span>データが届くと、今の街の様子がここに映ります。</span></div><div class="scene-caption"><span id="sceneCaption">風景イメージ</span><span>住民の姿は人口に合わせたイメージです</span></div></div>
 <div class="town-summary"><div><span>街のレベル</span><strong id="level">—</strong></div><div><span>暮らしている住民</span><strong id="population">—</strong></div><div class="growth"><div><span>次のレベルまで</span><strong id="growthLabel">未同期</strong></div><progress id="growthBar" value="0" max="100" aria-label="街のレベル進捗"></progress></div></div>
 <div class="sync-row"><span id="syncStatus" role="status" aria-live="polite">街のデータを確認しています…</span><button id="refreshButton">更新する ↻</button></div></section>
-<section class="support-card" id="townSupport" aria-labelledby="supportHeading"><div id="supportCard">
-<p class="eyebrow">ONE SMALL HELP, A GROWING TOWN</p><h2 id="supportHeading">今日のひと押しを、街の力に。</h2>
-<p>ログインなしで、同じブラウザから1日10回まで。1回支援すると柚の街に1 EXPが届きます。</p>
-<div class="support-counts"><div><span>今日のあなたの支援</span><strong id="supportMine">—</strong></div><div><span>今日の支援</span><strong id="supportToday">—</strong></div><div><span>これまでの支援EXP</span><strong id="supportTotal">—</strong></div><div><span>配信側への反映待ち</span><strong id="supportPending">—</strong></div></div>
-<div class="support-actions"><button type="button" class="support-button" id="supportButton" disabled>支援状況を確認中…</button><button type="button" class="support-refresh" id="supportRefresh">状況を確認する</button></div>
-<p id="supportStatus" role="status" aria-live="polite">支援の受付状況を確認しています…</p>
-<p class="small-copy">受付は日本時間0時に切り替わります。配信していない間の支援も保存し、Streamer.botの次回同期で街に反映します。個人EXPは増えません。<br>Cookieでブラウザを区別します。別端末・別ブラウザやCookie削除後は再度支援できます。</p>
-</div></section>
 <section class="town-section" id="facilities"><div class="section-heading"><div><p class="eyebrow">PLACES TO COME HOME TO</p><h2>街を支える、三つの灯り。</h2></div><p>持ち帰った資材と、住民の仕事で少しずつ発展します。</p></div><div class="facility-grid">
 <article class="facility inn"><span class="facility-number">01 / INN</span><div class="facility-symbol" aria-hidden="true">☾</div><h3>宿屋</h3><p>旅の疲れを癒やす、あたたかな帰り道。</p><strong id="innLevel">未同期</strong><div class="level-dots" id="innDots" aria-hidden="true"></div><span id="innEffect" class="facility-effect">街の記録を待っています</span></article>
 <article class="facility smith"><span class="facility-number">02 / SMITHY</span><div class="facility-symbol" aria-hidden="true">⚒</div><h3>鍛冶屋</h3><p>響く槌の音が、次の冒険を支えます。</p><strong id="smithLevel">未同期</strong><div class="level-dots" id="smithDots" aria-hidden="true"></div><span id="smithEffect" class="facility-effect">街の記録を待っています</span></article>

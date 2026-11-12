@@ -66,8 +66,8 @@ form.addEventListener('submit',async event=>{
     await api({...preferences(),shareImage:fields.shareImage.checked,avatar,removeImage});
     avatar=undefined;
     removeImage=false;
-    await load();
-    status.textContent='キャラを保存しました。オート冒険で表示されます。';
+    try { await load(); } catch { /* The save already succeeded. */ }
+    status.textContent='キャラクターを保存しました！ 画面を切り替えても大丈夫です。';
   } catch(error) {
     status.textContent=error.message==='login'?'ログインし直してから保存してください。':'保存結果を確認できませんでした。もう一度お試しください。';
   } finally {busy=false;submit.disabled=false;}
