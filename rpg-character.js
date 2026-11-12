@@ -148,18 +148,23 @@ form.addEventListener('submit',async event=>{
   if (busy) return;
   busy=true;
   const submit=form.querySelector('[type=submit]');
+  byId('characterSaved').hidden=true;
   form.inert=true;
   submit.disabled=true;
-  status.textContent='保存しています…';
+  byId('characterSavedText').textContent='保存しています…';
   try {
     await api({...preferences(),shareImage:fields.shareImage.checked,publicLook:fields.publicLook.checked,avatar,removeImage});
     avatar=undefined;
     removeImage=false;
     try { await load(); } catch { /* The save already succeeded. */ }
-    status.textContent='キャラクターを保存しました！ 画面を切り替えても大丈夫です。';
+    status.textContent='';
+    byId('characterSaved').hidden=false;
+    byId('characterSavedText').textContent='キャラクターを保存しました！ 次に進めます。';
   } catch(error) {
-    status.textContent=error.message==='login'?'ログインし直してから保存してください。':'保存結果を確認できませんでした。もう一度お試しください。';
-  } finally {busy=false;form.inert=false;submit.disabled=false;}
+    byId('characterSavedText').textContent=error.message==='login'?'ログインし直してから保存してください。':'保存結果を確認できませんでした。もう一度お試しください。';
+  } finally {busy=false;form.inert=false;submit.disabled=false;
+    byId('characterSavedText').focus();
+  }
 });
 load().then(()=>{status.textContent='見た目を選んで保存してください。';}).catch(error=>{
   status.textContent=error.message==='login'?'キャラ作成にはログインが必要です。':'キャラを読み込めませんでした。ページを再読み込みしてください。';

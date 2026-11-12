@@ -60,7 +60,7 @@ export async function onRequest({request,env}) {
       const legacy = row ? null : await db.prepare(
         "SELECT CASE WHEN json_valid(state_json) THEN json_extract(state_json,'$.appearance.sprite') END AS sprite FROM idle270_state WHERE public_id=?"
       ).bind(id).first();
-      return json({id,publicLook:!!row?.sprite?.endsWith(':public'),csrf:session.csrf,gender:row?.gender||'unset',shareImage:!!row?.share_image,
+      return json({id,saved:!!row,publicLook:!!row?.sprite?.endsWith(':public'),csrf:session.csrf,gender:row?.gender||'unset',shareImage:!!row?.share_image,
         look:publicLook({public_id:id,sprite:sprites[legacy?.sprite]||'forest',color:'original',accessory:'none',...avatar})});
     }
     if (request.method !== 'POST') return json({error:'method'},405);
