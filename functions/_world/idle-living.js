@@ -26,19 +26,10 @@ export function livingValid(s){
 }
 export function allCompanions(s,base){return [...base,...(s.journey?.guests||[]).map(g=>({...g,id:'viewer_'+g.id,at:0,role:'視聴者の分身',type:'physical',note:'同行ONの視聴者の助っ人です。'})),...s.roster.map(a=>({...a,role:{guard:'護衛',magic:'術士',physical:'剣士',heal:'癒し手',swift:'斥候'}[a.type],note:'旅の途中で出会った仲間。'}))];}
 export function activeCompanions(s,base){const pool=allCompanions(s,base);return (s.companions||s.party).map(id=>pool.find(a=>a.id===id)).filter(Boolean);}
-export function completeConstruction(s,at){
- const c=s.construction;
- if(!c||at<c.readyAt)return null;
- if(c.kind==='home')s.home=c.to;
- else if(!s.garden.includes(c.item))s.garden.push(c.item);
- s.construction=null;
- return {kind:c.kind,item:c.item||'',stage:s.home};
-}
 export function livingBefore(s,at,weather){
  const notes=[],detail={},day=dayAt(at),hour=new Date(at+32400000).getUTCHours();
  if(s.questDay!==day){s.questDay=day;s.daily={gather:0,win:0,social:0,claimed:[]};}
- const completed=completeConstruction(s,at);
- if(completed){notes.push(completed.kind==='home'?'住まいの増築が完成しました。':'庭の「'+GARDEN[completed.item].name+'」が完成しました。');detail.completed=completed;}
+ if(s.construction&&at>=s.construction.readyAt){const c=s.construction;if(c.kind==='home')s.home=c.to;else if(!s.garden.includes(c.item))s.garden.push(c.item);notes.push(c.kind==='home'?'住まいの増築が完成しました。':'庭の「'+GARDEN[c.item].name+'」が完成しました。');detail.completed={kind:c.kind,item:c.item||'',stage:s.home};s.construction=null;}
  if(s.mood.until<=at)s.mood={name:'穏やか',until:at};
  let force=null,reason='';if(s.injury>0&&s.routine.autoHeal){force='rest';reason='けがの療養';}
  else if(s.energy<35&&s.personality.care>=60){force='rest';reason='慎重な性格で早めの休息';}

@@ -4,7 +4,7 @@ import {activeWorkSQL,pendingJobSQL} from '../api/work-duty.js';
 import {startJourney} from './idle-expedition.js';
 import {pickSupporters} from '../api/rpg-random-party.js';
 import {PLAY} from '../../rpg-play-data.js';
-import {dayAt,allCompanions,completeConstruction,GARDEN,HOUSE_STYLES,DYES,PERSONALITIES} from './idle-living.js';
+import {dayAt,allCompanions,GARDEN,HOUSE_STYLES,DYES,PERSONALITIES} from './idle-living.js';
 import {idleSession} from './idle-access.js';
 import {json,sameOrigin} from '../api/town-support.js';
 import {hash} from '../api/rpg-account.js';
@@ -21,22 +21,6 @@ const allowed=['begin','settle','settings','build','read','favorite','party','li
 const known=['owner_only','login_required','not_configured','disabled','invalid','begin_first','conflict','materials','max_home','already_owned','locked_chapter','choice_saved','save_invalid','clock_conflict','party_locked','layout_invalid','recipe_locked','gear_max','farm_busy','not_ready','request_conflict','restore_confirm','sync_required','client_version','construction_busy','party_limit','quest_incomplete','already_claimed','blueprint_limit','journey_active','no_journey','job_pending'];
 async function synced(fn,request,env,body){const url=new URL(request.url);url.pathname='/api/'+(fn===play?'rpg-play':fn===work?'rpg-work':'rpg-life');url.search='';const headers=new Headers(request.headers);headers.delete('Content-Length');return fn({env,request:new Request(url,{method:body?'POST':'GET',headers,...(body?{body:JSON.stringify(body)}:{})})});}
 function decode(row){try{return valid(JSON.parse(row.state_json));}catch{throw Error('save_invalid');}}
-async function completeSavedHome(db,id,row,now){
- for(let attempt=0;row&&attempt<3;attempt++){
-  const raw=JSON.parse(row.state_json);
-  if(!raw.construction||raw.construction.readyAt>now)return row;
-  const s=decode(row);
-  if(!completeConstruction(s,now))return row;
-  raw.home=s.home;
-  raw.garden=s.garden;
-  raw.construction=null;
-  // Keep the exact saved journey, layout, wallet, and clock cursor.
-  await db.prepare('UPDATE idle270_state SET state_json=?,revision=revision+1,last_op=? WHERE public_id=? AND revision=?')
-    .bind(JSON.stringify(raw),crypto.randomUUID(),id,row.revision).run();
-  row=await getRow(db,id);
- }
- return row;
-}
 async function backupList(db,id){const items=await rows(db.prepare('SELECT revision,created_at,state_json FROM idle271_backups WHERE public_id=? ORDER BY revision DESC LIMIT 5').bind(id));return items.filter(item=>{try{decode(item);return true;}catch{return false;}}).map(({revision,created_at})=>({revision,created_at}));}
 export async function onRequest({request,env}){try{
  env={...env,snapshotCache:new Map()};
@@ -45,36 +29,8 @@ export async function onRequest({request,env}){try{
  if(env.RPG_IDLE_ENABLED==='0')return json({error:'disabled'},503);
  if(url.searchParams.get('access')==='1'&&request.method==='GET')return json({ok:true,private:false,release:275});
  if(request.method==='POST'&&(!sameOrigin(request)||request.headers.get('X-RPG-CSRF')!==session.csrf))return json({error:'csrf'},403);
- if(url.searchParams.get('scout')==='1'&&request.method==='GET'){
-  const snapshot=await snapshotGet(env,'yuzu_rpg_public_v1');
-  const players=new Map((snapshot?.players||[]).map(p=>[p.id,p]));
-  const criteria=`
-    WHERE a.active=1 AND a.public_id<>? AND COALESCE(v.enabled,1)=1
-      AND (SELECT COUNT(*) FROM web_mission_supporters x WHERE x.public_id=a.public_id AND x.day_key=?)<6
-  `;
-  const accounts=' FROM rpg_accounts a LEFT JOIN web_random_support_settings v ON v.public_id=a.public_id ';
-  const read=(select,joins='')=>rows(db.prepare(select+accounts+joins+criteria).bind(id,dayAt(now)));
-  let eligible;
-  try{
-   eligible=await read(`SELECT a.public_id,c.sprite,c.color,c.accessory,c.share_image,p.avatar_revision,
-           CASE WHEN c.share_image=1 THEN LENGTH(p.avatar)>0 ELSE 0 END AS has_image`,
-     `LEFT JOIN web_character c ON c.public_id=a.public_id
-      LEFT JOIN web_profiles p ON p.public_id=a.public_id AND c.share_image=1`);
-  }catch(error){
-   if(!String(error.message).includes('no such table: web_character'))throw error;
-   eligible=await read('SELECT a.public_id');
-  }
-  return json({candidates:eligible.flatMap(a=>{
-   const p=players.get(a.public_id);
-   if(!p)return [];
-   const look=a.share_image?{sprite:a.sprite,color:a.color,accessory:a.accessory,
-     image:a.has_image?'api/rpg-character?image='+a.public_id+'&v='+a.avatar_revision:null}:null;
-   return [{name:p.name,level:Number.isSafeInteger(p.level)&&p.level>0?p.level:1,job:p.job||'未設定',look}];
-  }).sort((a,b)=>a.name.localeCompare(b.name,'ja'))});
- }
  let row=await getRow(db,id);const savedRun=await db.prepare('SELECT run_json FROM idle274_runs WHERE public_id=?').bind(id).first();let durableJourney=savedRun?JSON.parse(savedRun.run_json):null;
  if(url.searchParams.get('recovery')==='1'&&request.method==='GET')return json({ok:true,revision:row?.revision??null,csrf:session.csrf,backups:await backupList(db,id)});
- if(request.method==='GET')row=await completeSavedHome(db,id,row,now);
  const claims=await rows(db.prepare("SELECT day_key,kind FROM idle272_claims WHERE public_id=? AND (day_key=? OR kind='birthday')").bind(id,dayAt(now)));
  const withClaims=s=>{if(s.companions)s.companions=s.companions.filter(g=>!g.startsWith('viewer_')||durableJourney?.guests.some(v=>'viewer_'+v.id===g));if(s.questDay!==dayAt(now)){s.questDay=dayAt(now);s.daily={gather:0,win:0,social:0,claimed:[]};}s.celebrations=[...new Set([...s.celebrations,...claims.filter(c=>c.kind==='birthday').map(c=>c.day_key)])];if(s.questDay===dayAt(now))s.daily.claimed=[...new Set([...s.daily.claimed,...claims.filter(c=>c.kind!=='birthday').map(c=>c.kind)])];return s;};
  let allowedViewers=new Set();if(durableJourney){const guests=await rows(db.prepare('SELECT a.public_id FROM rpg_accounts a LEFT JOIN web_random_support_settings s ON s.public_id=a.public_id WHERE a.active=1 AND COALESCE(s.enabled,1)=1'));const active=new Set(guests.map(g=>g.public_id));allowedViewers=active;durableJourney.guests=durableJourney.guests.filter(g=>active.has(g.id));}
@@ -90,17 +46,17 @@ export async function onRequest({request,env}){try{
    if(d.action==='restore'){
     if(d.confirm!=='RESTORE'||!Number.isInteger(d.backupRevision))throw Error('restore_confirm');const b=await db.prepare('SELECT * FROM idle271_backups WHERE public_id=? AND revision=?').bind(id,d.backupRevision).first();if(!b)throw Error('invalid');const restored=valid(JSON.parse(b.state_json)),last=await db.prepare('SELECT MAX(tick) tick FROM idle270_events WHERE public_id=?').bind(id).first();restored.ticks=Math.max(restored.ticks,last?.tick||0);try{const old=valid(JSON.parse(row.state_json));restored.read=[...new Set([...restored.read,...old.read])];restored.choices={...restored.choices,...old.choices};}catch{}row=await save(db,id,row,withClaims({...restored,journey:structuredClone(durableJourney),companions:null}),now,[],d,payloadHash);
    }else{
-    if(!player)throw Error('sync_required');if(d.action==='daily_claim'&&claims.some(c=>c.day_key===dayAt(now)&&c.kind===d.quest))throw Error('already_claimed');const result=settle({...row,state_json:JSON.stringify(withClaims({...decode(row),journey:structuredClone(durableJourney)}))},now,{level:player.level,job:player.job}),s=withClaims(result.s),homeFinished=completeConstruction(s,now);
+    if(!player)throw Error('sync_required');if(d.action==='daily_claim'&&claims.some(c=>c.day_key===dayAt(now)&&c.kind===d.quest))throw Error('already_claimed');const result=settle({...row,state_json:JSON.stringify(withClaims({...decode(row),journey:structuredClone(durableJourney)}))},now,{level:player.level,job:player.job}),s=withClaims(result.s);
     if(d.action==='favorite'&&(!Number.isSafeInteger(d.tick)||d.tick<1||typeof d.favorite!=='boolean'))throw Error('invalid');
     if(d.action==='journey_start'){
  const blockers=await db.prepare('SELECT '+pendingJobSQL+' AS job,'+activeWorkSQL+" AS work, EXISTS(SELECT 1 FROM web_missions m JOIN web_mission_members p ON p.mission_id=m.id WHERE p.public_id=? AND m.status='running') AS mission").bind(id,id,id).first();
  if(blockers.job)throw Error('job_pending');if(blockers.work||blockers.mission)throw Error('journey_active');
- if(!['manual','random'].includes(d.partyMode))throw Error('invalid');let guests=[];if(d.partyMode==='random'){const ids=await pickSupporters({db,id,snapshot},dayAt(now));guests=ids.slice(0,3).map(g=>({id:g,name:snapshot.players.find(x=>x.id===g).name}));}
+ if(!['manual','random'].includes(d.partyMode))throw Error('invalid');let guests=[];if(d.partyMode==='random'){const ids=await pickSupporters({db,id,snapshot},dayAt(now));guests=ids.slice(0,1).map(g=>({id:g,name:snapshot.players.find(x=>x.id===g).name}));}
  const pool=allCompanions(s,ALLIES).filter(a=>a.at<=s.ticks&&!a.id.startsWith('viewer_'));for(let i=pool.length-1;i>0;i--){const n=crypto.getRandomValues(new Uint32Array(1))[0]%(i+1);[pool[i],pool[n]]=[pool[n],pool[i]];}
  const members=d.partyMode==='random'?pool.slice(0,3-guests.length).map(a=>a.id):d.members;if(!Array.isArray(members)||members.length>3||new Set(members).size!==members.length||members.some(g=>!pool.some(a=>a.id===g)))throw Error('party_locked');
  const job=PLAY.jobs.find(j=>j.id===player.job||j.name===player.job)?.id||'warrior';startJourney(s,{...d,job},now,guests);s.companions=[...members,...guests.map(g=>'viewer_'+g.id)];s.partyCustomized=true;result.p.nextCursor=now;
  }else if(d.action==='journey_claim'){if(!s.journey||s.journey.claimed)throw Error('no_journey');s.journey.claimed=true;result.p.nextCursor=now;}else applyAction(s,d,now);
-    if(d.action!=='settle'||result.events.length||result.fiveChanged||homeFinished||JSON.parse(row.state_json).idleVersion!==2)row=await save(db,id,row,s,result.p.nextCursor,result.events,d,payloadHash);
+    if(d.action!=='settle'||result.events.length||result.fiveChanged||JSON.parse(row.state_json).idleVersion!==2)row=await save(db,id,row,s,result.p.nextCursor,result.events,d,payloadHash);
    }
   }
  }

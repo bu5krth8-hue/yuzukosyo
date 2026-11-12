@@ -45,7 +45,7 @@ function renderLayout(){
 }
 async function makePaper(){if(!current?.events?.length){$('paperStatus').textContent='暮らしの記録が届くと新聞を作れます。';return;}if(paperUrl)URL.revokeObjectURL(paperUrl);const canvas=document.createElement('canvas');canvas.width=840;const articles=current.events.slice(0,6),ctx=canvas.getContext('2d'),lines=[];ctx.font='22px sans-serif';for(const a of articles){lines.push(new Date(a.at_ms).toLocaleString('ja-JP',{timeZone:'Asia/Tokyo'}));let line='';for(const ch of (a.shareText||a.text)){if(ctx.measureText(line+ch).width>710){lines.push(line);line='';}line+=ch;}if(line)lines.push(line);lines.push('');}canvas.height=260+lines.length*36;ctx.fillStyle='#fbf7e8';ctx.fillRect(0,0,840,canvas.height);ctx.fillStyle='#244b3d';ctx.font='bold 46px serif';ctx.fillText('柚の世界　旅の新聞',55,92);ctx.font='19px sans-serif';ctx.fillText('保存した暮らしの記録から / '+new Date(current.now).toLocaleDateString('ja-JP',{timeZone:'Asia/Tokyo'}),55,140);ctx.fillRect(55,165,730,2);ctx.font='22px sans-serif';lines.forEach((line,i)=>ctx.fillText(line,60,215+i*36));const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/png'));if(!blob)return;paperUrl=URL.createObjectURL(blob);const image=el('img');image.src=paperUrl;image.alt='記録から作った新聞の保存前プレビュー';$('paperPreview').replaceChildren(image);$('paperDownload').href=paperUrl;$('paperDownload').download='柚の世界_旅の新聞.png';$('paperDownload').hidden=false;$('paperShare').hidden=false;$('paperStatus').textContent='共有する内容を確認してください。アカウント名・ID・ログイン情報は画像に含めません。';}
 async function sharePaper(){if(!paperUrl)return;try{const blob=await(await fetch(paperUrl)).blob(),file=new File([blob],'柚の世界_旅の新聞.png',{type:'image/png'});if(navigator.canShare?.({files:[file]}))await navigator.share({files:[file],title:'柚の世界 旅の新聞'});else $('paperStatus').textContent='このブラウザでは画像を直接共有できません。「画像を保存」して、お好きなアプリに添付してください。';}catch(e){$('paperStatus').textContent=e.name==='AbortError'?'共有をキャンセルしました。':'画像を保存してから、共有先のアプリに添付してください。';}}
-export function releaseTick(now){if(!current)return;const refresh=$('constructionRefresh');if(refresh&&current.state.construction){refresh.hidden=now<current.state.construction.readyAt;refresh.disabled=bridge.isLocked();}const farm=$('farm');if(current.state.farm&&farm){const b=farm.querySelector('button');if(b){b.disabled=bridge.isLocked()||now<current.state.farm.readyAt;b.title=b.disabled?'2時間で収穫できます。':'';}}}
+export function releaseTick(now){if(!current)return;const farm=$('farm');if(current.state.farm&&farm){const b=farm.querySelector('button');if(b){b.disabled=bridge.isLocked()||now<current.state.farm.readyAt;b.title=b.disabled?'2時間で収穫できます。':'';}}}
 
 let livingDraft={};
 function rememberLiving(){for(const [group,ids]of Object.entries({routine:['livingEarly','livingHeal'],exterior:['exteriorStyle','exteriorroof','exteriorwall','exteriordoor'],blueprint:['blueprintName']}))if(drafts.has(group))for(const id of ids){const e=$(id);if(e)livingDraft[id]=e.type==='checkbox'?e.checked:e.value;}}
@@ -57,7 +57,7 @@ function renderLiving(d,b){
  // Preserve typed choices when the periodic snapshot refreshes.
  let routine=oldRoutine;if(!routine){routine=el('div');routine.id='routineForm';const early=checked('早寝・早起きのリズムにする',s.routine.early),heal=checked('けがをしたら療養を優先する',s.routine.autoHeal);early.c.id='livingEarly';heal.c.id='livingHeal';early.c.onchange=heal.c.onchange=()=>drafts.add('routine');routine.append(early.label,heal.label,button('生活リズムを保存',async()=>{await change('routine',{early:early.c.checked,autoHeal:heal.c.checked});drafts.delete('routine');delete livingDraft.livingEarly;delete livingDraft.livingHeal;}));}mind.append(routine);if(!drafts.has('routine')){$('livingEarly').checked=s.routine.early;$('livingHeal').checked=s.routine.autoHeal;}
  const quests=$('livingQuests');quests.replaceChildren(el('h3','今日の暮らしの目標'),el('p','日本時間の1日ごと。達成分だけ受け取れます。報酬は住まい用の木材2・薬草1。','muted'));for(const [key,name,target]of [['gather','資材を採集',3],['win','自動戦闘に勝利',2],['social','街で交流',2]]){const row=el('div',undefined,'quest-row'),p=el('progress');p.max=target;p.value=s.daily[key];p.setAttribute('aria-label',name);const reason=s.daily.claimed.includes(key)?'受け取り済み':s.daily[key]<target?'目標の達成までお待ちください。':'';row.append(el('strong',name+' '+Math.min(target,s.daily[key])+'/'+target),p,button('目標の報酬を受け取る',()=>change('daily_claim',{quest:key}),reason));if(reason)row.append(el('small',reason));quests.append(row);}
- const construction=$('livingBuilding');construction.replaceChildren(el('h3','建築と庭づくり'));if(s.construction){const c=s.construction;const refresh=el('button','完成を反映する');refresh.id='constructionRefresh';refresh.hidden=b.now()<c.readyAt;refresh.onclick=()=>change('settle');construction.append(el('p','建築士が'+(c.kind==='home'?'住まいの増築':d.garden[c.item].name)+'を工事中。'),b.timer(c.startedAt,c.readyAt,b.now(),'工事','construction'),el('p','完成時刻を過ぎると、次の更新で増築が反映されます。','muted'),refresh);}
+ const construction=$('livingBuilding');construction.replaceChildren(el('h3','建築と庭づくり'));if(s.construction){const c=s.construction;construction.append(el('p','建築士が'+(c.kind==='home'?'住まいの増築':d.garden[c.item].name)+'を工事中。'),b.timer(c.startedAt,c.readyAt,b.now(),'工事','construction'),el('p','完成時刻を過ぎた最初の暮らしの精算で完成します。','muted'));}
  const garden=el('div',undefined,'two');for(const [id,v]of Object.entries(d.garden)){const card=el('article',undefined,'subcard'),owned=s.garden.includes(id),why=owned?'建築済み':s.construction?'ほかの工事が完成すると建てられます。':s.wood<v.wood||s.ore<v.ore?'資材が足りません。':'';card.append(el('h4',v.name),el('p','木材'+v.wood+'・鉱石'+v.ore+' / 工事'+v.hours+'時間'),button('庭に建てる',()=>change('construction',{kind:'garden',item:id}),why));if(why)card.append(el('small',why));garden.append(card);}const gd=el('details');gd.append(el('summary','庭の施設を選ぶ（10種類）'),garden);construction.append(gd);
  const exterior=$('livingExterior');let form=$('exteriorForm');if(!form){form=el('div');form.id='exteriorForm';const style=select(Object.entries(d.houseStyles),s.exterior.style);style.id='exteriorStyle';form.append(field('住まいの外観プラン',style));const names=['苔の緑','煉瓦色','空の青','麦の金','藤色','生成り'];for(const [key,name]of [['roof','屋根'],['wall','壁'],['door','扉']]){const c=select(d.dyes.map((color,i)=>[i,names[i]]),s.exterior[key]);c.id='exterior'+key;form.append(field(name+'の色',c));}form.querySelectorAll('select').forEach(c=>c.onchange=()=>drafts.add('exterior'));form.append(button('外観プランを保存',async()=>{await change('exterior',{style:$('exteriorStyle').value,...Object.fromEntries(['roof','wall','door'].map(k=>[k,Number($('exterior'+k).value)]))});drafts.delete('exterior');for(const id of ['exteriorStyle','exteriorroof','exteriorwall','exteriordoor'])delete livingDraft[id];}));}exterior.replaceChildren(el('h3','住まいの外観設計'),el('p','保存した色を設計図に表示します。背景イラストのパーツ変更は開発中です。','muted'),form);
  if(!drafts.has('exterior')){$('exteriorStyle').value=s.exterior.style;for(const k of ['roof','wall','door'])$('exterior'+k).value=s.exterior[k];}
@@ -94,41 +94,10 @@ window.addEventListener('message',e=>{if(e.origin!==location.origin||e.source!==
 
 const shopReason={work_active:'活動を終了・回収すると処理を再開',insufficient_coins:'柚コインが不足',account_disabled:'アカウントの利用停止',sync_required:'配信との同期待ち',job_locked:'職業が未解放'};
 let journeyMode='adventure',journeyPartyMode='random';
-function scoutList(){
- const panel=el('details'), title=el('summary','同行できる視聴者を見る');
- const content=el('div');panel.append(title,content);
- panel.addEventListener('toggle',async()=>{
-  if(!panel.open||panel.dataset.loaded)return;
-  panel.dataset.loaded='1';content.textContent='候補を確認中…';
-  try{
-   const r=await fetch('/api/idle-world?scout=1',{cache:'no-store'});
-   if(!r.ok)throw Error('scout');
-   const {candidates}=await r.json();
-   const search=el('input');search.type='search';search.placeholder='名前・職業で検索';
-   search.setAttribute('aria-label','視聴者の名前・職業を検索');
-   const list=el('div'),more=el('button','さらに表示');let limit=12;
-   const show=()=>{
-    const q=search.value.trim().toLocaleLowerCase('ja');
-    const matches=candidates.filter(c=>(c.name+' '+c.job).toLocaleLowerCase('ja').includes(q));
-    list.replaceChildren(el('p',matches.length+'人・おまかせで最大3人が同行'));
-    for(const c of matches.slice(0,limit)){
-     const card=el('div',undefined,'guest-looks'), icon=c.look?portrait(c.look):sprite(0);
-     const img=icon.matches('img')?icon:icon.querySelector('img');if(img)img.loading='lazy';
-     card.append(icon,el('span',c.name+' ／ Lv.'+c.level+' ／ '+c.job));list.append(card);
-    }
-    more.hidden=matches.length<=limit;
-   };
-   search.oninput=()=>{limit=12;show();};more.onclick=()=>{limit+=12;show();};
-   content.replaceChildren(search,list,more);show();
-  }catch{delete panel.dataset.loaded;content.textContent='候補を取得できませんでした。閉じて開き直してください。';}
- });
- return panel;
-}
 function renderJourney(d,b){const s=d.state,j=s.journey,box=$('journeyPanel');if(!s)return;box.replaceChildren();const labels={adventure:'冒険・エリア踏破',town:'街への貢献・住民の依頼',income:'お金稼ぎ'};
  $('journeyParty').append($('allyList'));$('journeyBattle').append($('battleReport'));
  if(j&&!j.claimed){const full=b.now()>=j.end;box.append(el('h3',labels[j.mode]+(full?'：報酬が満杯です':'に出かけています')),b.timer(j.started,j.end,b.now(),'活動','journey'),el('p',full?'24時間分に達しました。これ以上の報酬は増えません。帰還して受け取ってください。':'途中で帰還して受け取ることもできます。受取後に次の活動を選べます。','mood-line'),el('p','仲間：'+(s.companions||s.party).map(id=>d.allies.find(a=>a.id===id)?.name||'旅の助っ人').join('・')));if(d.guestLooks?.length){const guests=el('div',undefined,'guest-looks');for(const g of d.guestLooks){const card=el('div');card.append(portrait(g.look),el('span',g.name));guests.append(card);}box.append(guests);}const near=el('div',undefined,'reward-near-action'),units=Math.min(288,Math.floor(Math.max(0,Math.min(b.now(),j.end)-j.started)/300000));near.append(el('strong','5分ごとの成果'),b.timer(j.started,j.end,b.now(),'次の成果','reward-step'),el('p',j.mode==='income'?'帰還時の見込み：🪙'+units+'枚・'+Math.floor(units/6)+' EXP':(j.mode==='town'?'追加の木材':'追加の薬草')+'：'+units+'個（通常の活動成果は別）'));box.append(near,b.button('帰還して報酬を受け取る',()=>b.change('journey_claim')));$('journeyMembers').hidden=true;return;}
  $('journeyMembers').hidden=false;const mode=select(Object.entries(labels),journeyMode),party=select([['random','おまかせ編成（NPC・同行ONの視聴者）'],['manual','自分でNPCの仲間を選ぶ']],journeyPartyMode);mode.id='journeyMode';party.id='journeyPartyMode';mode.onchange=()=>journeyMode=mode.value;party.onchange=()=>{journeyPartyMode=party.value;$('journeyMembers').open=party.value==='manual';};box.append(field('① 目的を選ぶ',mode),field('② 仲間を決める',party),el('p','冒険：エリアを踏破して物語を解放。街への貢献：資材と住民の依頼。お金稼ぎ：5分ごとに🪙1枚、30分ごとに1 EXP。冒険は薬草1、街への貢献は木材1を5分ごとに追加。最大24時間、帰還時に受取。','muted'));
- box.append(scoutList());
  const p=d.services.find(x=>x.name==='explore')?.data,w=d.services.find(x=>x.name==='work')?.data,pending=w?.jobPending,blocked=!w||!p||pending||w?.work||p?.missions?.some(m=>m.status==='running');box.append(b.button('仲間と出発する',()=>b.change('journey_start',{mode:mode.value,partyMode:party.value,members:(partyDraft||s.party).filter(id=>!id.startsWith('viewer_'))}),!w||!p?'活動と転職の状態を確認できません。再読み込みしてください。':pending?'転職の反映待ちです。配信側で確定し、同期が完了すると出発できます。':blocked?'以前の仕事・探索の結果を受け取り、仕事を終了すると出発できます。':''));if(pending){const order=p?.commands?.find(c=>c.kind==='shop'&&c.status==='pending'&&!/^title[1-6]$/.test(c.p1)),job=SHOP.jobs.find(j=>j.id===order?.p1)?.name||'転職';box.append(el('p','「'+job+'」の反映待ちです。'+(w?.work?'進行中の仕事を終了・回収すると処理を再開します。':'同期後、自動で出発できる状態に戻ります。'),'mood-line'));if(w?.work){const a=el('a','仕事の終了・回収へ →');a.href='work.html';box.append(a);}}else if(blocked){box.append(el('p','以前の活動が残っています。「街・家族・資料」の仕事詳細／旅の記録から終了・回収してください。','mood-line'));}
  if(j?.claimed)box.append(el('p','前回の帰還：'+Math.floor((j.fiveUnits??j.processed*6)/12)+'時間'+String((j.fiveUnits??j.processed*6)%12*5).padStart(2,'0')+'分。'+(j.mode==='income'?'EXP '+Math.floor((j.fiveUnits??j.processed*6)/6)+'・🪙'+(j.fiveUnits??j.processed*6)+'を既存の仕事報酬として配信へ同期します。':j.mode==='town'?'住民依頼は本日分が未実施の場合だけ、既存の1日1回枠で同期します。':'旅の成果は「旅の思い出」で確認できます。')));
 }
