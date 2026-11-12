@@ -26,7 +26,8 @@ export async function onRequest({request,env}){
   if(!await botAuth(request,env))return json({error:'unauthorized'},401);
   try{
    const a=await aggregate(db);
-   if(request.method==='GET')return new Response('1|'+a.epoch+'|'+a.total+'|'+a.applied,{headers:{'Content-Type':'text/plain; charset=utf-8','Cache-Control':'no-store'}});
+   if(request.method==='GET')return new Response('1|'+a.epoch+'|'+a.total+'|'+a.applied,{headers:{'Content-Type':'text/plain; charset=utf-8','Cache-Control':'no-store',
+    ...(a.total===a.applied?{'X-Town-Support-Drained':'1'}:{})}});
    if(request.method==='POST'){
     if(Number(request.headers.get('Content-Length')||0)>128)return json({error:'large'},413);
     const reader=request.body?.getReader();if(!reader)return json({error:'invalid'},400);let bytes=0,parts=[];
@@ -40,29 +41,6 @@ export async function onRequest({request,env}){
    return json({error:'method'},405);
   }catch{return json({error:'support_storage_unavailable'},503);}
  }
- if(request.method!=='GET'&&request.method!=='POST')return json({error:'method'},405);
- if(typeof env.RPG_TOWN_TOKEN!=='string'||env.RPG_TOWN_TOKEN.length<32)return json({configured:false,error:'secret_not_configured'},503);
- let user=await session(request,env);const today=day();let newCookie;
- if(!user && request.method==='GET'){
-  user={id:random(),csrf:random(),exp:Date.now()+31536000000};
-  newCookie=cookie(COOKIE,await sign(env,user,'browser-support-v1'),31536000);
- }
- try{
-  if(request.method==='POST'){
-   if(!sameOrigin(request))return json({error:'origin'},403);
-   if(!user)return json({error:'cookie_required'},401);
-   if(request.headers.get('X-Town-CSRF')!==user.csrf)return json({error:'csrf'},403);
-   const requestId=request.headers.get('X-Town-Request')||'';
-   if(!/^[A-Za-z0-9_-]{16,80}$/.test(requestId))return json({error:'request_id'},400);
-   // The quota check, slot allocation and insertion are one atomic SQL statement.
-   // A retried HTTP request retains its request ID and never consumes another slot.
-   await db.prepare('INSERT INTO town_support_v2(id,day_key,browser_id,slot,request_key) SELECT (SELECT COALESCE(MAX(id),0)+1 FROM town_support_v2),?,?,(SELECT COALESCE(MAX(slot),0)+1 FROM town_support_v2 WHERE day_key=? AND browser_id=?),? WHERE (SELECT COUNT(*) FROM town_support_v2 WHERE day_key=? AND browser_id=?)<10 ON CONFLICT DO NOTHING').bind(today,user.id,today,user.id,requestId,today,user.id).run();
-  }
-  const all=await aggregate(db),count=await db.prepare('SELECT COUNT(*) AS n FROM town_support_v2 WHERE day_key=?').bind(today).first();
-  const mine=await db.prepare('SELECT COUNT(*) AS n, COALESCE(SUM(CASE WHEN id<=? THEN 1 ELSE 0 END),0) AS applied FROM town_support_v2 WHERE day_key=? AND browser_id=?').bind(all.applied,today,user.id).first();
-  const requestId=request.headers.get('X-Town-Request')||'';
-  const seen=/^[A-Za-z0-9_-]{16,80}$/.test(requestId)?await db.prepare('SELECT id FROM town_support_v2 WHERE day_key=? AND browser_id=? AND request_key=?').bind(today,user.id,requestId).first():null;
-  const response=json({configured:true,day:today,today:count.n,total:all.total,applied:all.applied,pending:all.total-all.applied,mineCount:mine.n,mineApplied:mine.applied,minePending:mine.n-mine.applied,remaining:Math.max(0,10-mine.n),dailyLimit:10,requestSeen:!!seen,xpPerSupport:1,csrf:user.csrf});
-  if(newCookie)response.headers.append('Set-Cookie',newCookie);return response;
- }catch{return json({configured:false,error:'support_storage_unavailable'},503);}
+ if(request.method==='GET')return json({configured:false,retired:true});
+ return json({error:'support_retired'},410);
 }
