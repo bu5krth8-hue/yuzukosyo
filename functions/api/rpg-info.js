@@ -24,7 +24,7 @@ export function validate(d){
 export async function readBody(request,max=MAX){if(Number(request.headers.get('Content-Length')||0)>max)throw Error('large');const reader=request.body?.getReader();if(!reader)throw Error('body');let length=0,chunks=[];for(;;){const {done,value}=await reader.read();if(done)break;length+=value.length;if(length>max){await reader.cancel();throw Error('large');}chunks.push(value);}const bytes=new Uint8Array(length);let i=0;for(const c of chunks){bytes.set(c,i);i+=c.length;}return JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(bytes));}
 export async function onRequest({request,env}){
  if(!env.RPG_TOWN)return json({configured:false,error:'storage_not_configured'},503);
- if(request.method==='GET'){try{const d=await snapshotGet(env,KEY);return json({configured:true,data:d});}catch{return json({error:'storage_unavailable'},503);}}
+ if(request.method==='GET'){try{const d=await snapshotGet(env,KEY);return json({configured:true,data:d?.newspaper?{...d,newspaper:{...d.newspaper,events:d.newspaper.events.map(({featured,...event})=>event)}}:d});}catch{return json({error:'storage_unavailable'},503);}}
  if(request.method!=='POST')return json({error:'method'},405);
  if(!await botAuth(request,env))return json({error:'unauthorized'},401);
  try{const input=await readBody(request),d=validate(input);let identities=null;
@@ -34,7 +34,7 @@ export async function onRequest({request,env}){
   if(identities!==null)records.push(['yuzu_rpg_identity_private_v1',{capturedAt:d.capturedAt,identities}]);
   if(game!==null)records.push(['yuzu_rpg_game_private_v1',{capturedAt:d.capturedAt,players:game}]);
   if(!env.RPG_SUPPORT)return json({error:'storage_not_configured'},503);
-  if(!await storeSnapshot(env.RPG_SUPPORT,records,Date.parse(d.capturedAt)))return json({error:'older_snapshot'},409);
+  if(!await storeSnapshot(env.RPG_SUPPORT,records,Date.parse(d.capturedAt),d.newspaper?.events))return json({error:'older_snapshot'},409);
   return json({ok:true});}
  catch(e){return json({error:e.message==='large'?'too_large':'invalid_or_unavailable'},e.message==='large'?413:503);}
 }

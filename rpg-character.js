@@ -100,6 +100,44 @@ async function api(body) {
   if (!response.ok) throw Error(response.status===401?'login':'network');
   return response.json();
 }
+function renderOutfits(){
+  const slots=byId('outfitSlots');
+  slots.replaceChildren();
+  for(let slot=1;slot<=3;slot++){
+    const outfit=record.outfits?.find(item=>item.slot===slot);
+    const row=document.createElement('p');
+    const name=looks.find(item=>item[0]===outfit?.sprite)?.[1];
+    row.append(document.createTextNode(`衣装${slot}　${name||'未登録'}　`));
+    const wear=document.createElement('button');
+    wear.type='button';wear.textContent='試着';wear.disabled=!outfit;
+    wear.onclick=()=>{
+      if(busy)return;
+      selected=outfit.sprite;
+      fields.color.value=outfit.color;
+      fields.accessory.value=outfit.accessory;
+      renderLooks();draw();
+      byId('outfitStatus').textContent='試着しました。「キャラを保存」で反映できます。画像を設定中の場合は、外見より画像が優先されます。';
+    };
+    const save=document.createElement('button');
+    save.type='button';save.textContent=outfit?'上書き':'登録';
+    save.onclick=async()=>{
+      if(busy||(outfit&&!confirm(`衣装${slot}を上書きしますか？`)))return;
+      busy=true;save.disabled=true;
+      const values=preferences();
+      try{
+        await api({action:'save_outfit',slot,...values});
+        record.outfits=[...(record.outfits||[]).filter(item=>item.slot!==slot),{slot,...values}];
+        renderOutfits();
+        slots.children[slot-1].lastElementChild.focus();
+        byId('outfitStatus').textContent=`衣装${slot}に保存しました。`;
+      }catch{byId('outfitStatus').textContent='衣装を保存できませんでした。もう一度お試しください。';}
+      finally{busy=false;save.disabled=false;}
+    };
+    row.append(wear,' ',save);
+    slots.append(row);
+  }
+}
+
 async function load() {
   record=await api();
   for (const key of ['color','accessory']) fields[key].value=record.look[key];
@@ -107,6 +145,7 @@ async function load() {
   fields.shareImage.checked=record.shareImage;
   fields.publicLook.checked=record.publicLook;
   setAccountLooks(record.id,record.look.sprite);
+  renderOutfits();
   form.hidden=false;
   draw();
 }

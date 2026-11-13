@@ -55,17 +55,23 @@ export async function onRequest({request,env}) {
           'Content-Type':'image/webp','Cache-Control':'private, no-store','X-Content-Type-Options':'nosniff'
         }});
       }
+      const {results:outfits}=await db.prepare('SELECT slot,sprite,color,accessory FROM rpg_character_outfits WHERE public_id=? ORDER BY slot').bind(id).all();
       const row = await db.prepare(characterSQL).bind(id).first();
       const avatar = row || await db.prepare('SELECT public_id,avatar_revision,LENGTH(avatar)>0 AS has_image FROM web_profiles WHERE public_id=?').bind(id).first();
       const legacy = row ? null : await db.prepare(
         "SELECT CASE WHEN json_valid(state_json) THEN json_extract(state_json,'$.appearance.sprite') END AS sprite FROM idle270_state WHERE public_id=?"
       ).bind(id).first();
-      return json({id,saved:!!row,publicLook:!!row?.sprite?.endsWith(':public'),csrf:session.csrf,gender:row?.gender||'unset',shareImage:!!row?.share_image,
+      return json({id,outfits,saved:!!row,publicLook:!!row?.sprite?.endsWith(':public'),csrf:session.csrf,gender:row?.gender||'unset',shareImage:!!row?.share_image,
         look:publicLook({public_id:id,sprite:sprites[legacy?.sprite]||'forest',color:'original',accessory:'none',...avatar})});
     }
     if (request.method !== 'POST') return json({error:'method'},405);
     if (!sameOrigin(request)||request.headers.get('X-RPG-CSRF')!==session.csrf) return json({error:'csrf'},403);
     const d = await readBody(request,140000);
+    if(d.action==='save_outfit'){
+      if(!Number.isInteger(d.slot)||d.slot<1||d.slot>3||!lookIds.has(d.sprite)||!colors.includes(d.color)||!accessories.includes(d.accessory))return json({error:'invalid'},400);
+      await db.prepare('INSERT INTO rpg_character_outfits(public_id,slot,sprite,color,accessory) VALUES(?,?,?,?,?) ON CONFLICT(public_id,slot) DO UPDATE SET sprite=excluded.sprite,color=excluded.color,accessory=excluded.accessory').bind(id,d.slot,d.sprite,d.color,d.accessory).run();
+      return json({ok:true});
+    }
     if (!lookIds.has(d.sprite)||!colors.includes(d.color)||!accessories.includes(d.accessory)||
       !genders.includes(d.gender)||typeof d.shareImage!=='boolean'||(d.publicLook!==undefined&&typeof d.publicLook!=='boolean')||(d.removeImage && d.avatar)) return json({error:'invalid'},400);
     const commands = [db.prepare(

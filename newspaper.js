@@ -1,3 +1,4 @@
+import {portrait} from './rpg-portrait.js?v=295';
 import {setupImageExport} from './newspaper-image.js?v=287';
 
 const $=id=>document.getElementById(id),LABEL={boss:'討伐の知らせ',rescue:'救出の知らせ',town:'街の発展',adventure:'冒険の記録',pvp:'対人戦'};
@@ -15,7 +16,7 @@ function render(){renderNemesis();
  for(const kind of ['boss','rescue','town'])$(kind+'Count').textContent=String(allForDay().filter(e=>e.kind===kind).length);
  const stories=visible();$('saveImage').disabled=stories.length===0;$('articles').replaceChildren();$('copy').disabled=allForDay().length===0;
  if(!stories.length){const empty=element('div',undefined,'empty');empty.append(element('h2',allForDay().length?'該当する記事がありません。':data?'この日の新聞は、まだ白紙です。':'最初の新聞を待っています。'),element('p',allForDay().length?'名前や記事の種類を変えて探してみてください。':'配信で記録された出来事が、発生した順に並びます。'));$('articles').append(empty);}
- for(const e of stories){const article=element('article',undefined,'story'+(e.kind==='boss'||e.kind==='rescue'?' important':'')),body=element('div'),meta=element('div',undefined,'meta'),at=element('time',time(e.at)+' 記録');at.dateTime=new Date(e.at).toISOString();meta.append(element('span',LABEL[e.kind],'tag'),at);body.append(meta,element('h2',e.headline),element('p',e.text));if(e.names.length)body.append(element('p','記事に登場：'+e.names.join('・'),'people'));article.append(body);$('articles').append(article);}
+ for(const e of stories){const article=element('article',undefined,'story'+(e.kind==='boss'||e.kind==='rescue'?' important':'')),body=element('div'),meta=element('div',undefined,'meta'),at=element('time',time(e.at)+' 記録');at.dateTime=new Date(e.at).toISOString();meta.append(element('span',LABEL[e.kind],'tag'),at);body.append(meta,element('h2',e.headline),element('p',e.text));if(e.look){const badge=element('div',undefined,'news-portrait');badge.append(portrait(e.look),element('strong',e.featuredName+' ／ '+{boss:'討伐MVP',rescue:'救助成功',adventure:'遠征で活躍'}[e.kind]));body.append(badge);}if(e.names.length)body.append(element('p','記事に登場：'+e.names.join('・'),'people'));article.append(body);$('articles').append(article);}
  $('status').textContent=failed?'通信を確認できませんでした。前回受信した記録は保持しています。「最新の記録へ」で再試行できます。':captured?`最終同期 ${new Date(captured).toLocaleString('ja-JP',{timeZone:'Asia/Tokyo'})}（日本時間）${Date.now()-captured>600000?' ／ 新しい同期を待っています。':' ／ 出来事は約1分を目安に反映します。'}`:'最初の同期を待っています。';
 }
 async function refresh(force=false){if(busy||document.hidden||(!force&&Date.now()<nextRefresh))return;busy=true;$('refresh').disabled=true;const abort=new AbortController(),timer=setTimeout(()=>abort.abort(),10000);try{const r=await fetch('api/newspaper',{cache:'no-store',signal:abort.signal});if(r.status===429){

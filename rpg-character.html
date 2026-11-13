@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="rpg-world-theme.css?v=284">
 <link rel="stylesheet" href="rpg-guide.css?v=284">
 <link rel="stylesheet" href="rpg-character.css?v=295">
-<script src="rpg-character.js?v=296" type="module"></script>
+<script src="rpg-character.js?v=297" type="module"></script>
 </head>
 <body>
 <header><a href="account.html">← マイページ</a><a href="/idle-world#activities">オート冒険へ →</a></header>
@@ -32,6 +32,9 @@
 </div><p id="lookCount" role="status"></p><div class="look-grid" id="lookGrid"></div>
 <button type="button" id="lookMore" hidden>さらに12種を表示</button>
 </section>
+<section aria-labelledby="outfitTitle"><h2 id="outfitTitle">衣装セット</h2>
+<p>外見・色・アクセサリーを3枠まで保存できます。着替えを反映するには「キャラを保存」を押してください。</p>
+<div id="outfitSlots"></div><p id="outfitStatus" role="status"></p></section>
 <details><summary>自分の画像を使う</summary>
 <label>自分の画像（PNG・JPEG・WebP、10 MBまで）<input name="image" type="file" accept="image/png,image/jpeg,image/webp"></label>
 <p>画像を使うと、冒険中の自分のキャラに表示します。街の住人として画像を公開済みの場合、その住人画像も更新されます。</p>
