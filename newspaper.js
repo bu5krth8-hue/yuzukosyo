@@ -1,12 +1,12 @@
 import {portrait} from './rpg-portrait.js?v=295';
 import {setupImageExport} from './newspaper-image.js?v=287';
 
-const $=id=>document.getElementById(id),LABEL={boss:'討伐の知らせ',rescue:'救出の知らせ',town:'街の発展',adventure:'冒険の記録',pvp:'対人戦'};
+const $=id=>document.getElementById(id),LABEL={boss:'討伐の知らせ',rescue:'救出の知らせ',town:'街の発展',adventure:'冒険の記録',pvp:'対人戦',ranking:'活躍ランキング',attendance:'参加者'};
 const today=()=>new Date(Date.now()+32400000).toISOString().slice(0,10),time=at=>new Date(at).toLocaleTimeString('ja-JP',{timeZone:'Asia/Tokyo',hour:'2-digit',minute:'2-digit'});
 let nemesis=null,data=null,captured=0,busy=false,failed=false,nextRefresh=0,delay=60000,selected=/^\d{4}-\d{2}-\d{2}$/.test(new URLSearchParams(location.search).get('day')||'')?new URLSearchParams(location.search).get('day'):today();
 function element(tag,text,cls){const e=document.createElement(tag);if(text!==undefined)e.textContent=text;if(cls)e.className=cls;return e;}
 function allForDay(){return(data?.events||[]).filter(e=>e.day===selected).sort((a,b)=>a.at-b.at||a.id.localeCompare(b.id));}
-const sections={boss:'ボスモンスター討伐',rescue:'救助',adventure:'冒険',pvp:'対人戦',town:'街の発展'};
+const sections={boss:'ボスモンスター討伐',rescue:'救助',adventure:'冒険',pvp:'対人戦',town:'街の発展',ranking:'今日のMVP・活躍ランキング',attendance:'今日の参加者一覧'};
 function grouped(stories){
   return Object.keys(sections).flatMap(kind=>stories.filter(story=>story.kind===kind));
 }
@@ -28,7 +28,7 @@ function render(){renderNemesis();
     section.append(element('h2',sections[currentKind]+'コーナー','news-section-title'));
     $('articles').append(section);
   }
-const article=element('article',undefined,'story'+(e.kind==='boss'||e.kind==='rescue'?' important':'')),body=element('div'),meta=element('div',undefined,'meta'),at=element('time',time(e.at)+' 記録');at.dateTime=new Date(e.at).toISOString();meta.append(element('span',LABEL[e.kind],'tag'),at);body.append(meta,element('h2',e.headline),element('p',e.text));if(e.look){const badge=element('div',undefined,'news-portrait');badge.append(portrait(e.look),element('strong',e.featuredName+' ／ '+{boss:'討伐MVP',rescue:'救助成功',adventure:'遠征で活躍'}[e.kind]));body.append(badge);}if(e.names.length)body.append(element('p','記事に登場：'+e.names.join('・'),'people'));article.append(body);section.append(article);}
+const article=element('article',undefined,'story'+(e.kind==='boss'||e.kind==='rescue'?' important':'')),body=element('div'),meta=element('div',undefined,'meta'),at=element('time',time(e.at)+' 記録');at.dateTime=new Date(e.at).toISOString();meta.append(element('span',LABEL[e.kind],'tag'),at);body.append(meta,element('h2',e.headline),element('p',e.text));if(e.look){const badge=element('div',undefined,'news-portrait');badge.append(portrait(e.look),element('strong',e.featuredName+' ／ '+{boss:'討伐MVP',rescue:'救助成功',adventure:'遠征で活躍',ranking:'今日の冒険者'}[e.kind]));body.append(badge);}if(e.names.length)body.append(element('p',(e.kind==='attendance'?'':'記事に登場：')+e.names.join('・'),'people'));article.append(body);section.append(article);}
  $('status').textContent=failed?'通信を確認できませんでした。前回受信した記録は保持しています。「最新の記録へ」で再試行できます。':captured?`最終同期 ${new Date(captured).toLocaleString('ja-JP',{timeZone:'Asia/Tokyo'})}（日本時間）${Date.now()-captured>600000?' ／ 新しい同期を待っています。':' ／ 出来事は約1分を目安に反映します。'}`:'最初の同期を待っています。';
 }
 async function refresh(force=false){if(busy||document.hidden||(!force&&Date.now()<nextRefresh))return;busy=true;$('refresh').disabled=true;const abort=new AbortController(),timer=setTimeout(()=>abort.abort(),10000);try{const r=await fetch('api/newspaper',{cache:'no-store',signal:abort.signal});if(r.status===429){
