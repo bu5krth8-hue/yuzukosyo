@@ -2,7 +2,7 @@ const SNAPSHOT_KEYS = new Set([
   'yuzu_town_public_v1',
   'yuzu_rpg_public_v1',
   'yuzu_rpg_identity_private_v1',
-  'yuzu_rpg_game_private_v1'
+  'yuzu_rpg_game_private_v1', 'yuzu_rpg_bonds_private_v307'
 ]);
 
 export async function snapshotGet(env, key) {

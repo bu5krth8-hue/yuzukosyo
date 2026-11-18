@@ -1,3 +1,4 @@
+import {validateBonds} from './rpg-bonds.js';
 import {snapshotGet,storeSnapshot} from './rpg-snapshot.js';
 import {validateNemesis} from './nemesis.js';
 import {validateNewspaper} from './newspaper.js';
@@ -33,6 +34,12 @@ export async function onRequest({request,env}){
   const old=await snapshotGet(env,KEY);if(old&&Date.parse(old.capturedAt)>Date.parse(d.capturedAt))return json({error:'older_snapshot'},409);if(input.nemesis===undefined&&old?.nemesis)d.nemesis=old.nemesis;if(input.newspaper===undefined&&old?.newspaper)d.newspaper=old.newspaper;const records=[[KEY,d]];
   if(identities!==null)records.push(['yuzu_rpg_identity_private_v1',{capturedAt:d.capturedAt,identities}]);
   if(game!==null)records.push(['yuzu_rpg_game_private_v1',{capturedAt:d.capturedAt,players:game}]);
+  if(input.privateBonds!==undefined){
+    const pairs=validateBonds(input.privateBonds);
+    const previous=await snapshotGet(env,'yuzu_rpg_bonds_private_v307');
+    if(JSON.stringify(previous?.pairs)!==JSON.stringify(pairs))
+      records.push(['yuzu_rpg_bonds_private_v307',{capturedAt:d.capturedAt,pairs}]);
+  }
   if(!env.RPG_SUPPORT)return json({error:'storage_not_configured'},503);
   if(!await storeSnapshot(env.RPG_SUPPORT,records,Date.parse(d.capturedAt),d.newspaper?.events))return json({error:'older_snapshot'},409);
   return json({ok:true});}
