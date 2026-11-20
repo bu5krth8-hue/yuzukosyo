@@ -1,1 +1,1 @@
-export {STEP,CAP,upgrade,fresh,valid,projection,settle,battle,unlockedChapter} from './idle-simulation.js';
+export {STEP,CAP,upgrade,fresh,valid,projection,settle,battle} from './idle-simulation.js';

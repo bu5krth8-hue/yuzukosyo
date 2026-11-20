@@ -1,6 +1,6 @@
 // Personal life only. No writes to shared EXP, coins, marriage or town materials.
 export const PERSONALITIES={courage:'勇気',care:'慎重さ',social:'社交性',curiosity:'好奇心',confidence:'自信',calm:'安心'};
-export const GARDEN={flower:{name:'季節の花壇',wood:4,ore:0,hours:1},pond:{name:'小さな池',wood:8,ore:5,hours:2},orchard:{name:'果樹',wood:6,ore:0,hours:2},fence:{name:'木の柵',wood:8,ore:1,hours:1},bench:{name:'庭のベンチ',wood:5,ore:1,hours:1},well:{name:'井戸',wood:4,ore:8,hours:3},shed:{name:'物置小屋',wood:12,ore:4,hours:4},petHouse:{name:'猫の家',wood:6,ore:2,hours:2},streetLamp:{name:'庭の街灯',wood:4,ore:4,hours:2},kitchen:{name:'屋外の台所',wood:10,ore:6,hours:3}};
+export const GARDEN={flower:{name:'季節の花壇',wood:4,ore:0,hours:1},pond:{name:'小さな池',wood:8,ore:5,hours:2},orchard:{name:'果樹',wood:6,ore:0,hours:2},fence:{name:'木の柵',wood:8,ore:1,hours:1},bench:{name:'庭のベンチ',wood:5,ore:1,hours:1},well:{name:'井戸',wood:4,ore:8,hours:3},shed:{name:'物置小屋',wood:12,ore:4,hours:4},petHouse:{name:'猫の家',wood:6,ore:2,hours:2},streetLamp:{name:'庭の街灯',wood:4,ore:4,hours:2},kitchen:{name:'屋外の台所',wood:10,ore:6,hours:3},path:{name:'石畳の小道',wood:3,ore:6,hours:1},tree:{name:'庭木',wood:6,ore:1,hours:2},fountain:{name:'小さな噴水',wood:6,ore:12,hours:3},ornament:{name:'柚の庭飾り',wood:5,ore:5,hours:2}};
 export const HOUSE_STYLES={cottage:'森のコテージ',stone:'石造りの家',town:'街角の住まい'};
 export const DYES=['#5f7758','#b57558','#567d9e','#b5924b','#88739d','#e1d7bd'];
 const cap=n=>Math.max(0,Math.min(100,n));
@@ -72,7 +72,6 @@ export function livingAction(s,d,now){
   else if(d.kind==='garden'&&GARDEN[d.item]){if(s.garden.includes(d.item))throw Error('already_owned');({wood,ore,hours}=GARDEN[d.item]);}else throw Error('invalid');
   if(s.wood<wood||s.ore<ore)throw Error('materials');s.wood-=wood;s.ore-=ore;s.construction={kind:d.kind,item:d.item||'',to:s.home+1,startedAt:now,readyAt:now+hours*3600000};
  }
- else if(d.action==='daily_claim'){const targets={gather:3,win:2,social:2},key=d.quest;if(!Object.hasOwn(targets,key)||s.daily[key]<targets[key])throw Error('quest_incomplete');if(s.daily.claimed.includes(key))throw Error('already_claimed');s.daily.claimed.push(key);s.wood+=2;s.supplies.herb++;}
  else if(d.action==='blueprint_save'){if(typeof d.name!=='string'||[...d.name.trim()].length<1||[...d.name.trim()].length>16||/[\u0000-\u001f<>]/.test(d.name))throw Error('invalid');const name=d.name.trim(),b={name,items:structuredClone(s.layout)};const i=s.blueprints.findIndex(x=>x.name===name);if(i<0){if(s.blueprints.length>=5)throw Error('blueprint_limit');s.blueprints.push(b);}else s.blueprints[i]=b;}
  else if(d.action==='blueprint_load'){const b=s.blueprints.find(x=>x.name===d.name);if(!b)throw Error('invalid');if(b.items.some(p=>!s.furniture.includes(p.id)))throw Error('materials');s.layout=structuredClone(b.items);}
  else return false;
