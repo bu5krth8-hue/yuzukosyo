@@ -12,12 +12,12 @@ import {readBody} from '../api/rpg-info.js';
 import {onRequest as play} from '../api/rpg-play.js';
 import {onRequest as work} from '../api/rpg-work.js';
 import {onRequest as life} from '../api/rpg-life.js';
-import {CHAPTERS,FOCUS,FRIENDS} from './idle-story.js';
-import {ALLIES,ROUTES,RECIPES,MATERIALS,SKILLS,weatherAt} from './idle-content.js';
-import {fresh,valid,projection,settle,unlockedChapter,STEP,CAP} from './idle-engine.js';
+import {FOCUS,FRIENDS} from './idle-activity-config.js';
+import {ALLIES,ROUTES,MATERIALS,weatherAt} from './idle-content.js';
+import {fresh,valid,projection,settle,STEP,CAP} from './idle-engine.js';
 import {getRow,rows,save} from './idle-store.js';
 import {applyAction} from './idle-actions.js';
-const allowed=['begin','settle','settings','build','read','favorite','party','life_settings','layout','craft','plant','harvest','pet_name','restore','routine','companions','exterior','interior','construction','daily_claim','blueprint_save','blueprint_load','journey_start','journey_claim'];
+const allowed=['begin','settle','settings','build','favorite','party','layout','pet_name','restore','routine','companions','exterior','interior','construction','blueprint_save','blueprint_load','journey_start','journey_claim'];
 const known=['owner_only','login_required','not_configured','disabled','invalid','begin_first','conflict','materials','max_home','already_owned','locked_chapter','choice_saved','save_invalid','clock_conflict','party_locked','layout_invalid','recipe_locked','gear_max','farm_busy','not_ready','request_conflict','restore_confirm','sync_required','client_version','construction_busy','party_limit','quest_incomplete','already_claimed','blueprint_limit','journey_active','no_journey','job_pending'];
 async function synced(fn,request,env,body){const url=new URL(request.url);url.pathname='/api/'+(fn===play?'rpg-play':fn===work?'rpg-work':'rpg-life');url.search='';const headers=new Headers(request.headers);headers.delete('Content-Length');return fn({env,request:new Request(url,{method:body?'POST':'GET',headers,...(body?{body:JSON.stringify(body)}:{})})});}
 function decode(row){try{return valid(JSON.parse(row.state_json));}catch{throw Error('save_invalid');}}
@@ -43,7 +43,7 @@ export async function onRequest({request,env}){try{
  if(!['GET','POST'].includes(request.method))return json({error:'method'},405);
  const session=await idleSession(request,env),id=session.public_id,db=env.RPG_SUPPORT,now=Date.now(),url=new URL(request.url);
  if(env.RPG_IDLE_ENABLED==='0')return json({error:'disabled'},503);
- if(url.searchParams.get('access')==='1'&&request.method==='GET')return json({ok:true,private:false,release:275});
+ if(url.searchParams.get('access')==='1'&&request.method==='GET')return json({ok:true,private:false,release:308});
  if(request.method==='POST'&&(!sameOrigin(request)||request.headers.get('X-RPG-CSRF')!==session.csrf))return json({error:'csrf'},403);
  if(url.searchParams.get('scout')==='1'&&request.method==='GET'){
   const snapshot=await snapshotGet(env,'yuzu_rpg_public_v1');
@@ -114,5 +114,5 @@ export async function onRequest({request,env}){try{
  for(const e of events){try{e.detail=JSON.parse(e.detail_json);}catch{e.detail={};}delete e.detail_json;e.shareText=e.text;const names=(e.detail.joinedIds||[]).filter(g=>allowedViewers.has(g)).map(g=>snapshot?.players?.find(p=>p.id===g)?.name).filter(Boolean);if(names.length)e.text+=' 同行：'+names.join('・')+'。';}
  const character=await characterLook(db,id);
  const guestLooks=await Promise.all((durableJourney?.guests||[]).map(async guest=>({name:guest.name,look:await characterLook(db,guest.id,true)})));
- return json({ok:true,private:false,release:275,character,guestLooks:guestLooks.filter(g=>g.look),now,csrf:session.csrf,step:STEP,cap:CAP,revision:row?.revision??null,cursor:row?.cursor_ms??null,state:s,pending:row?projection(row,Math.max(row.cursor_ms,Math.min(now,s?.journey&&!s.journey.claimed?s.journey.end:row.cursor_ms))):null,focus:FOCUS,friends:FRIENDS,allies:s?allCompanions(s,ALLIES):ALLIES,garden:GARDEN,houseStyles:HOUSE_STYLES,dyes:DYES,personalities:PERSONALITIES,routes:ROUTES,recipes:RECIPES,materials:MATERIALS,skills:SKILLS,weather:weatherAt(now),backups:await backupList(db,id),town:await snapshotGet(env,'yuzu_town_public_v1'),chapters:s?CHAPTERS.map((c,i)=>{const unlocked=unlockedChapter(s,c,i),boss=Math.floor(i/2);return {id:i,title:c.title,at:c.at,unlocked,reason:!s.cleared.includes(boss)?ROUTES[boss].name+'を踏破すると読めます':'',...(unlocked?{text:c.text,speaker:c.speaker,choice:c.choice,read:s.read.includes(i),selected:s.choices[i]}:{})};}):[],events,services});
+ return json({ok:true,private:false,release:308,character,guestLooks:guestLooks.filter(g=>g.look),now,csrf:session.csrf,step:STEP,cap:CAP,revision:row?.revision??null,cursor:row?.cursor_ms??null,state:s,pending:row?projection(row,Math.max(row.cursor_ms,Math.min(now,s?.journey&&!s.journey.claimed?s.journey.end:row.cursor_ms))):null,focus:FOCUS,friends:FRIENDS,allies:s?allCompanions(s,ALLIES):ALLIES,garden:GARDEN,houseStyles:HOUSE_STYLES,dyes:DYES,routes:ROUTES,materials:MATERIALS,weather:weatherAt(now),backups:await backupList(db,id),town:await snapshotGet(env,'yuzu_town_public_v1'),events,services});
  }catch(e){const m=e.message;return json({error:known.includes(m)?m:'idle_unavailable'},m==='owner_only'?403:m==='login_required'?401:!known.includes(m)||['not_configured','disabled','save_invalid','sync_required'].includes(m)?503:409);}}
