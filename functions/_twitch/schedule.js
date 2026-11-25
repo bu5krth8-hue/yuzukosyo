@@ -1,4 +1,6 @@
 export const lookahead = 14 * 86400_000;
+export const snapshotHeartbeat = 40 * 60_000;
+const snapshotMaxAge = 65 * 60_000;
 const tai = 'https://api.twitch.tv/helix/schedule';
 const day = 86400_000;
 
@@ -84,7 +86,13 @@ export async function getSharedSchedule(db, now) {
   if (!db) return null;
   try {
     const row = await db.prepare('SELECT payload FROM twitch_schedule_snapshot WHERE singleton = 1').first();
-    if (row) return websiteSchedule(JSON.parse(row.payload), now);
+    if (row) {
+      const snapshot = JSON.parse(row.payload);
+      if (Array.isArray(snapshot.items) && Number.isFinite(snapshot.checkedAt) &&
+          snapshot.checkedAt <= now && now - snapshot.checkedAt < snapshotMaxAge) {
+        return websiteSchedule(snapshot.items, now);
+      }
+    }
   } catch {
     // Before migration or during a D1 outage, the page uses its existing Twitch flow.
   }

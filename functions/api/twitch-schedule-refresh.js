@@ -1,4 +1,4 @@
-import { lookahead, readSchedule, twitchToken, twitchUser } from '../_twitch/schedule.js';
+import { lookahead, readSchedule, snapshotHeartbeat, twitchToken, twitchUser } from '../_twitch/schedule.js';
 
 function json(data, status = 200) {
   return Response.json(data, {status, headers: {'Cache-Control': 'no-store'}});
@@ -39,9 +39,13 @@ export async function onRequest({request, env}) {
     if (user?.login !== login || !/^\d+$/.test(user.id)) return json({error: 'twitch_user_failed'}, 502);
     const items = await readSchedule(headers, user.id, login, now, rows.results.map(row => row.segment_id));
     // Include currently running segments and keep a small cushion for the site's top-five list.
-    const snapshot = JSON.stringify(items.filter(item => !item.canceled && (item.end ?? item.start) > now).slice(0, 25));
+    const visible = items.filter(item => !item.canceled && (item.end ?? item.start) > now).slice(0, 25);
     const old = await env.RPG_SUPPORT.prepare('SELECT payload FROM twitch_schedule_snapshot WHERE singleton = 1').first();
-    if (old?.payload !== snapshot) {
+    let previous;
+    try { previous = JSON.parse(old?.payload || 'null'); } catch {}
+    if (!Number.isFinite(previous?.checkedAt) || previous.checkedAt > now ||
+        now - previous.checkedAt >= snapshotHeartbeat || JSON.stringify(previous.items) !== JSON.stringify(visible)) {
+      const snapshot = JSON.stringify({checkedAt: now, items: visible});
       await env.RPG_SUPPORT.prepare(
         'INSERT INTO twitch_schedule_snapshot (singleton, payload) VALUES (1, ?) ON CONFLICT(singleton) DO UPDATE SET payload = excluded.payload'
       ).bind(snapshot).run();

@@ -1,11 +1,11 @@
-import {getSharedSchedule, twitchToken, twitchUser} from "../_twitch/schedule.js";
+import {getSharedSchedule, readSchedule, twitchToken, twitchUser, websiteSchedule} from "../_twitch/schedule.js";
 
 export async function onRequest(context) {
  const env = context.env || {};
 
  const CLIENT_ID = String(env.TWITCH_CLIENT_ID || "").trim();
  const CLIENT_SECRET = String(env.TWITCH_CLIENT_SECRET || "").trim();
- const CHANNEL_LOGIN = String(env.TWITCH_CHANNEL_LOGIN || "yuzukosyo07").trim();
+ const CHANNEL_LOGIN = String(env.TWITCH_CHANNEL_LOGIN || "yuzukosyo07").trim().toLowerCase();
 
  if (!CLIENT_ID || !CLIENT_SECRET) {
   return json({
@@ -132,55 +132,14 @@ export async function onRequest(context) {
   let scheduleMessage = "配信予定を取得しました";
   let schedule = shared ?? [];
 
-  if (shared === null) try {
-   const scheduleResponse = await fetch(
-    `https://api.twitch.tv/helix/schedule?broadcaster_id=${encodeURIComponent(user.id)}&first=10`,
-    {
-     cache: "no-store",
-     headers: commonHeaders
-    }
-   );
-
-   if (scheduleResponse.ok) {
-    const scheduleData = await scheduleResponse.json();
-
-    const segments =
-     scheduleData.data &&
-     Array.isArray(scheduleData.data.segments)
-      ? scheduleData.data.segments
-      : [];
-
-    const now = new Date();
-
-    schedule = segments
-     .filter((segment) => {
-      if (segment.canceled_until) return false;
-
-      const endTime = segment.end_time
-       ? new Date(segment.end_time)
-       : null;
-
-      if (endTime && endTime < now) return false;
-
-      return true;
-     })
-     .slice(0, 5)
-     .map((segment) => ({
-      startTime: segment.start_time || "",
-      endTime: segment.end_time || "",
-      title: segment.title || "配信予定",
-      category:
-       segment.category && segment.category.name
-        ? segment.category.name
-        : "カテゴリ未設定"
-     }));
-   } else {
+  if (shared === null) {
+   try {
+    const now = Date.now();
+    schedule = websiteSchedule(await readSchedule(commonHeaders, user.id, CHANNEL_LOGIN, now), now);
+   } catch {
     scheduleConfigured = false;
     scheduleMessage = "スケジュール取得失敗";
    }
-  } catch (scheduleError) {
-   scheduleConfigured = false;
-   scheduleMessage = "スケジュール取得例外";
   }
 
   return json({
