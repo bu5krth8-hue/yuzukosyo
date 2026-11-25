@@ -1,3 +1,5 @@
+import {getSharedSchedule, twitchToken, twitchUser} from "../_twitch/schedule.js";
+
 export async function onRequest(context) {
  const env = context.env || {};
 
@@ -22,18 +24,7 @@ export async function onRequest(context) {
  }
 
  try {
-  const tokenResponse = await fetch("https://id.twitch.tv/oauth2/token", {
-   method: "POST",
-   cache: "no-store",
-   headers: {
-    "Content-Type": "application/x-www-form-urlencoded"
-   },
-   body: new URLSearchParams({
-    client_id: CLIENT_ID,
-    client_secret: CLIENT_SECRET,
-    grant_type: "client_credentials"
-   })
-  });
+  const tokenResponse = await twitchToken(CLIENT_ID, CLIENT_SECRET);
 
   if (!tokenResponse.ok) {
    const text = await tokenResponse.text();
@@ -76,41 +67,39 @@ export async function onRequest(context) {
    "Authorization": `Bearer ${accessToken}`
   };
 
-  const userResponse = await fetch(
-   `https://api.twitch.tv/helix/users?login=${encodeURIComponent(CHANNEL_LOGIN)}`,
-   {
-    cache: "no-store",
-    headers: commonHeaders
+  const shared = env.TWITCH_USE_SHARED_SCHEDULE === "1" ? await getSharedSchedule(env.RPG_SUPPORT, Date.now()) : null;
+  let user;
+  if (shared === null) {
+   const userResponse = await twitchUser(commonHeaders, CHANNEL_LOGIN);
+
+   if (!userResponse.ok) {
+    const text = await userResponse.text();
+
+    return json({
+     configured: true,
+     isLive: false,
+     stream: null,
+     scheduleConfigured: false,
+     schedule: [],
+     scheduleMessage: "Twitchユーザー取得エラー",
+     error: `Twitch user error: ${userResponse.status} ${text}`
+    });
    }
-  );
 
-  if (!userResponse.ok) {
-   const text = await userResponse.text();
+   const userData = await userResponse.json();
+   user = userData.data && userData.data[0];
 
-   return json({
-    configured: true,
-    isLive: false,
-    stream: null,
-    scheduleConfigured: false,
-    schedule: [],
-    scheduleMessage: "Twitchユーザー取得エラー",
-    error: `Twitch user error: ${userResponse.status} ${text}`
-   });
-  }
-
-  const userData = await userResponse.json();
-  const user = userData.data && userData.data[0];
-
-  if (!user) {
-   return json({
-    configured: true,
-    channel: CHANNEL_LOGIN,
-    isLive: false,
-    stream: null,
-    scheduleConfigured: false,
-    schedule: [],
-    scheduleMessage: "Twitchユーザーが見つかりません"
-   });
+   if (!user) {
+    return json({
+     configured: true,
+     channel: CHANNEL_LOGIN,
+     isLive: false,
+     stream: null,
+     scheduleConfigured: false,
+     schedule: [],
+     scheduleMessage: "Twitchユーザーが見つかりません"
+    });
+   }
   }
 
   const liveResponse = await fetch(
@@ -141,9 +130,9 @@ export async function onRequest(context) {
 
   let scheduleConfigured = true;
   let scheduleMessage = "配信予定を取得しました";
-  let schedule = [];
+  let schedule = shared ?? [];
 
-  try {
+  if (shared === null) try {
    const scheduleResponse = await fetch(
     `https://api.twitch.tv/helix/schedule?broadcaster_id=${encodeURIComponent(user.id)}&first=10`,
     {
